@@ -7,34 +7,33 @@ export const Header: React.FC = () => {
 
     return (
         <header className="sticky top-0 z-40 flex items-center justify-between px-md py-sm bg-bg border-b border-border">
-            {/* Logo + Nav */}
-            <div className="flex items-center gap-xl">
-                <NavLink to="/" className="no-underline">
-                    <img src="/logo.png" alt="Agora-X Logo" className="h-8" />
-                </NavLink>
+            {/* Logo */}
+            <NavLink to="/" className="no-underline">
+                <img src="/logo.png" alt="Agora-X Logo" className="h-8" />
+            </NavLink>
 
-                <nav className="flex gap-lg">
-                    {[
-                        { to: '/', label: '홈' },
-                        { to: '/community', label: '커뮤니티' },
-                        { to: '/ai-discussion', label: 'AI와의 토론' },
-                        { to: '/guide', label: '이용 가이드' },
-                    ].map(({ to, label }) => (
-                        <NavLink
-                            key={to}
-                            to={to}
-                            end={to === '/'}
-                            className={({ isActive }) =>
-                                isActive
-                                    ? 'text-sm font-bold text-primary no-underline'
-                                    : 'text-sm font-medium text-text-secondary no-underline hover:text-primary transition-colors duration-200'
-                            }
-                        >
-                            {label}
-                        </NavLink>
-                    ))}
-                </nav>
-            </div>
+            {/* Nav */}
+            <nav className="flex gap-lg">
+                {[
+                    { to: '/', label: '홈' },
+                    { to: '/community', label: '커뮤니티' },
+                    { to: '/ai-discussion', label: 'AI와의 토론' },
+                    { to: '/guide', label: '이용 가이드' },
+                ].map(({ to, label }) => (
+                    <NavLink
+                        key={to}
+                        to={to}
+                        end={to === '/'}
+                        className={({ isActive }) =>
+                            isActive
+                                ? 'text-sm font-bold text-primary no-underline'
+                                : 'text-sm font-medium text-text-secondary no-underline hover:text-primary transition-colors duration-200'
+                        }
+                    >
+                        {label}
+                    </NavLink>
+                ))}
+            </nav>
 
             {/* Auth */}
             <div className="flex items-center">

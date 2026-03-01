@@ -262,7 +262,7 @@ agora-x/
 |     |
 │     ├── components/  
 │     │     ├── layout/
-│     │     │     ├── BottomNavigation.tsx
+│     │     │     ├── Footer.tsx
 │     │     │     ├── Header.tsx
 │     │     │     └── MainLayout.tsx
 │     │     │
