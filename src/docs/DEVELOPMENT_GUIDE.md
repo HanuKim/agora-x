@@ -291,8 +291,7 @@ agora-x/
 │     │     |     |     └── useAuth.ts
 │     │     |     └── index.ts      (barrel — re-exports components/auth/* 포함)
 │     │     |        
-│     │     └── news/
-│     │            └── NewsList.tsx          
+│     │     └── news/     
 │     |
 │     ├── lib/
 │     │     └── claude.ts
