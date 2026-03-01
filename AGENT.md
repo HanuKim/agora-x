@@ -82,19 +82,63 @@ Pages are layout ONLY.
 
 ---
 
-## ✅ COMPONENT RESPONSIBILITY
+## ✅ FOLDER RESPONSIBILITY (STRICT)
 
-### Pages
+Each folder has a single responsibility. Violating these boundaries = INVALID OUTPUT.
 
-Routing + Layout only
+### `features/`
+**Business logic ONLY.**
 
-### Features
+✅ Allowed:
+- React Context & Providers (state management)
+- Custom hooks (`useXxx.ts`)
+- Types and interfaces
+- Service calls / API adapters
+- Barrel `index.ts` for public API surface
 
-Business logic
+❌ Forbidden:
+- Page-level layouts (`min-h-screen`, page containers)
+- Standalone renderable page components
+- UI-only presentational components with no logic
 
-### UI Components
+### `components/`
+**Reusable UI ONLY.**
 
-Pure presentation only
+✅ Allowed:
+- `components/ui/` — primitive, logic-free UI (Button, Card, Input)
+- `components/layout/` — structural shells (Header, Footer, MainLayout)
+- `components/auth/` — domain UI components that render auth-related UI (LoginModal, ProtectedRoute)
+- Props-driven, stateless or lightly stateful components
+
+❌ Forbidden:
+- Direct API calls or fetch inside components
+- Context Provider definitions
+- Business-rule logic
+
+### `pages/`
+**Route-level views ONLY.**
+
+✅ Allowed:
+- Page layout composition (assembles feature components + UI components)
+- Page-specific layout wrappers (`min-h-screen`, hero sections, etc.)
+- One-off elements that are not reused elsewhere
+- Calling hooks from `features/` for data
+
+❌ Forbidden:
+- Inline styles
+- Direct business logic
+- Components that should be reused in other pages (extract to `components/`)
+
+---
+
+### Data flow
+```
+features/ (hooks + context)
+  ↓
+pages/ (assemble layout)
+  ↓ uses ↓
+components/ (render UI)
+```
 
 ## ✅ DESIGN SYSTEM LOCK
 

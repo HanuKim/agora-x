@@ -260,12 +260,14 @@ agora-x/
 │     ├── assets/
 │     │     └── images/
 |     |
-│     ├── components/  
+│     ├── components/
+│     │     ├── auth/               ← 도메인 UI 컴포넌트
+│     │     │     ├── LoginModal.tsx
+│     │     │     └── ProtectedRoute.tsx
 │     │     ├── layout/
 │     │     │     ├── Footer.tsx
 │     │     │     ├── Header.tsx
 │     │     │     └── MainLayout.tsx
-│     │     │
 │     │     └── ui/
 │     │           ├── Button.tsx
 │     │           ├── Card.tsx
@@ -280,33 +282,28 @@ agora-x/
 │     |     
 │     ├── docs/
 │     │     └── DEVELOPMENT_GUIDE.md
-|     |
+│     |
 │     ├── features/
-│     │     ├── auth/
-│     │     |     ├── components/
-│     │     |     |     ├── LoginModal.tsx
-│     │     |     |     └── ProtectedRoute.tsx
+│     │     ├── auth/               ← 비즈니스 로직만
 │     │     |     ├── context/
 │     │     |     |     └── AuthContext.tsx
 │     │     |     ├── hooks/
 │     │     |     |     └── useAuth.ts
-│     │     |     ├── index.ts
-│     │     |     └── SocialLogin.tsx
+│     │     |     └── index.ts      (barrel — re-exports components/auth/* 포함)
 │     │     |        
-│     │     |      
 │     │     └── news/
 │     │            └── NewsList.tsx          
 │     |
 │     ├── lib/
 │     │     └── claude.ts
 │     |
-│     ├── pages/
+│     ├── pages/                    ← 라우트 단위 뷰
 │     │     ├── Community.tsx
 │     │     ├── Detail.tsx
 │     │     ├── DiscussionAI.tsx
 │     │     ├── Guide.tsx
 │     │     ├── Home.tsx
-│     │     └── Login.tsx
+│     │     ├── Login.tsx
 │     │     └── Profile.tsx
 │     |
 |     └── services/
@@ -319,6 +316,32 @@ agora-x/
 └── main.tsx
 
 ```
+
+---
+
+## ✅ Folder Responsibility Rules
+
+각 폴더는 단일 책임을 가집니다. 경계를 벗어나면 아키텍처 위반입니다.
+
+| 폴더 | 역할 | 포함 O | 포함 X |
+|---|---|---|---|
+| `features/` | 비즈니스 로직 | Context, hooks, types, service adapters, barrel index | 페이지 레이아웃, 순수 UI 컴포넌트 |
+| `components/ui/` | 기본 UI 프리미티브 | Button, Card, Input 등 로직 없는 컴포넌트 | API 호출, Context 정의 |
+| `components/layout/` | 구조 쉘 | Header, Footer, MainLayout | 비즈니스 로직 |
+| `components/auth/` | 도메인 UI | LoginModal, ProtectedRoute (auth 관련 UI) | Context Provider 정의 |
+| `pages/` | 라우트 뷰 | 컴포넌트 조합, 페이지 레이아웃, hook 호출 | 인라인 스타일, 직접 비즈니스 로직 |
+
+### 데이터 흐름
+```
+features/ (hooks + context)
+  ↓
+pages/ (레이아웃 조합)
+  ↓ 사용 ↓
+components/ (UI 렌더링)
+```
+
+> **Note:** `features/auth/index.ts`는 barrel로, `components/auth/`의 UI 컴포넌트를
+> re-export합니다. 외부에서는 항상 `import { … } from '../features/auth'`로 접근하세요.
 
 ---
 

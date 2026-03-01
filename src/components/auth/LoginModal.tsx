@@ -1,8 +1,8 @@
 import React from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
-import { Button } from '../../../components/ui/Button';
-import { Card } from '../../../components/ui/Card';
-import { useAuth } from '../hooks/useAuth';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { useAuth } from '../../features/auth/hooks/useAuth';
 
 declare global {
     interface Window {
