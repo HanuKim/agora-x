@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K-Agora: Future Democracy Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- React Router -->
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round" rel="stylesheet"/>
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#FF7A00", 
+              "primary-dark": "#e66e00",
+              secondary: "#2563EB",
+              "background-light": "#F8F9FA", 
+              "background-dark": "#1A1D21", 
+              "card-light": "#FFFFFF",
+              "card-dark": "#2B2E34", 
+              "text-light": "#2B2E34",
+              "text-dark": "#E5E7EB",
+              "surface-light": "#FFFFFF",
+              "surface-dark": "#292524",
+              "neutral-border-light": "#E7E5E4",
+              "neutral-border-dark": "#44403C",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "Pretendard", "sans-serif"],
+              sans: ["Pretendard", "Noto Sans KR", "Inter", "sans-serif"],
+              body: ["Noto Sans KR", "Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.75rem",
+              'xl': "1rem",
+              '2xl': "1.5rem",
+              '3xl': "2rem",
+            },
+            boxShadow: {
+                'neo': '4px 4px 0px 0px rgba(0,0,0,1)',
+                'neo-dark': '4px 4px 0px 0px rgba(255,255,255,0.2)',
+                'neo-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
+                'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                'glow': '0 0 15px rgba(217, 119, 6, 0.3)',
+            }
+          },
+        },
+      };
+    </script>
+    <style>
+        .hide-scroll::-webkit-scrollbar, .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll, .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            word-break: keep-all;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 20px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Common Components ---
+
+        const NavigationOverlay = () => {
+            const navigate = useNavigate();
+            const location = useLocation();
+            
+            return (
+                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] bg-black/80 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl flex gap-6 border border-white/10">
+                    <button 
+                        onClick={() => navigate('/')} 
+                        className={`flex flex-col items-center gap-1 hover:text-primary transition-colors ${location.pathname === '/' ? 'text-primary' : 'text-gray-400'}`}
+                    >
+                        <span className="material-icons text-xl">home</span>
+                        <span className="text-[10px] uppercase font-bold">Home</span>
+                    </button>
+                    <button 
+                        onClick={() => navigate('/detail')} 
+                        className={`flex flex-col items-center gap-1 hover:text-primary transition-colors ${location.pathname === '/detail' ? 'text-primary' : 'text-gray-400'}`}
+                    >
+                        <span className="material-icons text-xl">article</span>
+                        <span className="text-[10px] uppercase font-bold">Detail</span>
+                    </button>
+                    <button 
+                        onClick={() => navigate('/community')} 
+                        className={`flex flex-col items-center gap-1 hover:text-primary transition-colors ${location.pathname === '/community' ? 'text-primary' : 'text-gray-400'}`}
+                    >
+                        <span className="material-icons text-xl">forum</span>
+                        <span className="text-[10px] uppercase font-bold">Forum</span>
+                    </button>
+                    <button 
+                        onClick={() => navigate('/ai-practice')} 
+                        className={`flex flex-col items-center gap-1 hover:text-primary transition-colors ${location.pathname === '/ai-practice' ? 'text-primary' : 'text-gray-400'}`}
+                    >
+                        <span className="material-icons text-xl">smart_toy</span>
+                        <span className="text-[10px] uppercase font-bold">AI Chat</span>
+                    </button>
+                </div>
+            );
+        };
+
+        // --- Screen 1: Home Issue Feed ---
+        const HomeScreen = () => {
+            return (
+                <div className="bg-background-light dark:bg-background-dark font-sans text-text-light dark:text-text-dark transition-colors duration-300 min-h-screen">
+                    <nav className="sticky top-0 z-50 bg-[#2B2E34] border-b border-gray-700 shadow-sm">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between items-center h-20">
+                                <Link to="/" className="flex-shrink-0 flex items-center gap-3 cursor-pointer group">
+                                    <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                                        <span className="material-icons text-white text-2xl">forum</span>
+                                    </div>
+                                    <span className="font-display font-bold text-2xl text-white tracking-tight">K-Agora</span>
+                                </Link>
+                                <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center space-x-10">
+                                    <a className="text-sm font-bold text-gray-300 hover:text-primary transition-colors duration-200" href="#">소개</a>
+                                    <a className="text-sm font-bold text-gray-300 hover:text-primary transition-colors duration-200" href="#">실시간 인기 이슈</a>
+                                    <Link to="/community" className="text-sm font-bold text-gray-300 hover:text-primary transition-colors duration-200">커뮤니티</Link>
+                                    <a className="text-sm font-bold text-gray-300 hover:text-primary transition-colors duration-200" href="#">가이드라인</a>
+                                </div>
+                                <div className="hidden md:flex items-center gap-6">
+                                    <button className="relative group text-gray-400 hover:text-white transition-colors">
+                                        <span className="material-icons text-2xl">notifications</span>
+                                        <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-[#2B2E34] bg-primary"></span>
+                                    </button>
+                                    <div className="relative cursor-pointer">
+                                        <img alt="User Profile" className="h-10 w-10 rounded-full border-2 border-gray-600 hover:border-primary transition-colors object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGqYskUc3LcoCYU4OakIkOc_7jfz_2HgBMdo1uzxJpbyLLzCLumV7uf3wrXVdvVUE4N5qHVbeFxCyZqT95cmbi3YTDfwjDryUPRWogGXnbXNOaCMrl9JPJF4a7tVZslJGf1pNdoPqoM9O7e_D5-9UBuRBYDzgYzY4OTlIPEemTY4s3bjl_bvZ-YXFAnwb1Vi6lMZvH9VbH7wa0kquchk85xZPI4PGFVpwD-e0HfkSXTBqtOh2TiTtSRgTj_XA9I-a1qGbk5gniupQ"/>
+                                    </div>
+                                </div>
+                                <div className="md:hidden flex items-center">
+                                    <button className="p-2 rounded-md text-gray-300 hover:text-white">
+                                        <span className="material-icons">menu</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <header className="relative overflow-hidden bg-card-dark text-white pt-20 pb-24 px-6 rounded-b-[3rem]">
+                        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none"></div>
+                        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-blue-500 opacity-20 blur-3xl rounded-full pointer-events-none"></div>
+                        <div className="max-w-7xl mx-auto relative z-10 text-center">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm mb-6">
+                                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                                <span className="text-sm font-medium tracking-wide uppercase">AI 기반 합의 시스템</span>
+                            </div>
+                            <h1 className="font-display text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-8">
+                                미래의 시민 담론을 <br/>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-300 relative">
+                                    만들어 갑니다
+                                    <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary opacity-80" fill="none" viewBox="0 0 200 9" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.7509 9.37523 78.9113 9.81705 112.604 7.40837C129.352 6.21115 136.138 6.55181 151.782 5.23438C161.731 4.39656 176.475 3.32839 198.004 2.03058" stroke="currentColor" strokeWidth="3"></path></svg>
+                                </span>
+                            </h1>
+                            <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-300 mb-10 leading-relaxed">
+                                K-Agora는 고도화된 AI를 활용해 복잡한 사회 이슈를 요약하고 핵심 논쟁을 분석하여, 우리 사회가 공통의 합의점을 찾도록 돕습니다. 지금 토론에 참여하세요.
+                            </p>
+                            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                                <a href="#feed" className="group relative px-8 py-4 bg-primary text-white font-bold text-lg rounded-xl overflow-hidden shadow-lg transition-transform hover:-translate-y-1">
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        이슈 탐색하기
+                                        <span className="material-icons group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                    </span>
+                                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                </a>
+                                <Link to="/ai-practice" className="px-8 py-4 bg-transparent border-2 border-gray-600 hover:border-white text-white font-bold text-lg rounded-xl transition-colors">
+                                    AI 토론 연습
+                                </Link>
+                            </div>
+                        </div>
+                    </header>
+
+                    <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="font-display text-xl font-bold flex items-center gap-2 bg-background-light dark:bg-background-dark px-2 rounded-lg inline-block">
+                                <span className="material-icons text-red-500">local_fire_department</span>
+                                지금 뜨는 이슈
+                            </h2>
+                            <div className="flex gap-2">
+                                <button className="p-2 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                    <span className="material-icons text-sm">arrow_back</span>
+                                </button>
+                                <button className="p-2 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                    <span className="material-icons text-sm">arrow_forward</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex gap-6 overflow-x-auto hide-scroll pb-4 snap-x">
+                             <Link to="/detail" className="snap-start flex-shrink-0 w-72 bg-card-light dark:bg-card-dark p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer group">
+                                <div className="flex justify-between items-start mb-3">
+                                    <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded uppercase tracking-wider">#주4일제</span>
+                                    <span className="text-gray-400 text-xs">2시간 전</span>
+                                </div>
+                                <h3 className="font-display font-bold text-lg leading-tight mb-2 group-hover:text-primary transition-colors">주 4일 근무제 전면 도입</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">2026년까지 대기업 및 공공기관 주 4일제 의무화 법안 발의에 대한 논의.</p>
+                                <div className="mt-4 flex items-center gap-2 text-xs font-medium">
+                                    <div className="flex -space-x-2">
+                                        <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGqYskUc3LcoCYU4OakIkOc_7jfz_2HgBMdo1uzxJpbyLLzCLumV7uf3wrXVdvVUE4N5qHVbeFxCyZqT95cmbi3YTDfwjDryUPRWogGXnbXNOaCMrl9JPJF4a7tVZslJGf1pNdoPqoM9O7e_D5-9UBuRBYDzgYzY4OTlIPEemTY4s3bjl_bvZ-YXFAnwb1Vi6lMZvH9VbH7wa0kquchk85xZPI4PGFVpwD-e0HfkSXTBqtOh2TiTtSRgTj_XA9I-a1qGbk5gniupQ"/>
+                                        <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAN8f260wtD9MI15S8NwAQuYszxSB7mYAnIctUVpOQpeMp3nnaH1KkR4qkWlRIAQVhMDv2BA45plf_Ln7wKwLRWJnw7xyfWWzSO36jQ6vX_469FahTOEr4uxNv-wINH8DUUD5Bya-MCaoHsdKoC0hjv0lVgDsY4jvIwwzNOmPQCi_BObvZkqnumN9PZ6FEX3g_PthETEt_P4-QATC3jXo_kzbSmUY0AaRVCaEzRkplgTcYqG3FlPYdWND9sooolCwIAMqev1HQXrc"/>
+                                    </div>
+                                    <span className="text-gray-500">+420명 참여 중</span>
+                                </div>
+                            </Link>
+
+                             {/* Static cards as provided */}
+                            <div className="snap-start flex-shrink-0 w-72 bg-card-light dark:bg-card-dark p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer group">
+                                <div className="flex justify-between items-start mb-3">
+                                    <span className="text-xs font-bold text-blue-500 bg-blue-500/10 px-2 py-1 rounded uppercase tracking-wider">#AI저작권</span>
+                                    <span className="text-gray-400 text-xs">5시간 전</span>
+                                </div>
+                                <h3 className="font-display font-bold text-lg leading-tight mb-2 group-hover:text-blue-500 transition-colors">생성형 AI 저작권법</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">AI 학습 데이터 사용에 대한 보상 체계 마련과 창작자 보호 법안.</p>
+                                <div className="mt-4 flex items-center gap-2 text-xs font-medium">
+                                    <div className="flex -space-x-2">
+                                         <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsc58hsqbTRerBy1rlpgp-rbb2Fa7zLc1m4Kkd4Ct7ZkeNPfO6Bsr65esuvJ0nNWOIQC8qqqHd70qXWmW2jOrHRpBH9dVWWkbEFXODrK-5guwRDoDG4ZwsLbT961-YnJ1Fl4L48JUhF18TLaDb6No_qNz3o7TjBQlzxUGQ1OM2mt4mdxsg4WonMOnN353_VpY7M-IqjPdJdt05PPKuR6oLKawWLfGeQJi9unyIr-uWiF41eQo7GPR7Z2bS2MKjheioYrGBFMyk2sI"/>
+                                         <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCT-qior8SvZ9T_oaaNII70QFainJMwkESbIAMD-CxUdu8kil04Tfnut54Lk1uWtVvweMMHrDOpf4PdSBRy5kQjb7dFsXxc50q6UyPnl3FjxarghjVpUY_FIBPLkw-Xn1frHGgRQRGZAsfY8LnRhOZBjrdikDvGLRTmQr4v0ZAmEewDv9_YUaYROCaCtCyCmQc54u7n27Rt4WdIyJ6RJRQ5y9gENM0nGKvU1SpAYDFypqN-S1bbte5rlgKQ2lK505EZO96lZeRTvIk"/>
+                                    </div>
+                                    <span className="text-gray-500">+1.2k명 참여 중</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="feed">
+                        <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-10 gap-4">
+                            <div>
+                                <h2 className="font-display text-4xl font-bold mb-2">이슈 둘러보기</h2>
+                                <p className="text-gray-500 dark:text-gray-400">AI가 큐레이션하고 커뮤니티가 주도합니다.</p>
+                            </div>
+                            <div className="flex items-center gap-3 bg-white dark:bg-card-dark p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                                <button className="px-4 py-2 text-sm font-semibold rounded-md bg-gray-100 dark:bg-gray-700 text-text-light dark:text-text-dark">최신순</button>
+                                <button className="px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">인기순</button>
+                                <button className="px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">종료됨</button>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            
+                            <article className="flex flex-col h-full bg-card-light dark:bg-card-dark rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-neo dark:hover:shadow-neo-dark hover:-translate-y-1 transition-all duration-300">
+                                <div className="relative h-48 bg-gray-200 dark:bg-gray-800">
+                                    <img alt="High rise buildings abstract" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaO4sbtDTS0L11A_II9douaIjaqXB6B4MsAXacYGjI9mHvq7OXflID5_-I9MY5sy6FEbnBHQcNH5u41wwcUVv7HI24g8Rj-0IsbL67s8q1GSXBWhdIdAjNzFvLWONNw5GwfFDPxxMfmxET20W-Xq04h1sEZnAJ7yb7i-4qepbhNAmR4CgX56t9mC-bkqoKoqU05ygvdv5RyVGbj9sfJaf-I_KWiBSxGjqFPo7OtIPyKvlFwS4nbnlui23yrC1RhLU9nghrmwHhGbw"/>
+                                    <div className="absolute top-4 left-4">
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-black shadow-sm">
+                                            <span className="w-2 h-2 rounded-full bg-primary mr-2"></span>
+                                            #주거지원
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-6 flex flex-col flex-grow">
+                                    <h3 className="font-display text-2xl font-bold mb-3 leading-tight">청년 공공임대 확대와 역차별 논란</h3>
+                                    <div className="mb-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center gap-2 mb-2 text-xs font-bold text-primary uppercase tracking-wide">
+                                            <span className="material-icons text-base">psychology</span>
+                                            AI 요약
+                                        </div>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                            청년층 주거 안정을 위한 역세권 공공임대 확대는 필수적이라는 의견과, 중장년층 소외 및 임대료 형평성 문제가 충돌하고 있습니다.
+                                        </p>
+                                    </div>
+                                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                                            <span className="material-icons text-base">chat_bubble_outline</span>
+                                            245개 댓글
+                                        </div>
+                                        <Link to="/detail" className="group inline-flex items-center justify-center w-10 h-10 rounded-full bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark hover:bg-primary hover:text-white transition-colors">
+                                            <span className="material-icons group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform text-lg">arrow_outward</span>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article className="flex flex-col h-full bg-card-light dark:bg-card-dark rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-neo dark:hover:shadow-neo-dark hover:-translate-y-1 transition-all duration-300">
+                                <div className="relative h-48 bg-gray-200 dark:bg-gray-800">
+                                    <img alt="Cryptocurrency graph" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu4J7aAAYxL1PXQzO5za9sk4iAjqH8-lY-VyWZF0QCo7yMKI4eMzorMULFgjOAxwYDkzOg9idEB_oXPoj1l1-5aYSuvJQ2ZxYfQRQMk9dZmg_Jy-ct-9iNImsugE03WbepKva7_lNU6z8xQ_a8g5x-OExpMfk1KwF8H7gzob0JN6eUSMoFu_yM2zUHlR3rIvgf6PjkGa7-CJR7IldUWa2I-siKgtvks_P9zu1pnVtsINsd0YW4C5IdMGFggOAgJ9bc3nB4eDXv9fQ"/>
+                                    <div className="absolute top-4 left-4">
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-black shadow-sm">
+                                            <span className="w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
+                                            #연금개혁
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-6 flex flex-col flex-grow">
+                                    <h3 className="font-display text-2xl font-bold mb-3 leading-tight">정년 연장 및 국민연금 개혁</h3>
+                                    <div className="mb-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center gap-2 mb-2 text-xs font-bold text-primary uppercase tracking-wide">
+                                            <span className="material-icons text-base">psychology</span>
+                                            AI 요약
+                                        </div>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                            정년을 65세로 연장하고 보험료율을 인상하는 방안. 세대 간 부담 형평성과 연금 고갈 방지를 위한 최선의 대안인지 논의가 필요합니다.
+                                        </p>
+                                    </div>
+                                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                                            <span className="material-icons text-base">chat_bubble_outline</span>
+                                            892개 댓글
+                                        </div>
+                                        <Link to="/ai-practice" className="group inline-flex items-center justify-center w-10 h-10 rounded-full bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark hover:bg-primary hover:text-white transition-colors">
+                                            <span className="material-icons group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform text-lg">arrow_outward</span>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </article>
+                            
+                             <article className="flex flex-col h-full bg-card-light dark:bg-card-dark rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-neo dark:hover:shadow-neo-dark hover:-translate-y-1 transition-all duration-300">
+                                <div className="relative h-48 bg-gray-200 dark:bg-gray-800">
+                                    <img alt="Healthcare tech" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_XcqQfUtp0fl40tk6ubQBA6VPhxQLqFHv3XaCYs7IjDiP17e1O5rLg89rOe97Jwa6cic9Kiv97nc6HlcCmhE_0K0xzPbd_ctghlyH4qeCydhrNugiUKGlIk2o2UxZcr55yrUBcf1oUyM6rn5F3vHTzp9bg36WDXol91rAAoJqhGSQ1bsmfbHpCX4ZATpgA2lQsT0bHpF6m17XEYlzd_bLjQCJbkI5XZPwTJJoPVf7DoVDC32Qeav-M4-7mOPSAh8RkaGLCUS0mrA"/>
+                                    <div className="absolute top-4 left-4">
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-black shadow-sm">
+                                            <span className="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                                            #의료
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-6 flex flex-col flex-grow">
+                                    <h3 className="font-display text-2xl font-bold mb-3 leading-tight">비대면 진료 법제화와 플랫폼 규제</h3>
+                                    <div className="mb-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center gap-2 mb-2 text-xs font-bold text-primary uppercase tracking-wide">
+                                            <span className="material-icons text-base">psychology</span>
+                                            AI 요약
+                                        </div>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                            의료 접근성을 높이는 비대면 진료의 전면 허용 요구와 약물 오남용 및 의료 영리화를 우려하는 의료계의 입장 차이.
+                                        </p>
+                                    </div>
+                                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                                            <span className="material-icons text-base">chat_bubble_outline</span>
+                                            342개 댓글
+                                        </div>
+                                        <Link to="/community" className="group inline-flex items-center justify-center w-10 h-10 rounded-full bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark hover:bg-primary hover:text-white transition-colors">
+                                            <span className="material-icons group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform text-lg">arrow_outward</span>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div className="mt-16 text-center">
+                            <button className="inline-flex items-center gap-2 px-8 py-3 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark font-bold hover:border-primary hover:text-primary transition-colors">
+                                더 많은 이슈 보기
+                                <span className="material-icons">expand_more</span>
+                            </button>
+                        </div>
+                    </main>
+                    <footer className="bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 mt-12 py-12">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <span className="material-icons text-primary">forum</span>
+                                <span className="font-display font-bold text-xl">K-Agora</span>
+                            </div>
+                            <div className="flex gap-6 text-sm text-gray-500">
+                                <a className="hover:text-primary" href="#">개인정보 처리방침</a>
+                                <a className="hover:text-primary" href="#">이용약관</a>
+                                <a className="hover:text-primary" href="#">해커톤 정보</a>
+                            </div>
+                            <div className="text-sm text-gray-400">
+                                © 2024 K-Agora Project.
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // --- Screen 2: Issue Detail ---
+        const IssueDetailScreen = () => {
+            return (
+                <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-body antialiased transition-colors duration-200 min-h-screen">
+                    <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between h-20 items-center">
+                                <Link to="/" className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-display font-bold text-xl shadow-neo">K</div>
+                                    <span className="font-display font-bold text-2xl tracking-tight">K-Agora</span>
+                                </Link>
+                                <div className="hidden md:flex items-center space-x-8">
+                                    <Link to="/" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">소개</Link>
+                                    <a className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors" href="#">실시간 인기 이슈</a>
+                                    <Link to="/community" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">커뮤니티</Link>
+                                    <a className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors" href="#">가이드라인</a>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <button className="bg-primary text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-orange-600 transition shadow-neo">
+                                        로그인
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                    <main className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+                        <header className="relative mb-16 text-center max-w-5xl mx-auto">
+                            <div className="absolute -top-10 -left-10 w-24 h-24 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-2xl opacity-60"></div>
+                            <div className="absolute top-0 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl opacity-60"></div>
+                            <div className="flex justify-center mb-6">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm">
+                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                    <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">정책 토론 • 진행 중</span>
+                                </div>
+                            </div>
+                            <h1 className="text-4xl md:text-6xl font-display font-black leading-tight mb-8 relative inline-block break-keep text-center mx-auto">
+                                주 4일 근무제 도입,<br/>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-primary">시기상조인가, 필수 변화인가?</span>
+                            </h1>
+                            <div className="relative group mt-8 text-center mx-auto max-w-4xl">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-primary rounded-2xl opacity-20 group-hover:opacity-40 blur transition duration-500"></div>
+                                <div className="relative bg-white dark:bg-card-dark p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+                                    <div className="flex items-center justify-center gap-2 mb-4 text-primary font-bold uppercase text-xs tracking-widest">
+                                        <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                                        AI 핵심 요약 (AI Summary)
+                                    </div>
+                                    <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed break-keep text-center">
+                                        이 제안은 현재의 주 5일 근무제를 주 4일로 단축하여 근로자의 삶의 질을 높이고 생산성을 향상시키자는 취지입니다. 찬성 측은 업무 효율성 증대와 소비 활성화를 주장하는 반면, 반대 측은 기업의 인건비 부담 증가와 국가 경쟁력 약화를 우려하며 치열하게 대립하고 있습니다.
+                                    </p>
+                                </div>
+                            </div>
+                        </header>
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
+                            <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex-col items-center justify-center pointer-events-none">
+                                <div className="bg-gray-200 dark:bg-gray-700 p-2 rounded-full border-4 border-white dark:border-gray-900">
+                                    <span className="font-display font-bold text-gray-500 text-sm">VS</span>
+                                </div>
+                            </div>
+                            <section className="lg:col-span-5 flex flex-col gap-6">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h2 className="text-3xl font-display font-bold flex items-center gap-3">
+                                        <span className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                                            <span className="material-symbols-outlined">thumb_up</span>
+                                        </span>
+                                        찬성 의견
+                                    </h2>
+                                    <span className="text-sm font-medium text-gray-500">12.4k 지지</span>
+                                </div>
+                                <article className="bg-white dark:bg-card-dark p-6 rounded-2xl shadow-sm border-l-4 border-green-500 hover:shadow-md transition-shadow">
+                                    <h3 className="font-bold text-xl mb-3">생산성 및 효율성 증대</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 mb-4 break-keep">
+                                        충분한 휴식이 보장되면 집중도가 높아져 업무 효율이 오릅니다. 마이크로소프트 일본 지사의 실험 결과 생산성이 40% 증가했다는 사례가 이를 뒷받침합니다.
+                                    </p>
+                                    <div className="flex items-center gap-4 text-sm text-gray-400">
+                                        <button className="flex items-center gap-1 hover:text-green-500 transition-colors">
+                                            <span className="material-symbols-outlined text-base">arrow_upward</span> 2.1k
+                                        </button>
+                                        <span>•</span>
+                                        <span>출처: 경제연구소 보고서</span>
+                                    </div>
+                                </article>
+                                <article className="bg-white dark:bg-card-dark p-6 rounded-2xl shadow-sm border-l-4 border-green-500 hover:shadow-md transition-shadow">
+                                    <h3 className="font-bold text-xl mb-3">워라밸 개선 및 내수 활성화</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 mb-4 break-keep">
+                                        여가 시간이 늘어나면 자기 계발과 소비 활동이 활발해져 내수 경제에도 긍정적인 영향을 미칩니다. 근로자의 삶의 만족도가 높아져 이직률 또한 감소합니다.
+                                    </p>
+                                    <div className="flex items-center gap-4 text-sm text-gray-400">
+                                        <button className="flex items-center gap-1 hover:text-green-500 transition-colors">
+                                            <span className="material-symbols-outlined text-base">arrow_upward</span> 1.8k
+                                        </button>
+                                        <span>•</span>
+                                        <span>출처: 2023 노동동향</span>
+                                    </div>
+                                </article>
+                                <button className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl text-gray-500 font-medium hover:border-green-500 hover:text-green-500 transition-colors flex items-center justify-center gap-2">
+                                    <span className="material-symbols-outlined">add</span> 찬성 의견 추가하기
+                                </button>
+                            </section>
+                            <div className="lg:col-span-2 flex flex-col items-center justify-start pt-10 lg:pt-20 order-first lg:order-none mb-10 lg:mb-0">
+                                <div className="sticky top-24 w-full bg-white dark:bg-card-dark rounded-3xl p-6 shadow-xl border border-gray-100 dark:border-gray-700 text-center relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 via-gray-300 to-red-400"></div>
+                                    <h3 className="font-display font-bold text-lg mb-6">현재 여론 현황</h3>
+                                    <div className="relative w-32 h-32 mx-auto mb-6">
+                                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                            <path className="text-gray-200 dark:text-gray-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3.8"></path>
+                                            <path className="text-green-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray="55, 100" strokeWidth="3.8"></path>
+                                            <path className="text-red-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray="25, 100" strokeDashoffset="-55" strokeWidth="3.8"></path>
+                                        </svg>
+                                        <div className="absolute inset-0 flex items-center justify-center flex-col">
+                                            <span className="text-2xl font-bold">55%</span>
+                                            <span className="text-[12px] uppercase text-gray-500 font-bold">찬성</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between text-xs font-bold text-gray-500 mb-6 px-2">
+                                        <span className="text-green-600">55% 찬성</span>
+                                        <span className="text-gray-400">20% 보류</span>
+                                        <span className="text-red-600">25% 반대</span>
+                                    </div>
+                                    <button className="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 px-2 rounded-xl shadow-lg transform hover:-translate-y-1 transition duration-200 flex items-center justify-center gap-2 group whitespace-nowrap">
+                                        투표하기
+                                        <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">how_to_vote</span>
+                                    </button>
+                                    <p className="mt-4 text-xs text-gray-400">투표 마감까지 3일 남음</p>
+                                </div>
+                            </div>
+                            <section className="lg:col-span-5 flex flex-col gap-6">
+                                <div className="flex items-center justify-between mb-2 lg:flex-row-reverse">
+                                    <h2 className="text-3xl font-display font-bold flex items-center gap-3">
+                                        반대 의견
+                                        <span className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
+                                            <span className="material-symbols-outlined">thumb_down</span>
+                                        </span>
+                                    </h2>
+                                    <span className="text-sm font-medium text-gray-500">8.1k 반대</span>
+                                </div>
+                                <article className="bg-white dark:bg-card-dark p-6 rounded-2xl shadow-sm border-r-4 border-red-500 hover:shadow-md transition-shadow">
+                                    <h3 className="font-bold text-xl mb-3">기업 비용 부담 증가</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 mb-4 break-keep">
+                                        근무 시간이 줄어도 급여를 유지할 경우, 기업의 인건비 부담이 급격히 늘어나며 이는 자금력이 부족한 중소기업에게 치명적일 수 있습니다.
+                                    </p>
+                                    <div className="flex items-center gap-4 text-sm text-gray-400 justify-end">
+                                        <span>출처: 중소기업중앙회</span>
+                                        <span>•</span>
+                                        <button className="flex items-center gap-1 hover:text-red-500 transition-colors">
+                                            <span className="material-symbols-outlined text-base">arrow_upward</span> 3.4k
+                                        </button>
+                                    </div>
+                                </article>
+                                <article className="bg-white dark:bg-card-dark p-6 rounded-2xl shadow-sm border-r-4 border-red-500 hover:shadow-md transition-shadow opacity-90">
+                                    <h3 className="font-bold text-xl mb-3">시기상조 및 경쟁력 약화</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 mb-4 break-keep">
+                                        아직 한국의 노동 생산성은 주요 선진국 대비 낮은 수준입니다. 준비 없는 섣부른 도입은 국가 산업 경쟁력을 약화시키고 물가 상승을 초래할 수 있습니다.
+                                    </p>
+                                    <div className="flex items-center gap-4 text-sm text-gray-400 justify-end">
+                                        <span>출처: 한국경영자총협회</span>
+                                        <span>•</span>
+                                        <button className="flex items-center gap-1 hover:text-red-500 transition-colors">
+                                            <span className="material-symbols-outlined text-base">arrow_upward</span> 1.2k
+                                        </button>
+                                    </div>
+                                </article>
+                                <button className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl text-gray-500 font-medium hover:border-red-500 hover:text-red-500 transition-colors flex items-center justify-center gap-2">
+                                    <span className="material-symbols-outlined">add</span> 반대 의견 추가하기
+                                </button>
+                            </section>
+                        </div>
+                        <div className="mt-20 pt-10 border-t border-gray-200 dark:border-gray-800">
+                            <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3">
+                                <span className="material-symbols-outlined text-primary">forum</span>
+                                시민 토론장
+                            </h2>
+                            <div className="bg-white dark:bg-card-dark rounded-2xl p-6 shadow-sm mb-6 flex gap-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex-shrink-0"></div>
+                                <div className="flex-grow">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="font-bold text-gray-900 dark:text-white">익명_시민_42</span>
+                                        <span className="text-xs text-gray-400">2시간 전</span>
+                                    </div>
+                                    <p className="text-gray-600 dark:text-gray-300 mb-3">
+                                        생산성이 오른다는 건 사무직 대기업 얘기 아닌가요? 제조업 기반 중소기업들은 납기 맞추려면 사람을 더 뽑아야 하는데 현실적으로 불가능합니다. 업종별 차이를 고려해야 합니다.
+                                    </p>
+                                    <div className="flex gap-4">
+                                        <button className="text-sm text-gray-500 hover:text-primary font-medium">답글</button>
+                                        <button className="text-sm text-gray-500 hover:text-primary font-medium">추천 (24)</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <button className="text-primary font-bold hover:underline">전체 댓글 1,204개 보기</button>
+                            </div>
+                        </div>
+                    </main>
+                    <div className="fixed top-1/3 right-10 hidden xl:block pointer-events-none opacity-50">
+                        <svg fill="none" height="100" viewBox="0 0 100 100" width="100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 0C60 30 70 40 100 50C70 60 60 70 50 100C40 70 30 60 0 50C30 40 40 30 50 0Z" fill="#FF7A00" fillOpacity="0.2"></path>
+                        </svg>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Screen 3: Anonymous Forum ---
+        const ForumScreen = () => {
+            return (
+                <div className="bg-background-light dark:bg-background-dark text-stone-800 dark:text-stone-200 font-sans transition-colors duration-300 min-h-screen flex flex-col">
+                    <nav className="sticky top-0 z-50 w-full border-b border-neutral-border-light dark:border-neutral-border-dark bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between h-16 items-center">
+                                <Link to="/" className="flex items-center gap-2">
+                                    <span className="material-icons-round text-primary text-3xl">forum</span>
+                                    <span className="font-display font-bold text-xl tracking-tight text-stone-900 dark:text-stone-100">K-Agora</span>
+                                </Link>
+                                <div className="hidden md:flex space-x-8">
+                                    <Link to="/" className="text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 text-sm font-medium transition-colors">소개</Link>
+                                    <a className="text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 text-sm font-medium transition-colors" href="#">실시간 인기 이슈</a>
+                                    <Link to="/community" className="text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 text-sm font-medium transition-colors">커뮤니티</Link>
+                                    <a className="text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 text-sm font-medium transition-colors" href="#">가이드라인</a>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <button className="p-2 rounded-full text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+                                        <span className="material-icons-round">notifications_none</span>
+                                    </button>
+                                    <button className="h-8 w-8 rounded-full overflow-hidden border border-neutral-border-light dark:border-neutral-border-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-stone-900">
+                                        <img alt="User Avatar" className="h-full w-full object-cover bg-stone-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6PfGGhh6CySFPpJL0uSxB033RUUDhOcYqvs-ZIboBMmCc7mj3rhw19yXaZgXdKbKQypIl9Ga7yV0jU2j-tb3ak7ATnRGqCiU2iCC--DRxzGUCkR-Lc0XcYEggEjKwWbN7IQ7Lhm8kiOb_Yz6jNqW8Zyi0FSI9ha0IErDv-H00RJXQ6fv2SIGDsEz5exdjZxC25rc_0Ix0RmrF3OlcSFjxhd5xcZ1Kjc37mqCE8Gd0wNknWiD4raw9c0BctjJOA6ykHSDbbwAa1Kg"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                    <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <aside className="hidden lg:block lg:col-span-3 space-y-6">
+                            <div className="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 border border-neutral-border-light dark:border-neutral-border-dark shadow-soft">
+                                <h3 className="font-display font-semibold text-lg mb-4 text-stone-900 dark:text-stone-100">활발한 토론</h3>
+                                <ul className="space-y-3">
+                                    <li>
+                                        <a className="flex items-center gap-3 p-2 rounded-lg bg-stone-50 dark:bg-stone-800/50 border border-stone-100 dark:border-stone-700 hover:border-primary/30 transition-all" href="#">
+                                            <span className="material-icons-round text-stone-400 text-sm">tag</span>
+                                            <span className="text-sm font-medium">도시 교통</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="flex items-center gap-3 p-2 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-800 transition-all group" href="#">
+                                            <span className="material-icons-round text-stone-300 group-hover:text-stone-400 text-sm">tag</span>
+                                            <span className="text-sm text-stone-600 dark:text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-200">디지털 프라이버시</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="flex items-center gap-3 p-2 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-800 transition-all group" href="#">
+                                            <span className="material-icons-round text-stone-300 group-hover:text-stone-400 text-sm">tag</span>
+                                            <span className="text-sm text-stone-600 dark:text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-200">공공 공간</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="p-6 rounded-2xl bg-gradient-to-b from-primary/10 to-transparent border border-primary/20">
+                                <h4 className="font-display font-semibold text-primary mb-2">오늘의 질문</h4>
+                                <p className="text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-sans">
+                                    "침묵과 개인 공간을 우선시하는 대중교통을 어떻게 설계할 수 있을까요?"
+                                </p>
+                            </div>
+                        </aside>
+                        <section className="col-span-1 lg:col-span-6 space-y-6">
+                            <div className="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-soft border border-neutral-border-light dark:border-neutral-border-dark relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+                                <div className="flex gap-4">
+                                    <div className="flex-shrink-0">
+                                        <div className="h-10 w-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                                            <span className="material-icons-round text-stone-400">edit</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex-grow">
+                                        <textarea className="w-full bg-transparent border-none p-0 text-stone-900 dark:text-stone-100 focus:ring-0 placeholder-stone-400 dark:placeholder-stone-500 resize-none h-24 text-base font-sans" placeholder="토론에 참여해보세요..."></textarea>
+                                        <div className="flex justify-between items-center mt-4 border-t border-stone-100 dark:border-stone-800 pt-4">
+                                            <div className="flex gap-2">
+                                                <button className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors" title="출처 추가">
+                                                    <span className="material-icons-round text-sm">link</span>
+                                                </button>
+                                                <button className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors" title="서식">
+                                                    <span className="material-icons-round text-sm">text_format</span>
+                                                </button>
+                                            </div>
+                                            <button className="bg-primary hover:bg-orange-700 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-md font-sans">
+                                                게시
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <article className="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-soft border border-neutral-border-light dark:border-neutral-border-dark transition-transform hover:-translate-y-0.5 duration-300">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-300">
+                                                <span className="material-icons-round text-sm">visibility</span>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-display font-medium text-stone-900 dark:text-stone-100 text-sm">지혜로운 올빼미</h4>
+                                                <span className="text-xs text-stone-400">2시간 전</span>
+                                            </div>
+                                        </div>
+                                        <button className="text-stone-300 hover:text-stone-500 dark:text-stone-600 dark:hover:text-stone-400">
+                                            <span className="material-icons-round text-lg">more_horiz</span>
+                                        </button>
+                                    </div>
+                                    <div className="prose prose-stone dark:prose-invert max-w-none">
+                                        <p className="text-stone-700 dark:text-stone-300 leading-relaxed font-sans">
+                                            핵심은 단순한 침묵이 아니라 "청각적 프라이버시"라고 생각합니다. 각 좌석에 지향성 스피커를 설치하여 헤드폰 없이도 음악을 들을 수 있게 하되, 옆 사람에게는 들리지 않게 하는 거죠. 소음 공해 문제를 근본적으로 해결할 수 있습니다.
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex gap-4 pt-4 border-t border-stone-50 dark:border-stone-800/50">
+                                        <button className="flex items-center gap-1.5 text-stone-500 hover:text-primary dark:text-stone-400 dark:hover:text-primary transition-colors text-xs font-medium font-sans">
+                                            <span className="material-icons-round text-base">reply</span>
+                                            답글
+                                        </button>
+                                        <button className="flex items-center gap-1.5 text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 transition-colors text-xs font-medium font-sans">
+                                            <span className="material-icons-round text-base">flag</span>
+                                            신고
+                                        </button>
+                                    </div>
+                                </article>
+                                <article className="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-soft border border-neutral-border-light dark:border-neutral-border-dark transition-transform hover:-translate-y-0.5 duration-300 relative overflow-hidden">
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/50"></div>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-300">
+                                                <span className="material-icons-round text-sm">landscape</span>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-display font-medium text-stone-900 dark:text-stone-100 text-sm">굳건한 다리</h4>
+                                                <span className="text-xs text-stone-400">4시간 전</span>
+                                            </div>
+                                        </div>
+                                        <button className="text-stone-300 hover:text-stone-500 dark:text-stone-600 dark:hover:text-stone-400">
+                                            <span className="material-icons-round text-lg">more_horiz</span>
+                                        </button>
+                                    </div>
+                                    <div className="prose prose-stone dark:prose-invert max-w-none">
+                                        <p className="text-stone-700 dark:text-stone-300 leading-relaxed font-sans">
+                                            "정숙 칸"을 도입하는 것은 효과적인 로우테크 솔루션입니다. 일본에서는 사회적 약속이 강력해서 사람들이 자연스럽게 속삭입니다. 어쩌면 기술적 문제가 아니라 문화적 설계의 문제 아닐까요? 단순한 규칙이 아닌 심리를 이용한 넛지 디자인이 필요합니다.
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 pl-4 border-l-2 border-stone-100 dark:border-stone-800">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="h-6 w-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-300">
+                                                <span className="material-icons-round text-xs">bolt</span>
+                                            </div>
+                                            <span className="text-xs font-medium text-stone-600 dark:text-stone-400">번개같은 여우</span>
+                                        </div>
+                                        <p className="text-sm text-stone-600 dark:text-stone-400 font-sans">
+                                            동의합니다. 디자인이 행동을 유도하죠. 조명이 부드러워지면 사람들은 자연스럽게 목소리를 낮추게 됩니다.
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex gap-4 pt-4 border-t border-stone-50 dark:border-stone-800/50">
+                                        <button className="flex items-center gap-1.5 text-stone-500 hover:text-primary dark:text-stone-400 dark:hover:text-primary transition-colors text-xs font-medium font-sans">
+                                            <span className="material-icons-round text-base">reply</span>
+                                            답글
+                                        </button>
+                                        <button className="flex items-center gap-1.5 text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 transition-colors text-xs font-medium font-sans">
+                                            <span className="material-icons-round text-base">flag</span>
+                                            신고
+                                        </button>
+                                    </div>
+                                </article>
+                                <article className="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-soft border border-neutral-border-light dark:border-neutral-border-dark transition-transform hover:-translate-y-0.5 duration-300">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-300">
+                                                <span className="material-icons-round text-sm">local_fire_department</span>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-display font-medium text-stone-900 dark:text-stone-100 text-sm">냉철한 호랑이</h4>
+                                                <span className="text-xs text-stone-400">5시간 전</span>
+                                            </div>
+                                        </div>
+                                        <button className="text-stone-300 hover:text-stone-500 dark:text-stone-600 dark:hover:text-stone-400">
+                                            <span className="material-icons-round text-lg">more_horiz</span>
+                                        </button>
+                                    </div>
+                                    <div className="prose prose-stone dark:prose-invert max-w-none">
+                                        <p className="text-stone-700 dark:text-stone-300 leading-relaxed font-sans">
+                                            운송 수단 자체가 모듈식이라면 어떨까요? 개인 회의를 위해 분리되는 포드처럼요. 대중교통치고는 비용이 너무 많이 들겠지만요.
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex gap-4 pt-4 border-t border-stone-50 dark:border-stone-800/50">
+                                        <button className="flex items-center gap-1.5 text-stone-500 hover:text-primary dark:text-stone-400 dark:hover:text-primary transition-colors text-xs font-medium font-sans">
+                                            <span className="material-icons-round text-base">reply</span>
+                                            답글
+                                        </button>
+                                        <button className="flex items-center gap-1.5 text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 transition-colors text-xs font-medium font-sans">
+                                            <span className="material-icons-round text-base">flag</span>
+                                            신고
+                                        </button>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+                        <aside className="col-span-1 lg:col-span-3 space-y-6">
+                            <div className="sticky top-24">
+                                <div className="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-glow border border-primary/30 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                                        <span className="material-icons-round text-6xl text-primary">psychology</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                                        <h3 className="font-display font-semibold text-stone-900 dark:text-stone-100 text-sm tracking-wide uppercase">AI 중재자</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="bg-stone-50 dark:bg-stone-800/50 rounded-xl p-3 border border-stone-100 dark:border-stone-700/50">
+                                            <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-1">현재 상태</p>
+                                            <p className="text-sm text-stone-800 dark:text-stone-200 flex items-center gap-2 font-sans">
+                                                <span className="material-icons-round text-green-500 text-sm">check_circle</span>
+                                                상호 존중하는 토론 문화를 만들어주세요.
+                                            </p>
+                                        </div>
+                                        <div className="bg-stone-50 dark:bg-stone-800/50 rounded-xl p-3 border border-stone-100 dark:border-stone-700/50">
+                                            <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-1">토론 인사이트</p>
+                                            <p className="text-sm text-stone-800 dark:text-stone-200 italic font-sans">
+                                                "여러 사용자가 '청각적 조닝' 아이디어에 동의하고 있습니다. 비용 효율적인 구현 방법을 논의해보는 것은 어떨까요?"
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800">
+                                        <div className="flex justify-between items-center text-xs text-stone-400">
+                                            <span>매너 점수</span>
+                                            <span className="font-mono text-primary">98/100</span>
+                                        </div>
+                                        <div className="w-full bg-stone-200 dark:bg-stone-700 h-1 rounded-full mt-2 overflow-hidden">
+                                            <div className="bg-primary h-full rounded-full" style={{width: '98%'}}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-6 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 border border-neutral-border-light dark:border-neutral-border-dark shadow-soft">
+                                    <h3 className="font-display font-semibold text-stone-900 dark:text-stone-100 text-sm mb-4">관련 주제</h3>
+                                    <div className="space-y-3">
+                                        <a className="block group" href="#">
+                                            <h4 className="text-sm font-medium text-stone-700 dark:text-stone-300 group-hover:text-primary transition-colors">지속 가능한 도시 계획</h4>
+                                            <p className="text-xs text-stone-500 mt-1">참여자 12명</p>
+                                        </a>
+                                        <div className="h-px bg-stone-100 dark:bg-stone-800 w-full"></div>
+                                        <a className="block group" href="#">
+                                            <h4 className="text-sm font-medium text-stone-700 dark:text-stone-300 group-hover:text-primary transition-colors">거버넌스와 AI</h4>
+                                            <p className="text-xs text-stone-500 mt-1">참여자 8명</p>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className="mt-6 text-center">
+                                    <p className="text-xs text-stone-400 dark:text-stone-500">
+                                        K-Agora © 2023 <br/>
+                                        <a className="hover:underline" href="#">개인정보 처리방침</a> • <a className="hover:underline" href="#">이용약관</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </aside>
+                    </main>
+                </div>
+            );
+        };
+
+        // --- Screen 4: AI Practice Room ---
+        const AIPracticeScreen = () => {
+            return (
+                <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans h-screen flex flex-col overflow-hidden transition-colors duration-200">
+                    <nav className="h-16 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 z-10 shrink-0">
+                        <Link to="/" className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold font-display text-xl">K</div>
+                            <span className="font-display font-bold text-xl tracking-tight">K-아고라</span>
+                        </Link>
+                        <div className="flex items-center gap-6">
+                            <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500 dark:text-gray-400">
+                                <Link to="/" className="hover:text-primary transition-colors">소개</Link>
+                                <a className="hover:text-primary transition-colors" href="#">실시간 인기 이슈</a>
+                                <Link to="/community" className="hover:text-primary transition-colors">커뮤니티</Link>
+                                <a className="hover:text-primary transition-colors" href="#">가이드라인</a>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors relative">
+                                    <span className="material-icons text-xl">notifications</span>
+                                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-surface-dark"></span>
+                                </button>
+                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-orange-400 flex items-center justify-center text-white text-xs font-bold border-2 border-white dark:border-gray-800 shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
+                                    JD
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                    <main className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+                        <aside className="w-full md:w-[35%] lg:w-[30%] bg-surface-light dark:bg-surface-dark border-r border-gray-200 dark:border-gray-700 flex flex-col h-full z-0 overflow-y-auto">
+                            <div className="p-6 md:p-8 space-y-8">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="material-icons text-primary text-sm">public</span>
+                                        <span className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">토론 주제</span>
+                                    </div>
+                                    <h1 className="font-display text-2xl md:text-3xl font-bold leading-tight text-gray-900 dark:text-white mb-4">
+                                        기초연금 수급 범위를 확대해야 하는가?
+                                    </h1>
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800">사회 복지</span>
+                                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">재정 정책</span>
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                                        핵심 논점
+                                        <span className="material-icons text-sm text-gray-400">info</span>
+                                    </h3>
+                                    <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1F2228] border border-gray-100 dark:border-gray-700/50 hover:border-primary/30 transition-colors cursor-default group">
+                                        <div className="flex items-start gap-3">
+                                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-bold mt-0.5">1</span>
+                                            <div>
+                                                <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1 group-hover:text-primary transition-colors">노인 빈곤 완화</h4>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed break-keep">OECD 최고 수준인 노인 빈곤율을 낮추기 위해 수급 범위를 확대하여 사각지대를 해소해야 한다.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1F2228] border border-gray-100 dark:border-gray-700/50 hover:border-primary/30 transition-colors cursor-default group">
+                                        <div className="flex items-start gap-3">
+                                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center text-xs font-bold mt-0.5">2</span>
+                                            <div>
+                                                <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1 group-hover:text-primary transition-colors">재정 건전성 우려</h4>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed break-keep">급격한 고령화로 인해 무분별한 대상 확대는 미래 세대에 과도한 세금 부담을 지우게 된다.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1F2228] border border-gray-100 dark:border-gray-700/50 hover:border-primary/30 transition-colors cursor-default group">
+                                        <div className="flex items-start gap-3">
+                                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs font-bold mt-0.5">3</span>
+                                            <div>
+                                                <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1 group-hover:text-primary transition-colors">형평성 및 실효성</h4>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed break-keep">소득 상위 계층까지 지급하는 것은 복지 재원의 비효율적 배분이며, 취약 계층 집중 지원이 더 효과적이다.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="hidden md:block mt-auto pt-6 border-t border-gray-100 dark:border-gray-800">
+                                    <div className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-[#25282e] dark:to-[#1a1c20] rounded-xl p-5 text-white shadow-lg relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary blur-[50px] opacity-10 rounded-full pointer-events-none"></div>
+                                        <div className="flex justify-between items-start mb-4 relative z-10">
+                                            <div>
+                                                <h3 className="font-display font-bold text-sm">논리적 일관성 분석</h3>
+                                                <p className="text-[10px] text-gray-400 mt-1">사용자의 주장을 실시간으로 분석합니다.</p>
+                                            </div>
+                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
+                                                <span className="material-icons text-primary text-sm">analytics</span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-3 relative z-10">
+                                            <div>
+                                                <div className="flex justify-between text-[10px] font-medium text-gray-400 mb-1">
+                                                    <span>명확성</span>
+                                                    <span className="text-green-400">92%</span>
+                                                </div>
+                                                <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-green-400 rounded-full" style={{width: '92%'}}></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="flex justify-between text-[10px] font-medium text-gray-400 mb-1">
+                                                    <span>관련성</span>
+                                                    <span className="text-primary">78%</span>
+                                                </div>
+                                                <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-primary rounded-full" style={{width: '78%'}}></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="flex justify-between text-[10px] font-medium text-gray-400 mb-1">
+                                                    <span>오류 검증</span>
+                                                    <span className="text-blue-400">통과</span>
+                                                </div>
+                                                <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-blue-400 rounded-full" style={{width: '100%'}}></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </aside>
+                        <section className="flex-1 flex flex-col bg-[#F9FAFB] dark:bg-[#1a1c20] relative h-full">
+                            <div className="md:hidden h-14 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 shrink-0">
+                                <span className="font-semibold text-sm">아고라 AI 토론</span>
+                                <button className="text-primary text-sm font-medium">세션 종료</button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scrollbar-hide flex flex-col">
+                                <div className="flex justify-center my-4">
+                                    <span className="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
+                                        오늘 오전 10:42 세션 시작
+                                    </span>
+                                </div>
+                                <div className="flex gap-4 max-w-3xl">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-surface-dark text-white flex items-center justify-center border-2 border-white dark:border-gray-600 shadow-sm">
+                                        <span className="material-icons text-lg">smart_toy</span>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 ml-1">아고라 AI</span>
+                                        <div className="p-5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none shadow-sm text-sm md:text-base leading-relaxed text-gray-800 dark:text-gray-200 break-keep">
+                                            <p>안녕하세요! <strong>'기초연금 수급 범위 확대'</strong> 주제에 대해 토론할 준비가 되었습니다.</p>
+                                            <p className="mt-3">저는 <span className="underline decoration-primary decoration-2 underline-offset-2">반대</span> 입장을 맡겠습니다. 현재의 재정 상황에서 무분별한 수급 확대는 미래 세대에게 과도한 부담이 될 수 있다고 생각합니다.</p>
+                                            <p className="mt-3">찬성 측의 입론을 먼저 제시해 주시겠습니까?</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 max-w-3xl self-end flex-row-reverse">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-400 text-white flex items-center justify-center border-2 border-white dark:border-gray-600 shadow-sm">
+                                        <span className="text-xs font-bold">JD</span>
+                                    </div>
+                                    <div className="flex flex-col gap-1 items-end">
+                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 mr-1">나</span>
+                                        <div className="p-5 bg-primary text-white rounded-2xl rounded-tr-none shadow-md text-sm md:text-base leading-relaxed break-keep">
+                                            <p>네, 저는 찬성합니다. 한국의 노인 빈곤율은 OECD 국가 중 가장 높습니다. 현재의 선별적 지원으로는 복지 사각지대를 완전히 해소하기 어렵기 때문에, 수급 범위를 확대하여 보편적 복지로 나아가야 합니다.</p>
+                                            <p className="mt-2">이는 노인의 삶의 질을 개선하고 사회적 안전망을 강화하는 필수적인 조치입니다.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 max-w-3xl w-full">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-surface-dark text-white flex items-center justify-center border-2 border-white dark:border-gray-600 shadow-sm">
+                                        <span className="material-icons text-lg">smart_toy</span>
+                                    </div>
+                                    <div className="flex flex-col gap-1 w-full max-w-2xl">
+                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 ml-1">아고라 AI</span>
+                                        <div className="p-5 bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none shadow-sm text-sm md:text-base leading-relaxed text-gray-800 dark:text-gray-200 break-keep">
+                                            <p>노인 빈곤 해결의 시급성에 대해서는 동의합니다. 하지만 <strong>재정 지속 가능성</strong> 문제를 간과해서는 안 됩니다.</p>
+                                            <p className="mt-3">저출산 고령화로 인해 생산가능인구는 급격히 줄어들고 있습니다. 이런 상황에서 보편적 지급으로 전환할 경우, 미래 세대가 짊어져야 할 조세 부담은 감당하기 어려운 수준으로 치솟을 것입니다. 이는 세대 간 갈등을 유발할 수 있습니다.</p>
+                                            <p className="mt-3">미래 세대의 과도한 부담을 막으면서 재원을 마련할 구체적인 대안이 있으십니까?</p>
+                                            <div className="mt-4 flex items-center gap-2">
+                                                <div className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center gap-2 border border-blue-100 dark:border-blue-800/50">
+                                                    <span className="material-icons text-blue-500 text-xs">psychology</span>
+                                                    <span className="text-xs font-medium text-blue-700 dark:text-blue-300">반론: 재정 지속 가능성 및 세대 간 형평성</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 max-w-3xl self-end flex-row-reverse opacity-50">
+                                </div>
+                            </div>
+                            <div className="p-4 md:p-6 bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 shrink-0">
+                                <div className="max-w-4xl mx-auto relative">
+                                    <div className="flex items-center gap-4 px-2 mb-2">
+                                        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-xs font-medium flex items-center gap-1">
+                                            <span className="material-icons text-sm">format_quote</span> 인용
+                                        </button>
+                                        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-xs font-medium flex items-center gap-1">
+                                            <span className="material-icons text-sm">list</span> 목록
+                                        </button>
+                                        <div className="flex-1"></div>
+                                        <span className="text-xs text-gray-400">Ctrl + Enter 전송</span>
+                                    </div>
+                                    <div className="relative bg-gray-50 dark:bg-[#1a1c20] rounded-2xl border border-gray-200 dark:border-gray-600 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all shadow-sm">
+                                        <textarea className="w-full bg-transparent border-none focus:ring-0 p-4 min-h-[60px] max-h-[150px] resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500" placeholder="의견을 입력하세요..."></textarea>
+                                        <div className="absolute bottom-2 right-2 flex items-center gap-2">
+                                            <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                                <span className="material-icons text-lg">mic</span>
+                                            </button>
+                                            <button className="h-9 w-9 bg-primary hover:bg-orange-600 text-white rounded-xl flex items-center justify-center transition-colors shadow-md">
+                                                <span className="material-icons text-lg transform -rotate-45 translate-x-0.5 -translate-y-0.5">send</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="text-center mt-3">
+                                        <p className="text-[10px] text-gray-400 dark:text-gray-500">
+                                            아고라 AI는 실수를 할 수 있습니다. 중요한 정보를 확인하세요.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <NavigationOverlay />
+                    <Routes>
+                        <Route path="/" element={<HomeScreen />} />
+                        <Route path="/detail" element={<IssueDetailScreen />} />
+                        <Route path="/community" element={<ForumScreen />} />
+                        <Route path="/ai-practice" element={<AIPracticeScreen />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

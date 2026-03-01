@@ -1,3 +1,9 @@
+⚠️ AI AGENT NOTICE
+
+Before coding, read:
+→ src/docs/DEVELOPMENT_GUIDE.md
+→ AGENT.md
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
