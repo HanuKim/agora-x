@@ -6,7 +6,7 @@ export const Header: React.FC = () => {
     const { user, isAuthenticated, openLoginModal } = useAuth();
 
     return (
-        <header className="sticky top-0 z-40 flex items-center justify-between px-md py-sm bg-bg border-b border-border">
+        <header className="sticky top-0 z-40 flex items-center justify-between px-md py-md bg-bg border-b border-border">
             {/* Logo */}
             <NavLink to="/" className="no-underline">
                 <img src="/logo.png" alt="Agora-X Logo" className="h-8" />
