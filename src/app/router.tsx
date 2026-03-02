@@ -12,22 +12,20 @@ const Login = React.lazy(() => import('../pages/Login').then(m => ({ default: m.
 const DiscussionAI = React.lazy(() => import('../pages/DiscussionAI').then(m => ({ default: m.DiscussionAI })));
 const Guide = React.lazy(() => import('../pages/Guide').then(m => ({ default: m.Guide })));
 
-const LoadingFallback = () => (
-    <div className="flex justify-center p-[50px]">Loading...</div>
-);
+const loadingFallback = <div className="flex justify-center p-[50px]">Loading...</div>;
 
 // App Router Configuration
 export const router = createBrowserRouter([
     {
         path: '/',
         element: (
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense fallback={loadingFallback}>
                 <MainLayout />
             </Suspense>
         ),
         children: [
             { path: '/', element: <Home /> },
-            { path: '/detail', element: <Detail /> },
+            { path: '/detail/:id', element: <Detail /> },
             { path: '/community', element: <Community /> },
             { path: '/ai-discussion', element: <DiscussionAI /> },
             { path: '/guide', element: <Guide /> },
@@ -44,7 +42,7 @@ export const router = createBrowserRouter([
     {
         path: '/login',
         element: (
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense fallback={loadingFallback}>
                 <Login />
             </Suspense>
         ),
