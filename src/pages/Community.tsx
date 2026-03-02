@@ -1,6 +1,9 @@
 import React from 'react';
+
 import { NewsCard } from '../components/community/NewsCard';
 import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
+import { Link } from 'react-router-dom';
+import newsData from '../data/selectedNews.json';
 
 export const Community: React.FC = () => {
     // limit 없이 호출 → 전체 기사 처리
@@ -15,12 +18,14 @@ export const Community: React.FC = () => {
 
             <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-lg">
                 {items.map((item) => (
+                   <Link key={index} to="/detail/1" className="no-underline">
                     <NewsCard
                         key={item.id}
                         article={item}
                         showAI={false}
                         onClick={() => {/* 상세 페이지 연결 예정 */ }}
                     />
+                    </Link>
                 ))}
             </div>
         </div>
