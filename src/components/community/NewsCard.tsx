@@ -44,7 +44,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) 
         >
             {/* ── Image ─────────────────────────────── */}
             {article.imageUrl ? (
-                <div className="relative h-[180px] w-full overflow-hidden">
+                <div className="relative h-[200px] w-full overflow-hidden">
                     <img
                         src={article.imageUrl}
                         alt={article.title}
@@ -58,7 +58,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) 
                     </div>
                 </div>
             ) : (
-                <div className="relative h-[180px] bg-surface flex items-center justify-center">
+                <div className="relative h-[200px] bg-surface flex items-center justify-center">
                     <span className="inline-flex items-center px-sm py-[4px] rounded-full text-xs font-bold bg-white shadow-sm absolute top-3 left-3">
                         <span className="w-2 h-2 rounded-full mr-2 bg-primary" />
                         {article.category}
