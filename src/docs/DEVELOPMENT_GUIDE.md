@@ -1,36 +1,127 @@
 # ✅ Agora-X Frontend Initialization Guide 
 
-```md
-# Agora-X Frontend Initialization Guide
-
 This document defines the **initial frontend setup standard**
 for the Agora-X hackathon project.
 
 Agora-X is an AI-assisted political discussion platform
 built on curated news articles.
 
+Agora-X is an AI-assisted political discussion platform
+built around curated news articles.
+
+The AI serves as a moderator,
+providing concise summaries and generating balanced
+pros and cons arguments to foster meaningful discussion.
+
+At this stage, the project operates using mock data
+and runs exclusively in a local development environment.
+
+Our goal is to deliver a polished, high-quality prototype
+and win the hackathon.
+
 ⚠️ Deployment is NOT required.
 ⚠️ Local execution level implementation only.
 
-The goal of this phase is to establish a scalable UI foundation
-so that additional pages can be added easily by other developers.
+---
+
+## 🧠 Problem Statement
+
+Online political discussions are often polarized,
+emotion-driven, and dominated by identity rather than ideas.
+
+Users tend to argue from fixed positions,
+rarely encountering structured counterarguments.
+
+There is a lack of systems that:
+
+- Encourage balanced reasoning
+- Promote civil discourse
+- Separate ideas from identity
+
+---
+
+## 🤖 Why AI as a Moderator?
+
+Agora-X introduces AI as a neutral moderator.
+
+The AI:
+
+- Summarizes articles to reduce misinformation
+- Presents structured pros and cons
+- Encourages evidence-based reasoning
+- Reduces emotional escalation
+
+The AI does NOT replace users.
+It structures the discussion.
+
+---
+
+## 🌍 Social Impact
+
+Agora-X aims to:
+
+- Reduce ideological polarization
+- Encourage critical thinking
+- Promote constructive civic dialogue
+- Experiment with AI-assisted democratic discourse
+
+This project explores how AI can improve
+the quality of public conversation,
+not replace human participation.
+
+---
+
+## 🎭 Anonymous Topic-Based Identity
+
+To reduce identity-based bias,
+users are assigned a random nickname
+for each discussion topic.
+
+This ensures:
+
+- Arguments are evaluated by content, not reputation
+- Reduced personal targeting
+- Topic-focused participation
+
+---
+
+## 🎯 Core Functional Goals
+
+1. AI Article Summarization
+   - Provide concise neutral summaries
+
+2. Structured Argument Generation
+   - Present pros and cons positions
+
+3. AI-Moderated Discussion
+   - Encourage balanced reasoning
+
+4. Topic-Based Anonymous Identity
+   - Assign random nickname per topic
+
+5. Community Discussion Layer
+   - Enable structured thread-based debate
+
+---
+
+## 🚀 Vision Beyond the Hackathon
+
+Agora-X is a prototype exploring
+how AI can improve democratic dialogue.
+
+Future directions may include:
+
+- Fact-checking integration
+- Sentiment moderation
+- Bias detection
+- Public policy simulation debates
 
 ---
 
 ## ✅ Current Implementation Scope
-
-This stage implements ONLY:
-
-- Social Login UI
-- News Article Rendering
-- Navigation Structure
-- Design System Foundation
-
 NOT included yet:
 
 - Backend server
-- Real authentication validation
-- Deployment
 - Database connection
 
 ---
@@ -249,7 +340,7 @@ agora-x/
 ├── public/
 │     ├── code.html
 │     ├── favicon.png
-│     ├── logo_dark.png
+│     ├── logo-dark.png
 │     └── logo.png
 │
 ├── src/
@@ -386,8 +477,6 @@ export const tokens = {
 
 News data is provided as JSON.
 
-Create:
-
 ```
 src/data/selectedNews.json
 ```
@@ -444,32 +533,4 @@ Antigravity should:
 
 Never generate isolated styling.
 
----
-
-## ✅ Development Order
-
-1. Apply favicon & logo
-2. Configure design/theme.ts
-3. Build UI components (Buttons, Cards, Inputs)
-4. Implement Contexts (AuthContext for Global Login State & Persistence)
-5. Implement Router (with React.lazy)
-6. Create Login Page & Modal (Google, Kakao)
-7. Build Home Layout styled from code.html
-8. Render News from JSON in Community Page
-9. Add AI Discussion & Guide routing
-
----
-
-## ✅ Goal of This Stage
-
-After completion:
-
-✅ Login persistence works
-✅ Kakao & Google Initialized
-✅ Home renders stunning curated articles interface
-✅ Navigation unified
-✅ Bundle optimized via Lazy Loading
-✅ Design system intact
-
-```
 
