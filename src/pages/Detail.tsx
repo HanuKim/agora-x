@@ -3,9 +3,16 @@ import { useParams } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { theme } from '../design/theme';
+import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 
 export const Detail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const numericId = id ? Number(id) : NaN;
+    const { items } = useNewsWithAISummary();
+    const article = items.find((item) => item.id === numericId);
+
+    const debateTopic = article?.aiSummary?.debateTopic;
+    const overview = article?.aiSummary?.overview;
 
     return (
         <div className={theme.section.page}>
@@ -22,11 +29,7 @@ export const Detail: React.FC = () => {
                     </div>
 
                     <h1 className="text-[2.25rem] md:text-[3rem] font-extrabold leading-tight text-text-primary break-keep">
-                        주 4일 근무제 도입,
-                        <br />
-                        <span className="text-primary">
-                            시기상조인가, 필수 변화인가?
-                        </span>
+                        {debateTopic ?? '토론 주제를 불러오는 중입니다.'}
                     </h1>
 
                     {id && (
@@ -42,9 +45,7 @@ export const Detail: React.FC = () => {
                                 <span>AI 핵심 요약 (AI Summary)</span>
                             </div>
                             <p className="text-base md:text-lg text-text-secondary leading-relaxed break-keep">
-                                이 제안은 현재의 주 5일 근무제를 주 4일로 단축하여 근로자의 삶의 질을 높이고 생산성을
-                                향상시키자는 취지입니다. 찬성 측은 업무 효율성 증대와 소비 활성화를 주장하는 반면, 반대 측은
-                                기업의 인건비 부담 증가와 국가 경쟁력 약화를 우려하며 치열하게 대립하고 있습니다.
+                                {overview ?? 'AI 개요를 불러오는 중입니다.'}
                             </p>
                         </Card>
                     </div>
