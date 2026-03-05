@@ -24,6 +24,10 @@ export interface NewsAISummary {
     overview: string;
     /** JSON topic 필드를 바탕으로 도출한 토론 주제 */
     debateTopic: string;
+    /** 찬성 측 논거 3개 */
+    proArguments: string[];
+    /** 반대 측 논거 3개 */
+    conArguments: string[];
 }
 
 export interface IssueAIAnalysis {
@@ -112,6 +116,8 @@ export class ClaudeService {
         const fallback: NewsAISummary = {
             overview: summary.slice(0, 80) || topic,
             debateTopic: topic,
+            proArguments: [],
+            conArguments: [],
         };
 
         if (!this.apiKey) return fallback;
@@ -128,23 +134,36 @@ export class ClaudeService {
 
 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {
-  "overview": "기사 핵심 내용을 한 문장으로 요약 (60자 이내, 지식 수준에 맞는 표현)",
-  "debateTopic": "이 기사를 바탕으로 시민이 토론할 수 있는 구체적인 질문 (35자 이내)"
+  "overview": "기사 핵심 내용을 한 문장으로 요약 (60~70자 이내, 지식 수준에 맞는 표현)",
+  "debateTopic": "이 기사를 바탕으로 시민이 토론할 수 있는 구체적인 질문 (50자 이내)",
+  "proArguments": ["찬성 논거 1 (40자 이내)", "찬성 논거 2 (40자 이내)", "찬성 논거 3 (40자 이내)"],
+  "conArguments": ["반대 논거 1 (40자 이내)", "반대 논거 2 (40자 이내)", "반대 논거 3 (40자 이내)"]
 }`;
 
             const { reply } = await this.sendMessage({
                 messages: [{ role: 'user', content: userPrompt }],
                 systemPrompt:
                     '당신은 한국 사회 이슈를 분석하는 AI입니다. 반드시 유효한 JSON만 반환하세요.',
-                maxTokens: 256,
+                maxTokens: 512,
             });
 
             const cleaned = reply.replace(/```json?/g, '').replace(/```/g, '').trim();
-            const parsed = JSON.parse(cleaned) as { overview?: string; debateTopic?: string };
+            const parsed = JSON.parse(cleaned) as {
+                overview?: string;
+                debateTopic?: string;
+                proArguments?: string[];
+                conArguments?: string[];
+            };
 
             return {
                 overview: parsed.overview?.trim() || fallback.overview,
                 debateTopic: parsed.debateTopic?.trim() || fallback.debateTopic,
+                proArguments: Array.isArray(parsed.proArguments) && parsed.proArguments.length > 0
+                    ? parsed.proArguments.slice(0, 3).map((s) => s.trim())
+                    : fallback.proArguments,
+                conArguments: Array.isArray(parsed.conArguments) && parsed.conArguments.length > 0
+                    ? parsed.conArguments.slice(0, 3).map((s) => s.trim())
+                    : fallback.conArguments,
             };
         } catch (e) {
             console.warn('[ClaudeService] generateNewsAISummary fallback. Error:', e);
@@ -193,10 +212,10 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
 
 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {
-  "background": "이 이슈의 배경과 사회적 맥락 설명 (150자 이내, 지식 수준에 맞게)",
+  "background": "이 이슈의 배경과 사회적 맥락 설명 (500자 이내, 지식 수준에 맞게)",
   "keyPoints": ["핵심 쟁점 1", "핵심 쟁점 2", "핵심 쟁점 3"],
-  "proArguments": ["찬성 심화 논거 1", "찬성 심화 논거 2", "찬성 심화 논거 3"],
-  "conArguments": ["반대 심화 논거 1", "반대 심화 논거 2", "반대 심화 논거 3"]
+"proArguments": ["찬성 논거 1 (40자 이내)", "찬성 논거 2 (40자 이내)", "찬성 논거 3 (40자 이내)"],
+  "conArguments": ["반대 논거 1 (40자 이내)", "반대 논거 2 (40자 이내)", "반대 논거 3 (40자 이내)"]
 }`;
 
             const { reply } = await this.sendMessage({
