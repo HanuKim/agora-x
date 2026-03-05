@@ -60,6 +60,26 @@ function parseArticles(data: Record<string, unknown>[]): NewsArticle[] {
 
 const allParsedArticles = parseArticles(rawArticles);
 
+/** 캐시된 데이터가 예전 형식(논거별 요약 누락 등)이어도 현재 형식으로 맞춤 */
+function normalizeNewsAISummary(cached: Partial<NewsAISummary> & { overview?: string; debateTopic?: string }): NewsAISummary {
+    const pro = Array.isArray(cached.proArguments) ? cached.proArguments.slice(0, 2).map((s) => String(s).trim()) : [];
+    const con = Array.isArray(cached.conArguments) ? cached.conArguments.slice(0, 2).map((s) => String(s).trim()) : [];
+    const proSummaries = Array.isArray(cached.proArgumentSummaries)
+        ? cached.proArgumentSummaries.slice(0, 2).map((s) => String(s).trim())
+        : [];
+    const conSummaries = Array.isArray(cached.conArgumentSummaries)
+        ? cached.conArgumentSummaries.slice(0, 2).map((s) => String(s).trim())
+        : [];
+    return {
+        overview: cached.overview?.trim() ?? '',
+        debateTopic: cached.debateTopic?.trim() ?? '',
+        proArguments: pro,
+        conArguments: con,
+        proArgumentSummaries: proSummaries,
+        conArgumentSummaries: conSummaries,
+    };
+}
+
 export function useNewsWithAISummary(limit?: number, issueAnalysisForId?: number) {
     const { getLevelForCategory, knowledgePrefs } = useUserPrefs();
 
@@ -76,6 +96,8 @@ export function useNewsWithAISummary(limit?: number, issueAnalysisForId?: number
                 debateTopic: a.topic,
                 proArguments: [],
                 conArguments: [],
+                proArgumentSummaries: [],
+                conArgumentSummaries: [],
             },
             aiLoading: true,
             issueAnalysis: {
@@ -98,6 +120,8 @@ export function useNewsWithAISummary(limit?: number, issueAnalysisForId?: number
                     debateTopic: a.topic,
                     proArguments: [],
                     conArguments: [],
+                    proArgumentSummaries: [],
+                    conArgumentSummaries: [],
                 },
                 aiLoading: true,
                 issueAnalysis: {
@@ -147,7 +171,7 @@ export function useNewsWithAISummary(limit?: number, issueAnalysisForId?: number
 
                     let aiSummary: NewsAISummary;
                     if (cachedNews) {
-                        aiSummary = cachedNews;
+                        aiSummary = normalizeNewsAISummary(cachedNews);
                         upsertNews(aiSummary, false);
                     } else {
                         // 캐시 미스 → Claude API 호출
