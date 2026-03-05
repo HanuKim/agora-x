@@ -36,7 +36,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick, compact })
     if (compact) {
         return (
             <Card
-                className="snap-start flex-shrink-0 w-[220px] flex flex-col gap-sm cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                className="snap-start flex-shrink-0 w-[220px] flex flex-col gap-sm cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
                 onClick={onClick}
             >
                 <span className={`self-start text-xs font-bold px-sm py-[2px] rounded-full ${badgeClass}`}>
@@ -58,7 +58,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick, compact })
 
     return (
         <Card
-            className="flex flex-col gap-sm cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            className="flex flex-col gap-sm cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
             onClick={onClick}
         >
             <span className={`self-start text-xs font-bold px-sm py-[2px] rounded-full ${badgeClass}`}>

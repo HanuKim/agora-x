@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { IssueCard } from '../components/discussion/IssueCard';
@@ -18,10 +18,27 @@ const issues: Issue[] = (issuesData as { title: string; issues: Issue[] }).issue
 
 export const Home: React.FC = () => {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const isPaused = useRef(false);
+    const CARD_WIDTH = 236; // 220px card + 16px gap
+
+    // Auto-scroll: 3초마다 카드 하나씩 오른쪽으로, 끝에 도달하면 처음으로
+    useEffect(() => {
+        const timer = setInterval(() => {
+            if (isPaused.current || !scrollRef.current) return;
+            const el = scrollRef.current;
+            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+            if (atEnd) {
+                el.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                el.scrollBy({ left: CARD_WIDTH, behavior: 'smooth' });
+            }
+        }, 3000);
+        return () => clearInterval(timer);
+    }, []);
 
     const scroll = (dir: 'left' | 'right') => {
         if (scrollRef.current) {
-            scrollRef.current.scrollBy({ left: dir === 'right' ? 600 : -600, behavior: 'smooth' });
+            scrollRef.current.scrollBy({ left: dir === 'right' ? CARD_WIDTH : -CARD_WIDTH, behavior: 'smooth' });
         }
     };
     const navigate = useNavigate();
@@ -31,43 +48,56 @@ export const Home: React.FC = () => {
     return (
         <div className="min-h-screen bg-bg font-sans">
             {/* ── Hero ─────────────────────────────── */}
-            <header className="bg-dark-brand text-text-inverse px-xl pt-xxl pb-xxl text-center relative overflow-hidden rounded-b-[3rem]">
-                {/* decorative blobs */}
-                <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none" />
-                <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-blue-500 opacity-20 blur-3xl rounded-full pointer-events-none" />
+            <header className="bg-[#1e2a3a] text-white px-xl pt-xxl pb-xxl text-center relative overflow-hidden rounded-b-[3rem]">
+                {/* Decorative floating blobs */}
+                <div className="hero-blob absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none" />
+                <div className="hero-blob-2 absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-blue-500 opacity-20 blur-3xl rounded-full pointer-events-none" />
 
                 <div className="relative z-10 max-w-[800px] mx-auto">
-                    {/* Badge */}
-                    <div className="inline-flex items-center gap-xs px-md py-xs rounded-full bg-white/10 border border-white/20 mb-lg">
+                    {/* Badge — delay 1 */}
+                    <div className="hero-item hero-delay-1 inline-flex items-center gap-xs px-md py-xs rounded-full bg-white/15 border border-white/30 mb-lg">
                         <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                        <span className="text-sm font-medium">AI와 열어가는 시민의 광장</span>
+                        <span className="text-sm font-medium text-white">AI와 열어가는 시민의 광장</span>
                     </div>
 
-                    <h1 className="text-[3.5rem] font-extrabold leading-tight mb-lg">
+                    {/* H1 — delay 2 */}
+                    <h1 className="hero-item hero-delay-2 text-[3.5rem] font-extrabold leading-tight mb-lg text-white">
                         미래의 시민 담론을 <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-300 relative">만들어 갑니다</span>
-                        <svg className="w-full h-3 -bottom-1 left-0 text-primary opacity-80" fill="none" viewBox="0 0 200 9" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.7509 9.37523 78.9113 9.81705 112.604 7.40837C129.352 6.21115 136.138 6.55181 151.782 5.23438C161.731 4.39656 176.475 3.32839 198.004 2.03058" stroke="currentColor" stroke-width="3"></path></svg>
+                        {/* SVG underline — draws left-to-right via hero-underline class */}
+                        <svg className="w-full h-3 text-primary opacity-90" fill="none" viewBox="0 0 200 9" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                className="hero-underline"
+                                d="M2.00025 6.99997C25.7509 9.37523 78.9113 9.81705 112.604 7.40837C129.352 6.21115 136.138 6.55181 151.782 5.23438C161.731 4.39656 176.475 3.32839 198.004 2.03058"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                            />
+                        </svg>
                     </h1>
 
-                    <p className="text-lg text-[#D1D5DB] mb-xl leading-relaxed">
+                    {/* Body text — delay 3 */}
+                    <p className="hero-item hero-delay-3 text-lg text-white/80 mb-xl leading-relaxed">
                         K-Agora는 고도화된 AI를 활용해 우리사회가 당면한 문제를 포착하고 핵심 쟁점을 분석하여,<br />  협치를 도모하고 사회적 신뢰 회복을 위한 토론의 장을 제공합니다.
                         <br /> 모든 이의 의견이 존중받는 이곳에서 당신의 생각을 나누어 주세요.
                     </p>
 
-                    <div className="flex justify-center gap-md">
-                        <Button size="lg" onClick={() => navigate('/community')}>
+                    {/* Buttons — delay 4 */}
+                    <div className="hero-item hero-delay-4 flex justify-center gap-md">
+                        <Button size="lg" className="text-white!" onClick={() => navigate('/community')}>
                             국민 토론 참여
                         </Button>
                         <Button
                             size="lg"
                             onClick={() => navigate('/ai-discussion')}
-                            className="bg-transparent! text-text-inverse! border-2 border-gray-brand hover:bg-white/10!"
+                            className="bg-transparent! text-white! border-2 border-white/50 hover:bg-white/15! hover:border-white!"
                         >
                             일대일 토론 시작 →
                         </Button>
                     </div>
                 </div>
             </header>
+
 
             {/* ── 1:1 토론하기 (구 "지금 뜨는 이슈") ────────── */}
             <section className="max-w-[1200px] mx-auto px-xl mt-xxl">
@@ -99,10 +129,12 @@ export const Home: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Horizontal scroll container — 5 cards visible, snap */}
+                {/* Horizontal scroll container — auto-scrolls every 3s, pauses on hover */}
                 <div
                     ref={scrollRef}
-                    className="flex gap-lg overflow-x-auto pt-sm pb-md snap-x [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-surface [&::-webkit-scrollbar-thumb]:bg-gray-brand/40 [&::-webkit-scrollbar-thumb]:rounded-full"
+                    onMouseEnter={() => { isPaused.current = true; }}
+                    onMouseLeave={() => { isPaused.current = false; }}
+                    className="flex gap-lg overflow-x-auto pt-sm pb-md snap-x [&::-webkit-scrollbar]:h-[0px]"
                 >
                     {issues.map((issue) => (
                         <IssueCard

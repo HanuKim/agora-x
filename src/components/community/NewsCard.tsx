@@ -39,7 +39,7 @@ interface NewsCardProps {
 export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) => {
     return (
         <div
-            className="flex flex-col bg-bg rounded-[1.25rem] border border-border overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            className="flex flex-col bg-bg rounded-[1.25rem] border border-border overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
             onClick={onClick}
         >
             {/* ── Image ─────────────────────────────── */}
@@ -51,7 +51,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) 
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute top-3 left-3">
-                        <span className="inline-flex items-center px-sm py-[4px] rounded-full text-xs font-bold bg-white shadow-sm">
+                        <span className="inline-flex items-center px-sm py-[4px] rounded-full text-xs font-bold bg-white/90 dark:bg-surface text-gray-800 dark:text-text-primary shadow-sm">
                             <span className="w-2 h-2 rounded-full mr-2 bg-primary" />
                             {article.category}
                         </span>
@@ -59,7 +59,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) 
                 </div>
             ) : (
                 <div className="relative h-[200px] bg-surface flex items-center justify-center">
-                    <span className="inline-flex items-center px-sm py-[4px] rounded-full text-xs font-bold bg-white shadow-sm absolute top-3 left-3">
+                    <span className="inline-flex items-center px-sm py-[4px] rounded-full text-xs font-bold bg-white/90 dark:bg-surface text-gray-800 dark:text-text-primary shadow-sm absolute top-3 left-3">
                         <span className="w-2 h-2 rounded-full mr-2 bg-primary" />
                         {article.category}
                     </span>
