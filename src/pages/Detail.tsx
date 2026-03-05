@@ -8,11 +8,15 @@ import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 export const Detail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const numericId = id ? Number(id) : NaN;
-    const { items } = useNewsWithAISummary();
+    const issueAnalysisForId = Number.isFinite(numericId) ? numericId : undefined;
+    const { items } = useNewsWithAISummary(undefined, issueAnalysisForId);
     const article = items.find((item) => item.id === numericId);
 
-    const debateTopic = article?.aiSummary?.debateTopic;
-    const overview = article?.aiSummary?.overview;
+    // 토론 주제: 기사 topic·내용 기반으로 AI가 추출한 debateTopic 우선, 미적용 시 기사 topic
+    const debateTopic =
+        article?.aiSummary?.debateTopic ?? article?.topic;
+
+    const overview = article?.issueAnalysis?.background ?? article?.aiSummary?.overview;
 
     return (
         <div className={theme.section.page}>

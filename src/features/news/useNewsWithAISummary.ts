@@ -10,7 +10,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import rawNewsData from '../../data/selectedNews.json';
-import { claudeService, type NewsAISummary } from '../../services/ai/claudeService';
+import { claudeService, type IssueAIAnalysis, type NewsAISummary } from '../../services/ai/claudeService';
 import { getCachedAIResult, setCachedAIResult, cacheKey } from '../../services/ai/aiCacheDB';
 import { useUserPrefs } from '../user/hooks/useUserPrefs';
 import { mapToContentCategory } from '../user/types';
@@ -30,6 +30,8 @@ export interface NewsArticle {
 export interface NewsWithAI extends NewsArticle {
     aiSummary: NewsAISummary;
     aiLoading: boolean;
+    issueAnalysis: IssueAIAnalysis;
+    issueLoading: boolean;
 }
 
 const rawArticles = (rawNewsData as { selectedNews: Record<string, unknown>[] }).selectedNews;
@@ -58,7 +60,7 @@ function parseArticles(data: Record<string, unknown>[]): NewsArticle[] {
 
 const allParsedArticles = parseArticles(rawArticles);
 
-export function useNewsWithAISummary(limit?: number) {
+export function useNewsWithAISummary(limit?: number, issueAnalysisForId?: number) {
     const { getLevelForCategory, knowledgePrefs } = useUserPrefs();
 
     const articlesToProcess = useMemo(
@@ -69,8 +71,20 @@ export function useNewsWithAISummary(limit?: number) {
     const [items, setItems] = useState<NewsWithAI[]>(() =>
         articlesToProcess.map((a) => ({
             ...a,
-            aiSummary: { overview: a.summary.slice(0, 80) || a.topic, debateTopic: a.topic },
+            aiSummary: {
+                overview: a.summary.slice(0, 80) || a.topic,
+                debateTopic: a.topic,
+                proArguments: [],
+                conArguments: [],
+            },
             aiLoading: true,
+            issueAnalysis: {
+                background: `${a.topic}에 관한 한국 사회의 주요 쟁점입니다.`,
+                keyPoints: [a.topic],
+                proArguments: [],
+                conArguments: [],
+            },
+            issueLoading: issueAnalysisForId !== undefined && a.id === issueAnalysisForId,
         })),
     );
 
@@ -79,11 +93,23 @@ export function useNewsWithAISummary(limit?: number) {
         setItems(
             articlesToProcess.map((a) => ({
                 ...a,
-                aiSummary: { overview: a.summary.slice(0, 80) || a.topic, debateTopic: a.topic },
+                aiSummary: {
+                    overview: a.summary.slice(0, 80) || a.topic,
+                    debateTopic: a.topic,
+                    proArguments: [],
+                    conArguments: [],
+                },
                 aiLoading: true,
+                issueAnalysis: {
+                    background: `${a.topic}에 관한 한국 사회의 주요 쟁점입니다.`,
+                    keyPoints: [a.topic],
+                    proArguments: [],
+                    conArguments: [],
+                },
+                issueLoading: issueAnalysisForId !== undefined && a.id === issueAnalysisForId,
             })),
         );
-    }, [knowledgePrefs, articlesToProcess]);
+    }, [knowledgePrefs, articlesToProcess, issueAnalysisForId]);
 
     useEffect(() => {
         let cancelled = false;
@@ -93,38 +119,64 @@ export function useNewsWithAISummary(limit?: number) {
                 articlesToProcess.map(async (article, idx) => {
                     const contentCategory = mapToContentCategory(article.category);
                     const level = getLevelForCategory(contentCategory);
-                    const key = cacheKey.news(article.id, contentCategory, level);
+                    const newsKey = cacheKey.news(article.id, contentCategory, level);
+                    const shouldFetchIssue = issueAnalysisForId !== undefined && article.id === issueAnalysisForId;
+                    const issueKey = shouldFetchIssue ? cacheKey.issue(article.id, contentCategory, level) : null;
 
-                    // 1. 캐시 우선 조회
-                    const cached = await getCachedAIResult<NewsAISummary>(key);
-                    if (cached) {
-                        if (!cancelled) {
-                            setItems((prev) =>
-                                prev.map((item, i) =>
-                                    i === idx ? { ...item, aiSummary: cached, aiLoading: false } : item,
-                                ),
-                            );
-                        }
+                    const cachedNewsPromise = getCachedAIResult<NewsAISummary>(newsKey);
+                    const cachedIssuePromise = shouldFetchIssue && issueKey
+                        ? getCachedAIResult<IssueAIAnalysis>(issueKey)
+                        : Promise.resolve(null);
+                    const [cachedNews, cachedIssue] = await Promise.all([cachedNewsPromise, cachedIssuePromise]);
+
+                    const upsertNews = (aiSummary: NewsAISummary, aiLoading: boolean) => {
+                        if (cancelled) return;
+                        setItems((prev) =>
+                            prev.map((item, i) => (i === idx ? { ...item, aiSummary, aiLoading } : item)),
+                        );
+                    };
+
+                    const upsertIssue = (issueAnalysis: IssueAIAnalysis, issueLoading: boolean) => {
+                        if (cancelled) return;
+                        setItems((prev) =>
+                            prev.map((item, i) =>
+                                i === idx ? { ...item, issueAnalysis, issueLoading } : item,
+                            ),
+                        );
+                    };
+
+                    let aiSummary: NewsAISummary;
+                    if (cachedNews) {
+                        aiSummary = cachedNews;
+                        upsertNews(aiSummary, false);
+                    } else {
+                        // 캐시 미스 → Claude API 호출
+                        aiSummary = await claudeService.generateNewsAISummary(article.topic, article.summary, level);
+                        await setCachedAIResult(newsKey, aiSummary);
+                        upsertNews(aiSummary, false);
+                    }
+
+                    if (!shouldFetchIssue) {
                         return;
                     }
 
-                    // 2. 캐시 미스 → Claude API 호출
-                    const aiSummary = await claudeService.generateNewsAISummary(
+                    if (cachedIssue) {
+                        upsertIssue(cachedIssue, false);
+                        return;
+                    }
+
+                    const issueAnalysis = await claudeService.generateIssueAIAnalysis(
                         article.topic,
-                        article.summary,
+                        contentCategory,
+                        aiSummary.proArguments,
+                        aiSummary.conArguments,
                         level,
                     );
 
-                    // 3. 결과 캐싱
-                    await setCachedAIResult(key, aiSummary);
-
-                    if (!cancelled) {
-                        setItems((prev) =>
-                            prev.map((item, i) =>
-                                i === idx ? { ...item, aiSummary, aiLoading: false } : item,
-                            ),
-                        );
+                    if (issueKey) {
+                        await setCachedAIResult(issueKey, issueAnalysis);
                     }
+                    upsertIssue(issueAnalysis, false);
                 }),
             );
         };
@@ -136,7 +188,7 @@ export function useNewsWithAISummary(limit?: number) {
         };
         // knowledgePrefs 변경 시 재실행
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [knowledgePrefs, limit]);
+    }, [knowledgePrefs, limit, issueAnalysisForId]);
 
     return { items };
 }
