@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { router } from './app/router';
 import { AuthProvider, useAuth } from './features/auth';
+import { UserPrefsProvider } from './features/user';
 import './index.css';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
@@ -187,9 +188,11 @@ function App() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <AuthProvider>
-        <OAuthCallbackBridge />
-        <OAuthPostMessageListener />
-        <RouterProvider router={router} />
+        <UserPrefsProvider>
+          <OAuthCallbackBridge />
+          <OAuthPostMessageListener />
+          <RouterProvider router={router} />
+        </UserPrefsProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
   );
