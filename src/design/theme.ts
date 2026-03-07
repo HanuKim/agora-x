@@ -22,7 +22,7 @@ export const theme = {
         ].join(' '),
 
         variants: {
-            primary: 'bg-primary text-text-inverse hover:bg-primary-hover border-0',
+            primary: 'bg-primary text-white hover:bg-primary-hover border-0',
             secondary: 'bg-surface text-text-primary hover:bg-border border-0',
             outline: 'bg-transparent text-text-primary border border-border hover:border-primary',
             ghost: 'bg-transparent text-text-primary hover:bg-surface border-0',

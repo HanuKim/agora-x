@@ -48,7 +48,7 @@ export const Home: React.FC = () => {
     return (
         <div className="min-h-screen bg-bg font-sans">
             {/* ── Hero ─────────────────────────────── */}
-            <header className="bg-[#1e2a3a] text-white px-xl pt-xxl pb-xxl text-center relative overflow-hidden rounded-b-[3rem]">
+            <header className="bg-[#2B2E34] text-white px-xl pt-xxl pb-xxl text-center relative overflow-hidden rounded-b-[3rem]">
                 {/* Decorative floating blobs */}
                 <div className="hero-blob absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none" />
                 <div className="hero-blob-2 absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-blue-500 opacity-20 blur-3xl rounded-full pointer-events-none" />
@@ -78,7 +78,7 @@ export const Home: React.FC = () => {
 
                     {/* Body text — delay 3 */}
                     <p className="hero-item hero-delay-3 text-lg text-white/80 mb-xl leading-relaxed">
-                        K-Agora는 고도화된 AI를 활용해 우리사회가 당면한 문제를 포착하고 핵심 쟁점을 분석하여,<br />  협치를 도모하고 사회적 신뢰 회복을 위한 토론의 장을 제공합니다.
+                        Agora-X는 고도화된 AI를 활용해 우리사회가 당면한 문제를 포착하고 핵심 쟁점을 분석하여,<br /> 사회적 합의를 도모하고 우리 사회의 신뢰 회복을 위한 토론의 장을 제공합니다.
                         <br /> 모든 이의 의견이 존중받는 이곳에서 당신의 생각을 나누어 주세요.
                     </p>
 
@@ -107,7 +107,7 @@ export const Home: React.FC = () => {
                             일대일 토론하기
                         </h2>
                         <p className="text-text-secondary">
-                            AI와 자유롭게 소통하며 한국 사회의 주요 쟁점을 깊이 파헤쳐 봅니다.
+                            Agora-X의 AI, 아곰이와 대화하며 한국 사회의 주요 쟁점을 깊이 파헤쳐 봅니다.
                         </p>
                     </div>
                     {/* Scroll arrow buttons */}
@@ -168,7 +168,7 @@ export const Home: React.FC = () => {
                             key={item.id}
                             article={item}
                             showAI
-                            onClick={() => navigate('/community')}
+                            onClick={() => navigate(`/detail/${item.id}`)}
                         />
                     ))}
                 </div>

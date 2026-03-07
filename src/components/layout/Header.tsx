@@ -8,22 +8,19 @@ export const Header: React.FC = () => {
     const { isDark, toggleTheme } = useTheme();
 
     return (
-        <header className="sticky top-0 z-40 flex items-center justify-between px-md py-md bg-bg border-b border-border">
+        <header className="sticky top-0 z-40 flex items-center justify-between px-xl py-lg bg-bg dark:bg-[#2B2E34] border-b border-border">
             {/* Logo — dark 모드에서 logo-dark.png로 전환 */}
             <NavLink to="/" className="no-underline">
-                <img
-                    src={isDark ? '/logo-dark.png' : '/logo.png'}
-                    alt="Agora-X Logo"
-                    className="h-8"
-                />
+                <img src="/logo-dark.png" alt="Agora-X Logo" className="hidden dark:block h-8" />
+                <img src="/logo.png" alt="Agora-X Logo" className="block dark:hidden h-8" />
             </NavLink>
 
             {/* Nav */}
-            <nav className="flex gap-lg">
+            <nav className="flex gap-xl">
                 {[
                     { to: '/', label: '홈' },
-                    { to: '/community', label: '커뮤니티' },
-                    { to: '/ai-discussion', label: 'AI와의 토론' },
+                    { to: '/community', label: '국민 토론' },
+                    { to: '/ai-discussion', label: '일대일 토론' },
                     { to: '/guide', label: '이용 가이드' },
                 ].map(({ to, label }) => (
                     <NavLink
@@ -33,7 +30,7 @@ export const Header: React.FC = () => {
                         className={({ isActive }) =>
                             isActive
                                 ? 'text-sm font-bold text-primary no-underline'
-                                : 'text-sm font-medium text-text-secondary no-underline hover:text-primary transition-colors duration-200'
+                                : 'text-sm font-bold text-text-white no-underline hover:text-primary transition-colors duration-200'
                         }
                     >
                         {label}
@@ -58,7 +55,7 @@ export const Header: React.FC = () => {
                 ) : (
                     <button
                         onClick={openLoginModal}
-                        className="bg-primary text-text-inverse border-0 px-md py-xs rounded-md cursor-pointer font-sans text-sm font-medium hover:bg-primary-hover transition-colors duration-200"
+                        className="bg-primary text-white border-0 px-md py-xs rounded-md cursor-pointer font-sans text-sm font-medium hover:bg-primary-hover transition-colors duration-200"
                     >
                         로그인
                     </button>

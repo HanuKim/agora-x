@@ -116,7 +116,6 @@ export const LoginModal: React.FC = () => {
                 <Card variant="glass" className="w-full text-center bg-bg!">
                     {/* Header */}
                     <div className="mb-xl">
-                        <img src="/logo.png" alt="Agora-X Logo" className="h-12 mb-md object-contain mx-auto" />
                         <h2 className="text-[1.75rem] font-bold text-text-primary mb-xs">Sign In</h2>
                         <p className="text-sm text-text-secondary">Log in to participate in the discussion.</p>
                     </div>
@@ -125,27 +124,29 @@ export const LoginModal: React.FC = () => {
                     <div className="flex flex-col gap-md">
                         <Button
                             fullWidth
-                            className="bg-social-google! text-text-primary! border border-border!"
+                            className="bg-social-google! text-text-primary! dark:text-text-inverse! border-1! border-border!"
                             onClick={() => handleGoogleLogin()}
                         >
                             Continue with Google
                         </Button>
                         <Button
                             fullWidth
-                            className="bg-social-kakao! text-text-primary! border-0!"
+                            className="bg-social-kakao! text-text-primary! dark:text-text-inverse! border-0!"
                             onClick={handleKakaoLogin}
                         >
                             Continue with Kakao
                         </Button>
                         <Button
                             fullWidth
-                            className="bg-social-naver! text-text-inverse! border-0!"
+                            className="bg-social-naver! text-text-primary! dark:text-text-inverse! border-0!"
                             onClick={handleNaverLogin}
                         >
                             Continue with Naver
                         </Button>
                     </div>
-
+                    {/* 다크모드/라이트모드 로고 전환 */}
+                    <img src="/logo-dark.png" alt="Agora-X Logo" className="hidden dark:block h-12 mt-lg object-contain mx-auto" />
+                    <img src="/logo.png" alt="Agora-X Logo" className="block dark:hidden h-12 mt-lg object-contain mx-auto" />
                     <button
                         onClick={closeLoginModal}
                         className="mt-lg bg-none border-0 text-text-secondary cursor-pointer text-sm underline font-sans"
