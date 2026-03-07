@@ -169,4 +169,32 @@ export const cacheKey = {
         `news-${category}:${id}:${level}`,
     issue: (id: number | string, category: string, level: string) =>
         `issue-${category}:${id}:${level}`,
+    chatSession: (issueId: number | string) =>
+        `chat_session:${issueId}`,
 };
+
+export interface AIChatSession {
+    messages: { role: 'user' | 'assistant', content: string }[];
+    opinionAnalysis: {
+        clarity: number;
+        relevance: number;
+        logicValid: number;
+        feedback: string;
+    };
+}
+
+/**
+ * 특정 이슈의 채팅 세션을 조회합니다. (TTL과 동일한 생명주기)
+ */
+export async function getChatSession(issueId: number | string): Promise<AIChatSession | null> {
+    const key = cacheKey.chatSession(issueId);
+    return getCachedAIResult<AIChatSession>(key);
+}
+
+/**
+ * 특정 이슈의 채팅 세션을 저장합니다.
+ */
+export async function setChatSession(issueId: number | string, sessionData: AIChatSession): Promise<void> {
+    const key = cacheKey.chatSession(issueId);
+    return setCachedAIResult<AIChatSession>(key, sessionData);
+}

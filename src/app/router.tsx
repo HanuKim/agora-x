@@ -10,6 +10,7 @@ const Community = React.lazy(() => import('../pages/Community').then(m => ({ def
 const Profile = React.lazy(() => import('../pages/Profile').then(m => ({ default: m.Profile })));
 const Login = React.lazy(() => import('../pages/Login').then(m => ({ default: m.Login })));
 const DiscussionAI = React.lazy(() => import('../pages/DiscussionAI').then(m => ({ default: m.DiscussionAI })));
+const DiscussionAIDetail = React.lazy(() => import('../pages/DiscussionAIDetail').then(m => ({ default: m.DiscussionAIDetail })));
 const Guide = React.lazy(() => import('../pages/Guide').then(m => ({ default: m.Guide })));
 
 const loadingFallback = <div className="flex justify-center p-[50px]">Loading...</div>;
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
             { path: '/detail/:id', element: <Detail /> },
             { path: '/community', element: <Community /> },
             { path: '/ai-discussion', element: <DiscussionAI /> },
+            { path: '/ai-discussion/:id', element: <DiscussionAIDetail /> },
             { path: '/guide', element: <Guide /> },
             {
                 path: '/profile',

@@ -45,6 +45,13 @@ export interface IssueAIAnalysis {
     conArguments: string[];
 }
 
+export interface UserArgumentAnalysis {
+    clarity: number;     // 명확성 0~100
+    relevance: number;   // 관련성 0~100
+    logicValid: number;  // 오류 검증(논리적 타당성) 0~100
+    feedback: string;    // 사용자 의견에 대한 짧은 피드백이나 지적
+}
+
 // ─── 지식 수준 프롬프트 지시어 ─────────────────────────────────────────────────
 
 const LEVEL_INSTRUCTIONS: Record<KnowledgeLevel, string> = {
@@ -232,6 +239,34 @@ export class ClaudeService {
     }
 
     /**
+     * 특정 토론 이슈에 대해 50자 내외의 짧은 설명을 생성합니다.
+     * IssueCard에서 찬성 의견 대신 출력할 때 사용됩니다.
+     */
+    async generateIssueSummary(
+        issueTopic: string,
+        issueCategory: string
+    ): Promise<string> {
+        const fallback = "이 이슈에 대한 의견이 팽팽하게 대립하고 있습니다.";
+
+        if (!this.apiKey) return fallback;
+
+        try {
+            const userPrompt = `"${issueTopic}" (분야: ${issueCategory})에 대한 찬반 논쟁의 핵심을 50자 내외의 한 문장으로 매우 짧게 요약해 주세요. 추가 설명이나 인사말 없이 요약된 문장만 반환하세요.`;
+
+            const { reply } = await this.sendMessage({
+                messages: [{ role: 'user', content: userPrompt }],
+                systemPrompt: '당신은 토론 이슈를 짧고 명확하게 요약하는 AI입니다. 반드시 50자 내외의 한 문장만 리턴하세요.',
+                maxTokens: 100,
+            });
+
+            return reply.trim() || fallback;
+        } catch (e) {
+            console.warn('[ClaudeService] generateIssueSummary fallback. Error:', e);
+            return fallback;
+        }
+    }
+
+    /**
      * 한국 사회 토론 이슈에 대한 심화 AI 분석을 생성합니다.
      * 배경 설명, 핵심 쟁점, 찬반 심화 논거를 지식 수준에 맞게 제공합니다.
      *
@@ -305,6 +340,88 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
             };
         } catch (e) {
             console.warn('[ClaudeService] generateIssueAIAnalysis fallback. Error:', e);
+            return fallback;
+        }
+    }
+
+    /**
+     * 사용자의 발언에 대한 AI 반론 또는 토론 응답을 생성합니다.
+     */
+    async generateChatReply(
+        issueTopic: string,
+        chatHistory: { role: 'user' | 'assistant', content: string }[],
+        knowledgeLevel: KnowledgeLevel = 'medium'
+    ): Promise<string> {
+        if (!this.apiKey) return "AI 오류: 응답을 생성할 수 없습니다.";
+
+        const levelInstruction = LEVEL_INSTRUCTIONS[knowledgeLevel];
+
+        try {
+            const systemPrompt = `당신은 한국 사회 이슈 "${issueTopic}"에 대해 사용자와 1:1 토론을 하는 'K-아고라 AI'입니다.
+목적: 사용자의 주장에 대해 건설적이고 논리적인 반론을 제기하여 토론을 심화시킵니다.
+태도: 객관적, 논리적, 존중하는 태도.
+응답 지침: ${levelInstruction}
+제한: 한 번에 너무 길게 말하지 마세요. (300자 내외로 짧게 끊어서 질문이나 핵심 반론만 전달할 것). 자연스러운 대화체로 답변하세요.`;
+
+            const { reply } = await this.sendMessage({
+                messages: chatHistory,
+                systemPrompt,
+                maxTokens: 500,
+            });
+
+            return reply.trim();
+        } catch (e) {
+            console.error('[ClaudeService] generateChatReply failed:', e);
+            return "죄송합니다. 서버 통신 중 오류가 발생하여 답변할 수 없습니다.";
+        }
+    }
+
+    /**
+     * 사용자의 최신 주장을 분석하여 논리적 일관성 그래프 데이터를 제공합니다.
+     */
+    async analyzeUserArgument(
+        issueTopic: string,
+        userMessage: string
+    ): Promise<UserArgumentAnalysis> {
+        const fallback: UserArgumentAnalysis = { clarity: 0, relevance: 0, logicValid: 0, feedback: "분석 불가" };
+
+        if (!this.apiKey) return fallback;
+
+        try {
+            const userPrompt = `토론 주제: "${issueTopic}"
+사용자 주장: "${userMessage}"
+
+이 사용자의 주장을 분석하여 다음 3가지 항목에 대해 0에서 100 사이의 점수를 채점해 주세요.
+1. clarity (명확성): 주장이 얼마나 명확하게 전달되는가?
+2. relevance (관련성): 주제와 얼마나 밀접한가?
+3. logicValid (오류 검증): 논리적 비약이나 오류 없이 타당한가?
+그리고 4. feedback 에 짧은(50자 내외) 피드백을 적어주세요.
+
+반드시 아래 JSON 형식으로만 응답하세요:
+{
+  "clarity": 85,
+  "relevance": 90,
+  "logicValid": 70,
+  "feedback": "주장의 명확성은 좋으나, 일부 논리적 도약이 보입니다."
+}`;
+
+            const { reply } = await this.sendMessage({
+                messages: [{ role: 'user', content: userPrompt }],
+                systemPrompt: '당신은 토론 논리를 냉철하게 분석하는 채점관입니다. 유효한 JSON만 반환하세요.',
+                maxTokens: 300,
+            });
+
+            const cleaned = reply.replace(/```json?/g, '').replace(/```/g, '').trim();
+            const parsed = JSON.parse(cleaned) as Partial<UserArgumentAnalysis>;
+
+            return {
+                clarity: typeof parsed.clarity === 'number' ? parsed.clarity : 50,
+                relevance: typeof parsed.relevance === 'number' ? parsed.relevance : 50,
+                logicValid: typeof parsed.logicValid === 'number' ? parsed.logicValid : 50,
+                feedback: parsed.feedback || "의견에 대한 분석을 완료했습니다.",
+            };
+        } catch (e) {
+            console.error('[ClaudeService] analyzeUserArgument failed:', e);
             return fallback;
         }
     }

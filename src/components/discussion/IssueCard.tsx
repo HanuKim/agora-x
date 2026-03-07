@@ -14,14 +14,9 @@ import React from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { getCategoryBadgeClass } from '../../design/categoryColors';
+import { useIssueSummary, type SocialIssue } from '../../features/discussion/useIssueWithAI';
 
-export interface IssueCardData {
-    id: number;
-    topic: string;
-    category: string;
-    pro: string[];
-    con: string[];
-}
+export interface IssueCardData extends SocialIssue { }
 
 interface IssueCardProps {
     issue: IssueCardData;
@@ -32,6 +27,7 @@ interface IssueCardProps {
 
 export const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick, compact }) => {
     const badgeClass = getCategoryBadgeClass(issue.category);
+    const { summary, loading } = useIssueSummary(issue);
 
     if (compact) {
         return (
@@ -45,9 +41,12 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick, compact })
                 <h3 className="text-sm font-semibold text-text-primary leading-snug line-clamp-3">
                     {issue.topic}
                 </h3>
-                <p className="text-xs text-text-secondary line-clamp-2 flex-1">
-                    <span className="text-success font-semibold">찬성</span>
-                    {' · '}{issue.pro[0].substring(0, 28)}…
+                <p className="text-xs text-text-secondary line-clamp-3 flex-1">
+                    {loading ? (
+                        <span className="animate-pulse">AI 요약 생성 중...</span>
+                    ) : (
+                        summary
+                    )}
                 </p>
                 <span className="text-xs font-semibold text-primary mt-auto">
                     토론 시작하기 →
@@ -65,13 +64,17 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick, compact })
                 {issue.category}
             </span>
             <h3 className="text-lg font-semibold text-text-primary m-0">{issue.topic}</h3>
-            <p className="text-xs text-text-secondary flex-1">
-                <span className="text-success font-semibold">찬성</span>
-                {' · '}{issue.pro[0].substring(0, 30)}…
+            <p className="text-sm text-text-secondary flex-1 line-clamp-3 leading-relaxed">
+                {loading ? (
+                    <span className="animate-pulse">AI 요약 생성 중...</span>
+                ) : (
+                    summary
+                )}
             </p>
-            <Button variant="secondary" size="sm" className="self-end">
+            <Button variant="secondary" size="sm" className="bg-transparent! self-end text-primary!">
                 토론 시작하기 →
             </Button>
         </Card>
     );
 };
+
