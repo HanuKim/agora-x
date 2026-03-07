@@ -8,11 +8,20 @@ import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 export const Detail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const numericId = id ? Number(id) : NaN;
-    const { items } = useNewsWithAISummary();
+    const issueAnalysisForId = Number.isFinite(numericId) ? numericId : undefined;
+    const { items } = useNewsWithAISummary(undefined, issueAnalysisForId);
     const article = items.find((item) => item.id === numericId);
 
-    const debateTopic = article?.aiSummary?.debateTopic;
-    const overview = article?.aiSummary?.overview;
+    // 토론 주제: 기사 topic·내용 기반으로 AI가 추출한 debateTopic 우선, 미적용 시 기사 topic
+    const debateTopic =
+        article?.aiSummary?.debateTopic ?? article?.topic;
+
+    const overview = article?.issueAnalysis?.background ?? article?.aiSummary?.overview;
+    const proArguments = article?.aiSummary?.proArguments ?? [];
+    const conArguments = article?.aiSummary?.conArguments ?? [];
+    const proArgumentSummaries = article?.aiSummary?.proArgumentSummaries ?? [];
+    const conArgumentSummaries = article?.aiSummary?.conArgumentSummaries ?? [];
+    const aiLoading = article?.aiLoading ?? false;
 
     return (
         <div className={theme.section.page}>
@@ -65,43 +74,40 @@ export const Detail: React.FC = () => {
                             <span className="text-xs font-medium text-text-secondary">12.4k 지지</span>
                         </div>
 
-                        <Card padding="lg" className="border-l-4 border-success">
-                            <h3 className="font-bold text-lg mb-xs text-text-primary">생산성 및 효율성 증대</h3>
-                            <p className="text-sm text-text-secondary mb-sm break-keep">
-                                충분한 휴식이 보장되면 집중도가 높아져 업무 효율이 오릅니다. 마이크로소프트 일본 지사의 실험
-                                결과 생산성이 40% 증가했다는 사례가 이를 뒷받침합니다.
-                            </p>
-                            <div className="flex items-center gap-md text-xs text-text-secondary">
-                                <button
-                                    type="button"
-                                    className="inline-flex items-center gap-[2px] text-text-secondary hover:text-success transition-colors"
-                                >
-                                    <span className="material-icons-round text-[14px]">arrow_upward</span>
-                                    2.1k
-                                </button>
-                                <span>•</span>
-                                <span>출처: 경제연구소 보고서</span>
-                            </div>
-                        </Card>
-
-                        <Card padding="lg" className="border-l-4 border-success">
-                            <h3 className="font-bold text-lg mb-xs text-text-primary">워라밸 개선 및 내수 활성화</h3>
-                            <p className="text-sm text-text-secondary mb-sm break-keep">
-                                여가 시간이 늘어나면 자기 계발과 소비 활동이 활발해져 내수 경제에도 긍정적인 영향을
-                                미칩니다. 근로자의 삶의 만족도가 높아져 이직률 또한 감소합니다.
-                            </p>
-                            <div className="flex items-center gap-md text-xs text-text-secondary">
-                                <button
-                                    type="button"
-                                    className="inline-flex items-center gap-[2px] text-text-secondary hover:text-success transition-colors"
-                                >
-                                    <span className="material-icons-round text-[14px]">arrow_upward</span>
-                                    1.8k
-                                </button>
-                                <span>•</span>
-                                <span>출처: 2023 노동동향</span>
-                            </div>
-                        </Card>
+                        {proArguments.length === 0 ? (
+                            <>
+                                <Card padding="lg" className="border-l-4 border-success">
+                                    <h3 className="font-bold text-lg mb-xs text-text-primary">
+                                        {aiLoading ? '찬성 논거 불러오는 중' : '찬성 논거'}
+                                    </h3>
+                                    <p className="text-sm text-text-secondary mb-sm break-keep">
+                                        {aiLoading ? '지식 수준에 맞는 찬성 논거를 생성하고 있습니다.' : '아직 논거가 없습니다.'}
+                                    </p>
+                                </Card>
+                                <Card padding="lg" className="border-l-4 border-success">
+                                    <h3 className="font-bold text-lg mb-xs text-text-primary">—</h3>
+                                    <p className="text-sm text-text-secondary mb-sm break-keep">—</p>
+                                </Card>
+                            </>
+                        ) : (
+                            proArguments.map((arg, i) => (
+                                <Card key={i} padding="lg" className="border-l-4 border-success">
+                                    <h3 className="font-bold text-lg mb-xs text-text-primary">
+                                        {proArgumentSummaries[i] || `찬성 논거 ${i + 1}`}
+                                    </h3>
+                                    <p className="text-sm text-text-secondary mb-sm break-keep">{arg}</p>
+                                    <div className="flex items-center gap-md text-xs text-text-secondary">
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center gap-[2px] text-text-secondary hover:text-success transition-colors"
+                                        >
+                                            <span className="material-icons-round text-[14px]">arrow_upward</span>
+                                            추천
+                                        </button>
+                                    </div>
+                                </Card>
+                            ))
+                        )}
 
                         <Button
                             type="button"
@@ -161,43 +167,40 @@ export const Detail: React.FC = () => {
                             <span className="text-xs font-medium text-text-secondary">8.1k 반대</span>
                         </div>
 
-                        <Card padding="lg" className="border-r-4 border-danger">
-                            <h3 className="font-bold text-lg mb-xs text-text-primary">기업 비용 부담 증가</h3>
-                            <p className="text-sm text-text-secondary mb-sm break-keep">
-                                근무 시간이 줄어도 급여를 유지할 경우, 기업의 인건비 부담이 급격히 늘어나며 이는 자금력이
-                                부족한 중소기업에게 치명적일 수 있습니다.
-                            </p>
-                            <div className="flex items-center gap-md text-xs text-text-secondary justify-end">
-                                <span>출처: 중소기업중앙회</span>
-                                <span>•</span>
-                                <button
-                                    type="button"
-                                    className="inline-flex items-center gap-[2px] text-text-secondary hover:text-danger transition-colors"
-                                >
-                                    <span className="material-icons-round text-[14px]">arrow_upward</span>
-                                    3.4k
-                                </button>
-                            </div>
-                        </Card>
-
-                        <Card padding="lg" className="border-r-4 border-danger">
-                            <h3 className="font-bold text-lg mb-xs text-text-primary">시기상조 및 경쟁력 약화</h3>
-                            <p className="text-sm text-text-secondary mb-sm break-keep">
-                                아직 한국의 노동 생산성은 주요 선진국 대비 낮은 수준입니다. 준비 없는 섣부른 도입은 국가
-                                산업 경쟁력을 약화시키고 물가 상승을 초래할 수 있습니다.
-                            </p>
-                            <div className="flex items-center gap-md text-xs text-text-secondary justify-end">
-                                <span>출처: 한국경영자총협회</span>
-                                <span>•</span>
-                                <button
-                                    type="button"
-                                    className="inline-flex items-center gap-[2px] text-text-secondary hover:text-danger transition-colors"
-                                >
-                                    <span className="material-icons-round text-[14px]">arrow_upward</span>
-                                    1.2k
-                                </button>
-                            </div>
-                        </Card>
+                        {conArguments.length === 0 ? (
+                            <>
+                                <Card padding="lg" className="border-r-4 border-danger">
+                                    <h3 className="font-bold text-lg mb-xs text-text-primary">
+                                        {aiLoading ? '반대 논거 불러오는 중' : '반대 논거'}
+                                    </h3>
+                                    <p className="text-sm text-text-secondary mb-sm break-keep">
+                                        {aiLoading ? '지식 수준에 맞는 반대 논거를 생성하고 있습니다.' : '아직 논거가 없습니다.'}
+                                    </p>
+                                </Card>
+                                <Card padding="lg" className="border-r-4 border-danger">
+                                    <h3 className="font-bold text-lg mb-xs text-text-primary">—</h3>
+                                    <p className="text-sm text-text-secondary mb-sm break-keep">—</p>
+                                </Card>
+                            </>
+                        ) : (
+                            conArguments.map((arg, i) => (
+                                <Card key={i} padding="lg" className="border-r-4 border-danger">
+                                    <h3 className="font-bold text-lg mb-xs text-text-primary">
+                                        {conArgumentSummaries[i] || `반대 논거 ${i + 1}`}
+                                    </h3>
+                                    <p className="text-sm text-text-secondary mb-sm break-keep">{arg}</p>
+                                    <div className="flex items-center gap-md text-xs text-text-secondary justify-end">
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center gap-[2px] text-text-secondary hover:text-danger transition-colors"
+                                        >
+                                            <span className="material-icons-round text-[14px]">arrow_upward</span>
+                                            추천
+                                        </button>
+                                    </div>
+                                </Card>
+                            ))
+                        )}
 
                         <Button
                             type="button"

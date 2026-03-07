@@ -24,10 +24,14 @@ export interface NewsAISummary {
     overview: string;
     /** JSON topic 필드를 바탕으로 도출한 토론 주제 */
     debateTopic: string;
-    /** 찬성 측 논거 3개 */
+    /** 찬성 측 논거 2개 (150자 내외, 2~3문장) */
     proArguments: string[];
-    /** 반대 측 논거 3개 */
+    /** 반대 측 논거 2개 (150자 내외, 2~3문장) */
     conArguments: string[];
+    /** 찬성 논거별 핵심 요약 2개 (각 20자 내외) */
+    proArgumentSummaries: string[];
+    /** 반대 논거별 핵심 요약 2개 (각 20자 내외) */
+    conArgumentSummaries: string[];
 }
 
 export interface IssueAIAnalysis {
@@ -101,6 +105,52 @@ export class ClaudeService {
     }
 
     /**
+     * 응답 텍스트에서 JSON 객체를 추출해 NewsAISummary 형식으로 반환.
+     * 코드 블록·앞뒤 설명이 있어도 첫 번째 { } 쌍을 찾아 파싱.
+     */
+    private parseNewsSummaryJson(
+        reply: string,
+        fallback: NewsAISummary,
+    ): {
+        overview?: string;
+        debateTopic?: string;
+        proArguments?: string[];
+        conArguments?: string[];
+        proArgumentSummaries?: string[];
+        conArgumentSummaries?: string[];
+    } {
+        let raw = reply.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+        const firstBrace = raw.indexOf('{');
+        if (firstBrace !== -1) {
+            const lastBrace = raw.lastIndexOf('}');
+            if (lastBrace > firstBrace) {
+                raw = raw.slice(firstBrace, lastBrace + 1);
+            }
+        }
+        try {
+            const parsed = JSON.parse(raw) as Record<string, unknown>;
+            return {
+                overview: typeof parsed.overview === 'string' ? parsed.overview : fallback.overview,
+                debateTopic: typeof parsed.debateTopic === 'string' ? parsed.debateTopic : fallback.debateTopic,
+                proArguments: Array.isArray(parsed.proArguments)
+                    ? parsed.proArguments.map((s) => String(s))
+                    : fallback.proArguments,
+                conArguments: Array.isArray(parsed.conArguments)
+                    ? parsed.conArguments.map((s) => String(s))
+                    : fallback.conArguments,
+                proArgumentSummaries: Array.isArray(parsed.proArgumentSummaries)
+                    ? parsed.proArgumentSummaries.map((s) => String(s))
+                    : fallback.proArgumentSummaries,
+                conArgumentSummaries: Array.isArray(parsed.conArgumentSummaries)
+                    ? parsed.conArgumentSummaries.map((s) => String(s))
+                    : fallback.conArgumentSummaries,
+            };
+        } catch {
+            return fallback;
+        }
+    }
+
+    /**
      * 뉴스 기사의 한 줄 개요와 토론 주제를 생성합니다.
      * (지식 수준에 따라 표현 난이도 조절)
      *
@@ -118,6 +168,8 @@ export class ClaudeService {
             debateTopic: topic,
             proArguments: [],
             conArguments: [],
+            proArgumentSummaries: [],
+            conArgumentSummaries: [],
         };
 
         if (!this.apiKey) return fallback;
@@ -132,38 +184,46 @@ export class ClaudeService {
 
 응답 지침: ${levelInstruction}
 
+논거 추출 규칙:
+- 찬성 논거 2개, 반대 논거 2개만 추출하세요.
+- 각 논거는 150자 내외, 2~3문장으로 작성하세요.
+- 각 논거마다 핵심 요약을 15자 내외 한 문장으로 작성하세요 (proArgumentSummaries, conArgumentSummaries).
+
 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {
   "overview": "기사 핵심 내용을 한 문장으로 요약 (60~70자 이내, 지식 수준에 맞는 표현)",
   "debateTopic": "이 기사를 바탕으로 시민이 토론할 수 있는 구체적인 질문 (50자 이내)",
-  "proArguments": ["찬성 논거 1 (40자 이내)", "찬성 논거 2 (40자 이내)", "찬성 논거 3 (40자 이내)"],
-  "conArguments": ["반대 논거 1 (40자 이내)", "반대 논거 2 (40자 이내)", "반대 논거 3 (40자 이내)"]
+  "proArguments": ["찬성 논거 1 (150자 내외)", "찬성 논거 2 (150자 내외)"],
+  "conArguments": ["반대 논거 1 (150자 내외)", "반대 논거 2 (150자 내외)"],
+  "proArgumentSummaries": ["찬성 논거 1 핵심 요약 (15자 내외)", "찬성 논거 2 핵심 요약 (15자 내외)"],
+  "conArgumentSummaries": ["반대 논거 1 핵심 요약 (15자 내외)", "반대 논거 2 핵심 요약 (15자 내외)"]
 }`;
 
             const { reply } = await this.sendMessage({
                 messages: [{ role: 'user', content: userPrompt }],
                 systemPrompt:
-                    '당신은 한국 사회 이슈를 분석하는 AI입니다. 반드시 유효한 JSON만 반환하세요.',
-                maxTokens: 512,
+                    '당신은 한국 사회 이슈를 분석하는 AI입니다. 반드시 유효한 JSON만 반환하세요. 다른 설명 없이 JSON 객체만 출력하세요.',
+                maxTokens: 1024,
             });
 
-            const cleaned = reply.replace(/```json?/g, '').replace(/```/g, '').trim();
-            const parsed = JSON.parse(cleaned) as {
-                overview?: string;
-                debateTopic?: string;
-                proArguments?: string[];
-                conArguments?: string[];
-            };
-
+            const parsed = this.parseNewsSummaryJson(reply, fallback);
             return {
                 overview: parsed.overview?.trim() || fallback.overview,
                 debateTopic: parsed.debateTopic?.trim() || fallback.debateTopic,
                 proArguments: Array.isArray(parsed.proArguments) && parsed.proArguments.length > 0
-                    ? parsed.proArguments.slice(0, 3).map((s) => s.trim())
+                    ? parsed.proArguments.slice(0, 2).map((s) => String(s).trim())
                     : fallback.proArguments,
                 conArguments: Array.isArray(parsed.conArguments) && parsed.conArguments.length > 0
-                    ? parsed.conArguments.slice(0, 3).map((s) => s.trim())
+                    ? parsed.conArguments.slice(0, 2).map((s) => String(s).trim())
                     : fallback.conArguments,
+                proArgumentSummaries:
+                    Array.isArray(parsed.proArgumentSummaries) && parsed.proArgumentSummaries.length > 0
+                        ? parsed.proArgumentSummaries.slice(0, 2).map((s) => String(s).trim())
+                        : fallback.proArgumentSummaries,
+                conArgumentSummaries:
+                    Array.isArray(parsed.conArgumentSummaries) && parsed.conArgumentSummaries.length > 0
+                        ? parsed.conArgumentSummaries.slice(0, 2).map((s) => String(s).trim())
+                        : fallback.conArgumentSummaries,
             };
         } catch (e) {
             console.warn('[ClaudeService] generateNewsAISummary fallback. Error:', e);
