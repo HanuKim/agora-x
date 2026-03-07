@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { PollCard } from './PollCard';
-import { PollFormCard, type PollVote } from './PollFormCard';
+import { PollCardAfter } from './PollCardAfter';
+import { PollCardBefore, type PollVote } from './PollCardBefore';
 
 const STORAGE_KEY = (articleId: number) => `agora-poll-${articleId}`;
 
@@ -12,29 +12,43 @@ interface StoredPoll {
     conCount: number;
 }
 
+// 임의로 투표 수 변경 시 StoredPoll 변경
+const DEFAULT_POLL: StoredPoll = {
+    hasVoted: false,
+    selectedVote: null,
+    proCount: 10,
+    neutralCount: 3,
+    conCount: 5,
+};
+
 function loadPoll(articleId: number): StoredPoll {
     try {
         const raw = localStorage.getItem(STORAGE_KEY(articleId));
         if (raw) {
             const parsed = JSON.parse(raw) as Partial<StoredPoll>;
-            return {
+            const loaded: StoredPoll = {
                 hasVoted: parsed.hasVoted ?? false,
                 selectedVote: parsed.selectedVote ?? null,
                 proCount: parsed.proCount ?? 55,
                 neutralCount: parsed.neutralCount ?? 20,
                 conCount: parsed.conCount ?? 25,
             };
+            // 이전 기본값(55,20,25) 마이그레이션 → 0,0,0으로 리셋
+            const wasLegacyDefault =
+                !loaded.hasVoted &&
+                loaded.proCount === 55 &&
+                loaded.neutralCount === 20 &&
+                loaded.conCount === 25;
+            if (wasLegacyDefault) {
+                localStorage.setItem(STORAGE_KEY(articleId), JSON.stringify(DEFAULT_POLL));
+                return DEFAULT_POLL;
+            }
+            return loaded;
         }
     } catch {
         // ignore
     }
-    return {
-        hasVoted: false,
-        selectedVote: null,
-        proCount: 55,
-        neutralCount: 20,
-        conCount: 25,
-    };
+    return DEFAULT_POLL;
 }
 
 export interface PollSectionProps {
@@ -78,7 +92,7 @@ export const PollSection: React.FC<PollSectionProps> = ({ articleId }) => {
 
     if (poll.hasVoted) {
         return (
-            <PollCard
+            <PollCardAfter
                 proCount={poll.proCount}
                 neutralCount={poll.neutralCount}
                 conCount={poll.conCount}
@@ -89,7 +103,7 @@ export const PollSection: React.FC<PollSectionProps> = ({ articleId }) => {
     }
 
     return (
-        <PollFormCard
+        <PollCardBefore
             selectedVote={selectedVote}
             onSelect={setSelectedVote}
             onSubmit={handleVoteSubmit}

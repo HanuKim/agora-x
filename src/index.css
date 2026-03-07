@@ -197,3 +197,36 @@ a {
   stroke-dashoffset: 220;
   animation: drawPath 1s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
 }
+
+/* Poll chart: 12시 방향에서 시계방향으로 차트 나타남 */
+@property --poll-chart-reveal {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes pollChartReveal {
+  from {
+    --poll-chart-reveal: 0deg;
+  }
+  to {
+    --poll-chart-reveal: 360deg;
+  }
+}
+
+.poll-chart-reveal {
+  --poll-chart-reveal: 0deg;
+  mask-image: conic-gradient(
+    from 0deg,
+    black 0deg,
+    black var(--poll-chart-reveal),
+    transparent var(--poll-chart-reveal)
+  );
+  -webkit-mask-image: conic-gradient(
+    from 0deg,
+    black 0deg,
+    black var(--poll-chart-reveal),
+    transparent var(--poll-chart-reveal)
+  );
+  animation: pollChartReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

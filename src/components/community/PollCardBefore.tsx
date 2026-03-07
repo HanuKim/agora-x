@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 
 export type PollVote = 'pro' | 'neutral' | 'con';
 
-export interface PollFormCardProps {
+export interface PollCardBeforeProps {
     /** 현재 선택된 투표 (없으면 null) */
     selectedVote: PollVote | null;
     /** 투표 선택 핸들러 */
@@ -15,7 +15,7 @@ export interface PollFormCardProps {
     deadlineText?: string;
 }
 
-export const PollFormCard: React.FC<PollFormCardProps> = ({
+export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
     selectedVote,
     onSelect,
     onSubmit,

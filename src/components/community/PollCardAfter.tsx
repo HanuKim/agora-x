@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 
-export interface PollCardProps {
+export interface PollCardAfterProps {
     /** 찬성 투표 수 */
     proCount: number;
     /** 보류 투표 수 */
@@ -15,7 +15,7 @@ export interface PollCardProps {
     onEdit: () => void;
 }
 
-export const PollCard: React.FC<PollCardProps> = ({
+export const PollCardAfter: React.FC<PollCardAfterProps> = ({
     proCount,
     neutralCount,
     conCount,
@@ -27,12 +27,15 @@ export const PollCard: React.FC<PollCardProps> = ({
     const neutralPercent = total > 0 ? Math.round((neutralCount / total) * 100) : 0;
     const conPercent = total > 0 ? Math.round((conCount / total) * 100) : 0;
 
-    // conic-gradient: green(찬성) → gray(보류) → red(반대), 순서대로
-    const gradientStops = [
-        `#10b981 0% ${proPercent}%`,
-        `#9ca3af ${proPercent}% ${proPercent + neutralPercent}%`,
-        `#ef4444 ${proPercent + neutralPercent}% 100%`,
-    ].join(', ');
+    // total=0이면 회색 빈 차트, 그 외 conic-gradient: green(찬성) → gray(보류) → red(반대)
+    const gradientStops =
+        total === 0
+            ? '#e5e5e5 0% 100%'
+            : [
+                  `#10b981 0% ${proPercent}%`,
+                  `#9ca3af ${proPercent}% ${proPercent + neutralPercent}%`,
+                  `#ef4444 ${proPercent + neutralPercent}% 100%`,
+              ].join(', ');
 
     return (
         <aside className="lg:col-span-2 flex justify-center lg:pt-xl mb-lg lg:mb-0">
@@ -46,7 +49,7 @@ export const PollCard: React.FC<PollCardProps> = ({
 
                 <div className="relative w-24 h-24 mx-auto mb-md">
                     <div
-                        className="w-full h-full rounded-full"
+                        className="poll-chart-reveal w-full h-full rounded-full"
                         style={{
                             background: `conic-gradient(${gradientStops})`,
                         }}
