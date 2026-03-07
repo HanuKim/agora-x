@@ -72,7 +72,7 @@ export const Detail: React.FC = () => {
                                 </span>
                                 찬성 의견
                             </h2>
-                            <span className="text-xs font-medium text-text-secondary">12.4k 지지</span>
+                            {/* <span className="text-xs font-medium text-text-secondary">12.4k 지지</span> */}
                         </div>
 
                         {proArguments.length === 0 ? (
@@ -110,7 +110,7 @@ export const Detail: React.FC = () => {
                             ))
                         )}
 
-                        <Button
+                        {/* <Button
                             type="button"
                             variant="outline"
                             size="md"
@@ -119,7 +119,7 @@ export const Detail: React.FC = () => {
                         >
                             <span className="material-icons-round text-base">add</span>
                             찬성 의견 추가하기
-                        </Button>
+                        </Button> */}
                     </section>
 
                     {/* 현재 여론 현황 */}
@@ -137,7 +137,7 @@ export const Detail: React.FC = () => {
                                     <span className="material-icons-round text-base">thumb_down</span>
                                 </span>
                             </h2>
-                            <span className="text-xs font-medium text-text-secondary">8.1k 반대</span>
+                            {/* <span className="text-xs font-medium text-text-secondary">8.1k 반대</span> */}
                         </div>
 
                         {conArguments.length === 0 ? (
@@ -175,7 +175,7 @@ export const Detail: React.FC = () => {
                             ))
                         )}
 
-                        <Button
+                        {/* <Button
                             type="button"
                             variant="outline"
                             size="md"
@@ -184,7 +184,7 @@ export const Detail: React.FC = () => {
                         >
                             <span className="material-icons-round text-base">add</span>
                             반대 의견 추가하기
-                        </Button>
+                        </Button> */}
                     </section>
                 </div>
 
