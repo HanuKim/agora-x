@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { PollCard } from '../components/community/PollCard';
 import { theme } from '../design/theme';
 import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 
@@ -123,36 +124,41 @@ export const Detail: React.FC = () => {
 
                     {/* 현재 여론 현황 */}
                     <aside className="lg:col-span-2 flex justify-center lg:pt-xl mb-lg lg:mb-0">
-                        <Card
-                            variant="glass"
-                            padding="lg"
-                            className="w-full max-w-[260px] text-center relative overflow-hidden"
-                        >
-                            <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-success via-border to-danger" />
-                            <h3 className="mt-sm font-bold text-base mb-md text-text-primary">현재 여론 현황</h3>
+                    <Card
+                        variant="glass"
+                        padding="lg"
+                        className="w-full max-w-[260px] text-center relative overflow-hidden flex flex-col"
+                    >
+                        {/* 상단 그라데이션 라인 */}
+                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-success via-border to-danger" />
+                        
+                        {/* 타이틀 */}
+                        <h3 className="mt-sm font-bold text-base mb-md text-text-primary">토론 참여하기</h3>
 
-                            <div className="relative w-24 h-24 mx-auto mb-md">
-                                {/* Simple circle representation */}
-                                <div className="w-full h-full rounded-full border-[6px] border-border flex items-center justify-center">
-                                    <div className="w-[70%] h-[70%] rounded-full bg-success/10 flex flex-col items-center justify-center">
-                                        <span className="text-xl font-bold text-text-primary">55%</span>
-                                        <span className="text-[10px] font-bold uppercase text-text-secondary">찬성</span>
-                                    </div>
-                                </div>
-                            </div>
+                        {/* 기존 차트(96px)와 하단 텍스트(약 20px) 영역의 높이를 맞추기 위해 
+                        버튼 컨테이너에 flex-grow를 주거나 각 버튼의 높이를 고정(h-12)합니다.
+                        */}
+                        <div className="flex flex-col gap-2 mb-md justify-center flex-grow">
+                        <button className="w-full h-[43px] rounded-xl border-2 border-success/30 bg-success/5 text-success font-bold text-sm hover:bg-success/10 transition-colors flex items-center justify-center">
+                            찬성
+                        </button>
+                        <button className="w-full h-[43px] rounded-xl border-2 border-danger/30 bg-danger/5 text-danger font-bold text-sm hover:bg-danger/10 transition-colors flex items-center justify-center">
+                            반대
+                        </button>
+                        <button className="w-full h-[43px] rounded-xl border-2 border-border bg-stone-100/5 text-text-secondary font-bold text-sm hover:bg-stone-100/10 transition-colors flex items-center justify-center">
+                            관전 (보류)
+                        </button>
+                        </div>
 
-                            <div className="flex justify-between text-[11px] font-bold text-text-secondary mb-md px-xs">
-                                <span className="text-success">55% 찬성</span>
-                                <span>20% 보류</span>
-                                <span className="text-danger">25% 반대</span>
-                            </div>
-
-                            <Button type="button" variant="primary" size="md" fullWidth className="whitespace-nowrap">
-                                투표하기
-                                <span className="material-icons-round text-base">how_to_vote</span>
-                            </Button>
-                            <p className="mt-xs text-[11px] text-text-secondary">투표 마감까지 3일 남음</p>
-                        </Card>
+                        {/* 하단 영역 (기존과 동일한 위치 고정) */}
+                        <div className="mt-auto">
+                        <Button type="button" variant="primary" size="md" fullWidth className="whitespace-nowrap">
+                            투표하기
+                            <span className="material-icons-round text-base ml-1">how_to_vote</span>
+                        </Button>
+                        <p className="mt-xs text-[11px] text-text-secondary font-medium">투표 마감까지 3일 남음</p>
+                        </div>
+                    </Card>
                     </aside>
 
                     {/* 반대 의견 */}
