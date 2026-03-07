@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { PollSection } from '../components/detail/PollSection';
 import { theme } from '../design/theme';
 import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 
@@ -71,7 +72,7 @@ export const Detail: React.FC = () => {
                                 </span>
                                 찬성 의견
                             </h2>
-                            <span className="text-xs font-medium text-text-secondary">12.4k 지지</span>
+                            {/* <span className="text-xs font-medium text-text-secondary">12.4k 지지</span> */}
                         </div>
 
                         {proArguments.length === 0 ? (
@@ -109,7 +110,7 @@ export const Detail: React.FC = () => {
                             ))
                         )}
 
-                        <Button
+                        {/* <Button
                             type="button"
                             variant="outline"
                             size="md"
@@ -118,42 +119,14 @@ export const Detail: React.FC = () => {
                         >
                             <span className="material-icons-round text-base">add</span>
                             찬성 의견 추가하기
-                        </Button>
+                        </Button> */}
                     </section>
 
                     {/* 현재 여론 현황 */}
-                    <aside className="lg:col-span-2 flex justify-center lg:pt-xl mb-lg lg:mb-0">
-                        <Card
-                            variant="glass"
-                            padding="lg"
-                            className="w-full max-w-[260px] text-center relative overflow-hidden"
-                        >
-                            <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-success via-border to-danger" />
-                            <h3 className="mt-sm font-bold text-base mb-md text-text-primary">현재 여론 현황</h3>
-
-                            <div className="relative w-24 h-24 mx-auto mb-md">
-                                {/* Simple circle representation */}
-                                <div className="w-full h-full rounded-full border-[6px] border-border flex items-center justify-center">
-                                    <div className="w-[70%] h-[70%] rounded-full bg-success/10 flex flex-col items-center justify-center">
-                                        <span className="text-xl font-bold text-text-primary">55%</span>
-                                        <span className="text-[10px] font-bold uppercase text-text-secondary">찬성</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex justify-between text-[11px] font-bold text-text-secondary mb-md px-xs">
-                                <span className="text-success">55% 찬성</span>
-                                <span>20% 보류</span>
-                                <span className="text-danger">25% 반대</span>
-                            </div>
-
-                            <Button type="button" variant="primary" size="md" fullWidth className="whitespace-nowrap">
-                                투표하기
-                                <span className="material-icons-round text-base">how_to_vote</span>
-                            </Button>
-                            <p className="mt-xs text-[11px] text-text-secondary">투표 마감까지 3일 남음</p>
-                        </Card>
-                    </aside>
+                    <PollSection
+                        key={Number.isFinite(numericId) ? numericId : 'none'}
+                        articleId={Number.isFinite(numericId) ? numericId : 0}
+                    />
 
                     {/* 반대 의견 */}
                     <section className="lg:col-span-5 flex flex-col gap-md">
@@ -164,7 +137,7 @@ export const Detail: React.FC = () => {
                                     <span className="material-icons-round text-base">thumb_down</span>
                                 </span>
                             </h2>
-                            <span className="text-xs font-medium text-text-secondary">8.1k 반대</span>
+                            {/* <span className="text-xs font-medium text-text-secondary">8.1k 반대</span> */}
                         </div>
 
                         {conArguments.length === 0 ? (
@@ -202,7 +175,7 @@ export const Detail: React.FC = () => {
                             ))
                         )}
 
-                        <Button
+                        {/* <Button
                             type="button"
                             variant="outline"
                             size="md"
@@ -211,7 +184,7 @@ export const Detail: React.FC = () => {
                         >
                             <span className="material-icons-round text-base">add</span>
                             반대 의견 추가하기
-                        </Button>
+                        </Button> */}
                     </section>
                 </div>
 
