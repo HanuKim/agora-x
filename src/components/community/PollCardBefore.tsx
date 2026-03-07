@@ -26,7 +26,7 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
             <Card
                 variant="glass"
                 padding="lg"
-                className="w-full max-w-[260px] text-center relative overflow-hidden flex flex-col"
+                className="pb-[12px] w-full max-w-[260px] text-center relative overflow-hidden flex flex-col"
             >
                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-success via-border to-danger" />
 
@@ -81,7 +81,7 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
                         투표하기
                         <span className="material-icons-round text-base ml-1">how_to_vote</span>
                     </Button>
-                    <p className="mt-xs text-[11px] text-text-secondary font-medium">{deadlineText}</p>
+                    <p className="mt-sm text-[11px] text-text-secondary font-medium">{deadlineText}</p>
                 </div>
             </Card>
         </aside>
