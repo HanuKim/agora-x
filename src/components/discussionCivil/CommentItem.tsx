@@ -54,9 +54,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLin
       {showThreadLine && hasReplies && <div className="thread-line" />}
 
       <div className="flex gap-4 group relative z-10">
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2 pt-4">
           <div className={`w-10 h-10 rounded-full flex-shrink-0 ${avatarClass}`} />
-          <div className="flex flex-col items-center bg-gray-100 dark:bg-gray-800 rounded-full py-2 px-1">
+          {/* <div className="flex flex-col items-center bg-gray-100 dark:bg-gray-800 rounded-full py-2 px-1">
             <button type="button" className="material-symbols-outlined text-sm hover:text-primary" aria-label="추천">
               expand_less
             </button>
@@ -64,7 +64,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLin
             <button type="button" className="material-symbols-outlined text-sm hover:text-secondary" aria-label="비추천">
               expand_more
             </button>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex-grow bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">

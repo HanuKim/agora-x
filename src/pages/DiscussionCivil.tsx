@@ -82,7 +82,7 @@ export const DiscussionCivil: React.FC = () => {
         <section className="space-y-6">
           <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
             <h2 className="text-2xl font-bold flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">forum</span>
+              <span className="material-icons-round text-primary">forum</span>
               시민 토론장 <span className="text-gray-400 font-normal">{totalDisplayCount.toLocaleString()}</span>
             </h2>
             <div className="flex gap-4 text-sm font-medium">
@@ -101,7 +101,8 @@ export const DiscussionCivil: React.FC = () => {
             </div>
           </div>
 
-          {hasComments && (
+          {/* 의견 작성란 */}
+          {hasComments ? (
             <div className="space-y-8">
               {visibleComments.map((comment) => (
                 <CommentItem
@@ -111,6 +112,35 @@ export const DiscussionCivil: React.FC = () => {
                   onReplyAdded={() => setRepliesVersion((prev) => prev + 1)}
                 />
               ))}
+            </div>
+          ) : (
+            // 의견이 0개라면
+            <div className="flex flex-col items-center justify-center py-20 px-6 mt-4 rounded-3xl border-1 border-border bg-surface/50 transition-all">
+              <div className="relative mb-6">
+                <span className="material-symbols-outlined text-7xl text-text-muted">
+                  chat_bubble_outline
+                </span>
+                <span className="material-symbols-outlined absolute -top-1 -right-1 text-2xl text-primary/40 animate-bounce">
+                  lightbulb
+                </span>
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-bold text-text-primary">
+                  아직 도착한 의견이 없어요
+                </h3>
+                <p className="text-text-muted text-sm max-w-[280px] mx-auto leading-relaxed">
+                  이 주제에 대해 가장 먼저 <br />
+                  당신의 소중한 생각을 공유해 보시겠어요?
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="mt-8 flex items-center gap-2 px-6 py-2.5 rounded-full bg-surface border border-border text-sm font-bold text-primary shadow-sm hover:shadow-md hover:border-primary/50 transition-all active:scale-95"
+              >
+                <span className="material-symbols-outlined text-base">add_comment</span>
+                첫 의견 작성하기
+              </button>
             </div>
           )}
         </section>
