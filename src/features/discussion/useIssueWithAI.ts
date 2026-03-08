@@ -10,7 +10,7 @@
  * - 지식 수준 변경(UserPrefsContext) 시 캐시 무효화 → 재호출
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import issuesData from '../../data/koreanSocialIssues.json';
 import { claudeService, type IssueAIAnalysis } from '../../services/ai/claudeService';
 import { getCachedAIResult, setCachedAIResult, cacheKey } from '../../services/ai/aiCacheDB';
@@ -111,4 +111,56 @@ export function useIssueWithAI() {
         /** 캐시 리셋 */
         resetIssueCache,
     };
+}
+
+/**
+ * 특정 이슈에 대한 50자 내외의 짧은 설명을 가져오는 훅 (캐시 지원)
+ */
+export function useIssueSummary(issue: SocialIssue) {
+    const [summary, setSummary] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchSummary = async () => {
+            const cacheKeyStr = cacheKey.issue(issue.id, issue.category, 'short_summary');
+
+            try {
+                // 1. Check cache
+                const cached = await getCachedAIResult<string>(cacheKeyStr);
+                if (cached) {
+                    if (isMounted) {
+                        setSummary(cached);
+                        setLoading(false);
+                    }
+                    return;
+                }
+
+                // 2. Fetch from AI
+                const result = await claudeService.generateIssueSummary(issue.topic, issue.category);
+
+                // 3. Save to cache
+                if (result) {
+                    await setCachedAIResult(cacheKeyStr, result);
+                    if (isMounted) {
+                        setSummary(result);
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to fetch issue summary:', err);
+                if (isMounted) setSummary('이 이슈에 대한 주요 쟁점을 확인해보세요.');
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
+        fetchSummary();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [issue.id, issue.topic, issue.category]);
+
+    return { summary, loading };
 }

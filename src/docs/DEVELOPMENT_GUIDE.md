@@ -300,8 +300,17 @@ Displays loaded mock news list.
 ### `/ai-discussion`
 
 ```
-Discussion Topic Grid
-Mock Chat Window for AI argumentation
+Discussion Topic Grid (List of curated issues with short summaries)
+```
+
+---
+
+### `/ai-discussion/:id`
+
+```
+Detailed Issue Page
+AI Background, 쟁점 분석
+
 ```
 
 ---
@@ -391,6 +400,7 @@ agora-x/
 │     │     ├── Community.tsx
 │     │     ├── Detail.tsx
 │     │     ├── DiscussionAI.tsx
+│     │     ├── DiscussionAIDetail.tsx
 │     │     ├── Guide.tsx
 │     │     ├── Home.tsx
 │     │     ├── Login.tsx
