@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '../ui/Button';
 import type { CivilStance } from './types';
 
 interface DiscussionInputProps {
@@ -42,13 +43,16 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({ onSubmit }) =>
         placeholder="당신의 의견을 자유롭게 공유해 주세요..."
       />
       <div className="flex justify-end">
-        <button
+        <Button
           type="button"
+          variant="primary"
+          size="md"
           onClick={handleSubmit}
-          className="cursor-pointer bg-primary text-white px-8 py-3 rounded-xl font-bold shadow-neo hover:translate-y-[-2px] transition-all"
+          className="whitespace-nowrap"
         >
           의견 남기기
-        </button>
+          <span className="material-icons-round text-base ml-1">edit_note</span>
+        </Button>
       </div>
     </div>
   );

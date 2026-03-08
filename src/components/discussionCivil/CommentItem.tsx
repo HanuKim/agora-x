@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { ReplyItem } from './ReplyItem';
-import type { CivilComment } from './types';
+import { ReplyInput } from './ReplyInput';
+import { getStoredReplies } from './replyStorage';
+import type { CivilComment, CivilReply } from './types';
 
 const REPLIES_PAGE_SIZE = 5;
 
 interface CommentItemProps {
   comment: CivilComment;
   showThreadLine?: boolean;
+  onReplyAdded?: () => void;
 }
 
 const stanceStyles: Record<string, { bg: string; text: string }> = {
@@ -21,13 +24,16 @@ const stanceLabels: Record<string, string> = {
   neutral: '중립',
 };
 
-export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLine = true }) => {
+export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLine = true, onReplyAdded }) => {
   const style = stanceStyles[comment.stance] ?? stanceStyles.neutral;
   const label = stanceLabels[comment.stance] ?? '중립';
   const avatarClass = comment.avatarGradient ?? 'bg-gradient-to-tr from-orange-400 to-red-500';
-  const repliesList = comment.replies ?? [];
+  const initialReplies = comment.replies ?? [];
+  const [storedReplies, setStoredReplies] = useState<CivilReply[]>(() => getStoredReplies(comment.id));
+  const repliesList = [...initialReplies, ...storedReplies];
   const hasReplies = repliesList.length > 0;
   const [visibleReplyCount, setVisibleReplyCount] = useState(0);
+  const [showReplyInput, setShowReplyInput] = useState(false);
 
   const loadMoreReplies = () => {
     setVisibleReplyCount((prev) => Math.min(prev + REPLIES_PAGE_SIZE, repliesList.length));
@@ -35,6 +41,13 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLin
   const visibleReplies = repliesList.slice(0, visibleReplyCount);
   const remainingCount = repliesList.length - visibleReplyCount;
   const showMoreRepliesButton = hasReplies && visibleReplyCount < repliesList.length;
+
+  const handleReplySubmit = (reply: CivilReply) => {
+    setStoredReplies((prev) => [...prev, reply]);
+    setVisibleReplyCount((prev) => Math.min(prev + 1, repliesList.length + 1));
+    setShowReplyInput(false);
+    onReplyAdded?.();
+  };
 
   return (
     <div className={`comment-group relative ${showThreadLine && hasReplies ? '' : ''}`}>
@@ -66,15 +79,20 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLin
             {comment.body}
           </p>
           <div className="flex items-center gap-6">
-            <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="좋아요">
+            <button type="button" className="cursor-pointer flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="좋아요">
               <span className="material-symbols-outlined text-base">thumb_up</span>
               좋아요
             </button>
-            <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="답글 달기">
+            <button
+              type="button"
+              onClick={() => setShowReplyInput((prev) => !prev)}
+              className="cursor-pointer flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary"
+              aria-label="답글 달기"
+            >
               <span className="material-symbols-outlined text-base">chat_bubble</span>
               답글 달기
             </button>
-            <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="신고">
+            <button type="button" className="cursor-pointer flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="신고">
               <span className="material-symbols-outlined text-base">siren</span>
               신고
             </button>
@@ -101,6 +119,14 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLin
             </div>
           )}
         </div>
+      )}
+
+      {showReplyInput && (
+        <ReplyInput
+          commentId={comment.id}
+          onCancel={() => setShowReplyInput(false)}
+          onSubmit={handleReplySubmit}
+        />
       )}
     </div>
   );
