@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ReplyItem } from './ReplyItem';
 import type { CivilComment } from './types';
+
+const REPLIES_PAGE_SIZE = 5;
 
 interface CommentItemProps {
   comment: CivilComment;
@@ -23,8 +25,16 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLin
   const style = stanceStyles[comment.stance] ?? stanceStyles.neutral;
   const label = stanceLabels[comment.stance] ?? '중립';
   const avatarClass = comment.avatarGradient ?? 'bg-gradient-to-tr from-orange-400 to-red-500';
-  const hasReplies = comment.replies && comment.replies.length > 0;
-  const moreCount = comment.moreRepliesCount ?? 0;
+  const repliesList = comment.replies ?? [];
+  const hasReplies = repliesList.length > 0;
+  const [visibleReplyCount, setVisibleReplyCount] = useState(0);
+
+  const loadMoreReplies = () => {
+    setVisibleReplyCount((prev) => Math.min(prev + REPLIES_PAGE_SIZE, repliesList.length));
+  };
+  const visibleReplies = repliesList.slice(0, visibleReplyCount);
+  const remainingCount = repliesList.length - visibleReplyCount;
+  const showMoreRepliesButton = hasReplies && visibleReplyCount < repliesList.length;
 
   return (
     <div className={`comment-group relative ${showThreadLine && hasReplies ? '' : ''}`}>
@@ -74,18 +84,19 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLin
 
       {hasReplies && (
         <div className="ml-10 mt-4 space-y-4 relative">
-          {comment.replies!.map((reply) => (
+          {visibleReplies.map((reply) => (
             <ReplyItem key={reply.id} reply={reply} />
           ))}
-          {moreCount > 0 && (
+          {showMoreRepliesButton && (
             <div className="pl-10 relative">
               <div className="thread-curve" style={{ height: 15 }} />
               <button
                 type="button"
+                onClick={loadMoreReplies}
                 className="flex items-center gap-2 text-primary font-bold text-sm hover:underline py-1"
               >
                 <span className="w-6 h-[2px] bg-primary/30" />
-                답글 {moreCount}개 더 보기...
+                답글 {visibleReplyCount === 0 ? repliesList.length : remainingCount}개 더 보기...
               </button>
             </div>
           )}
