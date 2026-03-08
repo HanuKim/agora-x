@@ -52,6 +52,11 @@ export interface UserArgumentAnalysis {
     feedback: string;    // 사용자 의견에 대한 짧은 피드백이나 지적
 }
 
+export interface OpinionValidation {
+    isValid: boolean;
+    reason?: string;
+}
+
 // ─── 지식 수준 프롬프트 지시어 ─────────────────────────────────────────────────
 
 const LEVEL_INSTRUCTIONS: Record<KnowledgeLevel, string> = {
@@ -422,6 +427,44 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
             };
         } catch (e) {
             console.error('[ClaudeService] analyzeUserArgument failed:', e);
+            return fallback;
+        }
+    }
+
+    /**
+     * 사용자의 발언에 대한 AI 반론 또는 토론 응답을 생성합니다.
+     */
+    async validateOpinion(content: string): Promise<OpinionValidation> {
+        const fallback: OpinionValidation = { isValid: true };
+        if (!this.apiKey) return fallback;
+
+        try {
+            const systemPrompt = `당신은 공공 토론 플랫폼의 중재자 AI입니다. 
+사용자의 의견을 분석하고 비속어, 혐오 표현, 혹은 명백히 공격적이거나 부적절한 내용이 포함되어 있는지 검토하세요.
+비판적 의견은 허용하되, 모욕적인 언사나 공론장에 부적절한 언어는 차단해야 합니다. 
+반드시 아래 JSON 형식으로만 응답하세요:
+{
+  "isValid": true 또는 false,
+  "reason": "만약 false인 경우 거절 사유를 짧게 적어주세요. true인 경우 비워두거나 안전함으로 적어주세요."
+}`;
+
+            const userPrompt = `다음 의견을 검토해주세요: "${content}"`;
+
+            const { reply } = await this.sendMessage({
+                messages: [{ role: 'user', content: userPrompt }],
+                systemPrompt,
+                maxTokens: 150,
+            });
+
+            const cleaned = reply.replace(/```json?/g, '').replace(/```/g, '').trim();
+            const parsed = JSON.parse(cleaned) as Partial<OpinionValidation>;
+
+            return {
+                isValid: typeof parsed.isValid === 'boolean' ? parsed.isValid : true,
+                reason: parsed.reason,
+            };
+        } catch (e) {
+            console.error('[ClaudeService] validateOpinion failed:', e);
             return fallback;
         }
     }

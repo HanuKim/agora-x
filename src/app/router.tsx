@@ -11,6 +11,9 @@ const Profile = React.lazy(() => import('../pages/Profile').then(m => ({ default
 const Login = React.lazy(() => import('../pages/Login').then(m => ({ default: m.Login })));
 const DiscussionAI = React.lazy(() => import('../pages/DiscussionAI').then(m => ({ default: m.DiscussionAI })));
 const DiscussionAIDetail = React.lazy(() => import('../pages/DiscussionAIDetail').then(m => ({ default: m.DiscussionAIDetail })));
+const ProposalList = React.lazy(() => import('../pages/ProposalList').then(m => ({ default: m.ProposalList })));
+const ProposalCreate = React.lazy(() => import('../pages/ProposalCreate').then(m => ({ default: m.ProposalCreate })));
+const ProposalDetail = React.lazy(() => import('../pages/ProposalDetail').then(m => ({ default: m.ProposalDetail })));
 const Guide = React.lazy(() => import('../pages/Guide').then(m => ({ default: m.Guide })));
 
 const loadingFallback = <div className="flex justify-center p-[50px]">Loading...</div>;
@@ -30,6 +33,9 @@ export const router = createBrowserRouter([
             { path: '/community', element: <Community /> },
             { path: '/ai-discussion', element: <DiscussionAI /> },
             { path: '/ai-discussion/:id', element: <DiscussionAIDetail /> },
+            { path: '/proposals', element: <ProposalList /> },
+            { path: '/proposals/new', element: <ProposalCreate /> },
+            { path: '/proposals/:id', element: <ProposalDetail /> },
             { path: '/guide', element: <Guide /> },
             {
                 path: '/profile',

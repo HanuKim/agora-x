@@ -19,6 +19,7 @@ export const Header: React.FC = () => {
             <nav className="flex gap-xl">
                 {[
                     { to: '/', label: '홈' },
+                    { to: '/proposals', label: '국민 제안' },
                     { to: '/community', label: '국민 토론' },
                     { to: '/ai-discussion', label: '일대일 토론' },
                     { to: '/guide', label: '이용 가이드' },
