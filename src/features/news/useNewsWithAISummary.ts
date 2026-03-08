@@ -170,7 +170,12 @@ export function useNewsWithAISummary(limit?: number, issueAnalysisForId?: number
                     };
 
                     let aiSummary: NewsAISummary;
-                    if (cachedNews) {
+                    // 찬반 논거가 없는 경우 캐시 미스로 처리하여 새로 받아오도록 합니다.
+                    const isValidCache = cachedNews &&
+                        Array.isArray(cachedNews.proArguments) &&
+                        cachedNews.proArguments.length > 0;
+
+                    if (isValidCache) {
                         aiSummary = normalizeNewsAISummary(cachedNews);
                         upsertNews(aiSummary, false);
                     } else {
