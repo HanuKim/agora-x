@@ -25,7 +25,7 @@ export const Detail: React.FC = () => {
     const aiLoading = article?.aiLoading ?? false;
 
     return (
-        <div className={theme.section.page}>
+        <div className={`${theme.section.page} page-bg-muted`}>
             <div className={`${theme.section.container} py-xl`}>
                 {/* Header / Hero */}
                 <header className="max-w-[900px] mx-auto text-center mb-xl">
@@ -226,8 +226,8 @@ export const Detail: React.FC = () => {
                     <div className="text-center">
                         <button
                             type="button"
-                            onClick={() => navigate('/discussion-civil')}
-                            className="text-primary font-bold text-sm hover:underline underline-offset-[2px]"
+                            onClick={() => id && navigate(`/discussion-civil/${id}`)}
+                            className="cursor-pointer text-primary font-bold text-sm hover:underline underline-offset-[2px]"
                         >
                             전체 댓글 1,204개 보기
                         </button>

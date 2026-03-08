@@ -88,6 +88,15 @@ body {
   box-sizing: border-box;
 }
 
+/* Page background matching DiscussionCivil (civil-bg-light / civil-bg-dark) */
+.page-bg-muted {
+  background-color: #F3F4F6;
+}
+
+.dark .page-bg-muted {
+  background-color: #111827;
+}
+
 a {
   font-weight: 500;
   text-decoration: inherit;

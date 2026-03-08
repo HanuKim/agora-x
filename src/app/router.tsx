@@ -38,7 +38,7 @@ export const router = createBrowserRouter([
             { path: '/proposals/new', element: <ProposalCreate /> },
             { path: '/proposals/:id', element: <ProposalDetail /> },
             { path: '/guide', element: <Guide /> },
-            { path: '/discussion-civil', element: <DiscussionCivil /> },
+            { path: '/discussion-civil/:id', element: <DiscussionCivil /> },
             {
                 path: '/profile',
                 element: (

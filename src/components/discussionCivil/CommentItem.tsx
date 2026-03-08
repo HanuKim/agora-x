@@ -56,13 +56,17 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, showThreadLin
             {comment.body}
           </p>
           <div className="flex items-center gap-6">
-            <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary">
+            <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="좋아요">
+              <span className="material-symbols-outlined text-base">thumb_up</span>
+              좋아요
+            </button>
+            <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="답글 달기">
               <span className="material-symbols-outlined text-base">chat_bubble</span>
               답글 달기
             </button>
-            <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary">
-              <span className="material-symbols-outlined text-base">share</span>
-              공유
+            <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="신고">
+              <span className="material-symbols-outlined text-base">siren</span>
+              신고
             </button>
           </div>
         </div>

@@ -45,7 +45,7 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({ onSubmit }) =>
         <button
           type="button"
           onClick={handleSubmit}
-          className="bg-primary text-white px-8 py-3 rounded-xl font-bold shadow-neo hover:translate-y-[-2px] transition-all"
+          className="cursor-pointer bg-primary text-white px-8 py-3 rounded-xl font-bold shadow-neo hover:translate-y-[-2px] transition-all"
         >
           의견 남기기
         </button>

@@ -36,9 +36,19 @@ export const ReplyItem: React.FC<ReplyItemProps> = ({ reply }) => {
           </span>
           <span className="text-xs text-gray-400">· {reply.timeAgo}</span>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           {reply.body}
         </p>
+        <div className="flex items-center gap-6">
+          <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="좋아요">
+            <span className="material-symbols-outlined text-base">thumb_up</span>
+            좋아요
+          </button>
+          <button type="button" className="flex items-center gap-1 text-sm text-gray-500 font-medium hover:text-primary" aria-label="신고">
+            <span className="material-symbols-outlined text-base">siren</span>
+            신고
+          </button>
+        </div>
       </div>
     </div>
   );

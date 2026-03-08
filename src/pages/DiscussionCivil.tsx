@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   CommentItem,
   DiscussionInput,
   type CivilComment,
   type CivilStance,
 } from '../components/discussionCivil';
+import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 import '../components/discussionCivil/discussionCivil.css';
 
 const MOCK_COMMENTS: CivilComment[] = [
@@ -41,6 +43,15 @@ const MOCK_COMMENTS: CivilComment[] = [
 const TOTAL_COUNT = 1204;
 
 export const DiscussionCivil: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const numericId = id ? Number(id) : NaN;
+  const issueAnalysisForId = Number.isFinite(numericId) ? numericId : undefined;
+  const { items } = useNewsWithAISummary(undefined, issueAnalysisForId);
+  const article = items.find((item) => item.id === numericId);
+
+  // 토론 주제: 기사 topic·내용 기반으로 AI가 추출한 debateTopic 우선, 미적용 시 기사 topic (Detail.tsx와 동일)
+  const debateTopic = article?.aiSummary?.debateTopic ?? article?.topic;
+
   const [sortBy] = useState<'popular' | 'latest'>('popular');
   const [comments] = useState<CivilComment[]>(MOCK_COMMENTS);
 
@@ -51,16 +62,24 @@ export const DiscussionCivil: React.FC = () => {
 
   return (
     <div data-page="discussion-civil" className="min-h-screen bg-bg text-text-primary font-sans antialiased transition-colors duration-200">
-      <main className="pt-28 pb-20 px-4 max-w-5xl mx-auto">
-        <header className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full mb-6">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-bold uppercase text-gray-500">실시간 시민 토론</span>
+      <main className="max-w-[1200px] mx-auto px-xl py-xl">
+        <header className="max-w-[900px] mx-auto text-center mb-xl">
+          <div className="flex justify-center mb-md">
+            <div className="inline-flex items-center gap-xs px-sm py-[4px] rounded-full bg-surface border border-border shadow-sm">
+              <span className="w-[6px] h-[6px] rounded-full bg-success animate-pulse" />
+              <span className="text-[11px] font-bold tracking-[0.12em] uppercase text-text-secondary">
+                정책 토론 • 진행 중
+              </span>
+            </div>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black leading-tight mb-4">
-            주 4일 근무제 도입,<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-primary">시기상조인가, 필수 변화인가?</span>
+          <h1 className="text-[2.25rem] md:text-[3rem] font-extrabold leading-tight text-text-primary break-keep">
+            {debateTopic ?? '토론 주제를 불러오는 중입니다.'}
           </h1>
+          {id && (
+            <p className="mt-sm text-xs text-text-secondary">
+              이슈 ID: <span className="font-semibold text-primary">{id}</span>
+            </p>
+          )}
         </header>
 
         <section className="mb-12">
