@@ -13,7 +13,7 @@ export const DiscussionAI: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="px-xl py-xl max-w-[1100px] mx-auto">
+        <div className="px-xl py-xl max-w-[1200px] mx-auto w-full">
             <h1 className="text-[2.25rem] font-extrabold mb-sm">일대일 토론</h1>
             <p className="text-text-secondary mb-xl">
                 Agora-X의 AI, 아곰이와 함께 한국 사회의 주요 쟁점들을 깊게 파헤쳐 봅니다.

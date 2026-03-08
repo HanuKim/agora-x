@@ -10,7 +10,8 @@
  * - 페이지는 레이아웃 및 hook 호출만 담당
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../features/auth';
@@ -21,7 +22,10 @@ import {
     type KnowledgeLevel,
     type ContentCategory,
 } from '../features/user';
+import { useProposals } from '../features/proposal/useProposals';
+import { ProposalCard } from '../components/proposal/ProposalCard';
 import { theme } from '../design/theme';
+import type { Proposal } from '../services/db/proposalDB';
 
 const LEVELS: KnowledgeLevel[] = ['low', 'medium', 'high'];
 
@@ -38,6 +42,20 @@ const CATEGORY_EMOJI: Record<ContentCategory, string> = {
 export const Profile: React.FC = () => {
     const { user, logout } = useAuth();
     const { knowledgePrefs, setKnowledgeLevel } = useUserPrefs();
+    const { fetchUserInteractions } = useProposals();
+    const navigate = useNavigate();
+
+    const [likedProposals, setLikedProposals] = useState<Proposal[]>([]);
+    const [scrapedProposals, setScrapedProposals] = useState<Proposal[]>([]);
+
+    useEffect(() => {
+        if (user) {
+            fetchUserInteractions(user.id).then(data => {
+                setLikedProposals(data.liked);
+                setScrapedProposals(data.scraped);
+            });
+        }
+    }, [user, fetchUserInteractions]);
 
     return (
         <div className="px-xl py-xl max-w-[760px] mx-auto">
@@ -100,6 +118,45 @@ export const Profile: React.FC = () => {
                     ))}
                 </div>
             </Card>
+
+            {/* ── 활동 내역 ─────────────────────────────── */}
+            <div className="mt-xxl flex flex-col gap-xl">
+                <div>
+                    <h2 className="text-xl font-bold text-text-primary mb-md flex items-center gap-sm">
+                        <span className="material-icons-round text-amber-500">bookmark</span>
+                        스크랩한 국민 제안
+                    </h2>
+                    {scrapedProposals.length === 0 ? (
+                        <Card className="p-xl text-center text-text-secondary border-dashed">
+                            스크랩한 제안이 없습니다.
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                            {scrapedProposals.map(p => (
+                                <ProposalCard key={p.id} proposal={p} onClick={() => navigate(`/proposals/${p.id}`)} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div>
+                    <h2 className="text-xl font-bold text-text-primary mb-md flex items-center gap-sm">
+                        <span className="material-icons-round text-primary">thumb_up</span>
+                        공감한 국민 제안
+                    </h2>
+                    {likedProposals.length === 0 ? (
+                        <Card className="p-xl text-center text-text-secondary border-dashed">
+                            공감한 제안이 없습니다.
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                            {likedProposals.map(p => (
+                                <ProposalCard key={p.id} proposal={p} onClick={() => navigate(`/proposals/${p.id}`)} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

@@ -24,6 +24,37 @@ and win the hackathon.
 
 ---
 
+## 📖 Overview
+
+Agora-X is a debate platform leveraging Claude AI to synthesize news, host 1-on-1 AI debates, and facilitate constructive public discourse through "People's Proposals". The project uses React, Tailwind CSS, IndexedDB for caching/offline storage, and Vite.
+
+## 🏗 Architecture
+
+### 1. Data Layer
+The application relies extensively on local JSON mock data (`src/data/*.json`) and IndexedDB for state persistence without a real backend.
+- `aiCacheDB.ts`: Caches Claude AI responses to minimize API calls and latency.
+- `proposalDB.ts`: An IndexedDB wrapper that manages the User Generated Content (UGC) for the "People's Proposal" feature, including `Proposals` and `Opinions`.
+  - **Proposal Schema**: Includes `problem`, `reason`, `currentSituation`, `solution`, `category`, ` opinionCount`, `relatedArticleCount`, `likes`, `scraps`, and arrays for `likedBy`/`scrapedBy`.
+  - **Opinion Schema**: Includes `likes` and `likedBy`.
+- `useProposals.ts`: Custom hooks to access `proposalDB` seamlessly inside React components, including toggle functions for likes and scraps.
+
+### 2. Core Features
+- **AI Summary & Debates**: Uses Claude Haiku API to extract pros and cons from news articles. Users can engage in an interactive chat with an AI holding opposing views.
+- **People's Proposals (국민 제안)**: A feature allowing users to surface societal issues and propose solutions. Other users can provide feedback ("opinions").
+  - *Identities are protected:* All users participating in a proposal are assigned deterministic random nicknames (e.g., "용감한 호랑이" / Brave Tiger) generated dynamically via `nicknameGenerator.ts` based on their profile ID and the proposal ID.
+  - *AI Moderation:* Opinions are validated against profanity and inappropriate content using a specialized Claude prompt before submission via `validateOpinion()`.
+  - *Interactions:* Users can 'Like' and 'Scrap' proposals, and 'Like' individual opinions. These are tracked via unique user IDs in IndexedDB arrays to prevent duplicates.
+  - *My Page:* Scrapped and liked proposals are displayed in the user profile for quick access.
+
+### 3. Styling & Theme System
+All styles are tokenized and managed via Tailwind within `src/design/theme.ts`.
+- Components should rarely define raw utility strings. Instead, import `theme.button.primary`, etc.
+- Dark mode is supported natively via Tailwind's `dark:` classes and toggled via the `useTheme` hook modifying the HTML root element.
+- **Layout Standard**: All main pages (Home, Community, Proposal List/Create/Detail) follow a consistent `max-w-[1200px] mx-auto px-xl py-xl` layout to maintain visual rhythm.
+- **Category Colors**: Content categories are color-coded in both badges and buttons using the `getActiveCategoryColorClass` utility.
+
+---
+
 ## 🧠 Problem Statement
 
 Online political discussions are often polarized,
@@ -315,6 +346,31 @@ AI Background, 쟁점 분석
 
 ---
 
+### `/proposals`
+
+```
+국민 제안 목록 전시 (List of user-submitted proposals)
+```
+
+---
+
+### `/proposals/new`
+
+```
+새로운 국민 제안 작성 폼 UI (Form to create a new proposal)
+```
+
+---
+
+### `/proposals/:id`
+
+```
+국민 제안 상세 내용 및 시민들의 의견(댓글) 토론 영역
+AI 비속어/비방 필터링 적용
+```
+
+---
+
 ### `/guide`
 
 ```
@@ -364,6 +420,11 @@ agora-x/
 │     │     ├── auth/               ← 도메인 UI 컴포넌트
 │     │     │     ├── LoginModal.tsx
 │     │     │     └── ProtectedRoute.tsx
+│     │     ├── discussion/         ← 토론 도메인 모듈
+│     │     │     └── IssueCard.tsx
+│     │     ├── proposal/         ← 국민 제안 및 토론 도메인 모듈
+│     │     │     ├── OpinionItem.tsx
+│     │     │     └── ProposalCard.tsx
 │     │     ├── layout/
 │     │     │     ├── Footer.tsx
 │     │     │     ├── Header.tsx
@@ -390,8 +451,12 @@ agora-x/
 │     │     |     ├── hooks/
 │     │     |     |     └── useAuth.ts
 │     │     |     └── index.ts      (barrel — re-exports components/auth/* 포함)
-│     │     |        
-│     │     └── news/     
+│     │     ├── discussion/         ← 국민 제안/토론 비즈니스 로직
+│     │     │     └── useIssueWithAI.ts
+│     │     ├── proposal/         ← 국민 제안/토론 비즈니스 로직
+│     │     │     └──  useProposals.ts
+│     │     └── news/  
+│     │           └── useNewsWithAISummary.ts
 │     |
 │     ├── lib/
 │     │     └── claude.ts
@@ -404,11 +469,20 @@ agora-x/
 │     │     ├── Guide.tsx
 │     │     ├── Home.tsx
 │     │     ├── Login.tsx
-│     │     └── Profile.tsx
+│     │     ├── Profile.tsx
+│     │     ├── ProposalCreate.tsx
+│     │     ├── ProposalDetail.tsx
+│     │     └── ProposalList.tsx
 │     |
 |     └── services/
-│           └── ai/
-│                └── claude.ts
+│           ├── ai/
+│           │    ├── aiCacheDB.ts
+│           │    └── claudeService.ts
+│           └── db/
+│                └── proposalDB.ts
+│     |
+│     └── utils/
+│           └── nicknameGenerator.ts
 │ 
 ├── App.css
 ├── App.tsx
