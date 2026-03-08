@@ -15,6 +15,7 @@ const ProposalList = React.lazy(() => import('../pages/ProposalList').then(m => 
 const ProposalCreate = React.lazy(() => import('../pages/ProposalCreate').then(m => ({ default: m.ProposalCreate })));
 const ProposalDetail = React.lazy(() => import('../pages/ProposalDetail').then(m => ({ default: m.ProposalDetail })));
 const Guide = React.lazy(() => import('../pages/Guide').then(m => ({ default: m.Guide })));
+const DiscussionCivil = React.lazy(() => import('../pages/DiscussionCivil').then(m => ({ default: m.DiscussionCivil })));
 
 const loadingFallback = <div className="flex justify-center p-[50px]">Loading...</div>;
 
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
             { path: '/proposals/new', element: <ProposalCreate /> },
             { path: '/proposals/:id', element: <ProposalDetail /> },
             { path: '/guide', element: <Guide /> },
+            { path: '/discussion-civil', element: <DiscussionCivil /> },
             {
                 path: '/profile',
                 element: (

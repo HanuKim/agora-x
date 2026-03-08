@@ -234,7 +234,8 @@ a {
 .material-icons-round,
 .material-icons-outlined,
 .material-icons-sharp,
-.material-icons-two-tone {
+.material-icons-two-tone,
+.material-symbols-outlined {
   font-size: inherit !important;
   vertical-align: middle;
   line-height: 1;

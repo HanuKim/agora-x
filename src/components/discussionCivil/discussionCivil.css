@@ -1,0 +1,70 @@
+/**
+ * Civil Discussion page — prototype design preserved.
+ * Thread lines, curves, and prototype color overrides for this page only.
+ */
+
+[data-page="discussion-civil"] {
+  --color-primary: #FF7A00;
+  --color-secondary: #2563EB;
+  --civil-bg-light: #F3F4F6;
+  --civil-bg-dark: #111827;
+  --civil-card-dark: #1F2937;
+  --civil-text-light: #111827;
+  --civil-text-dark: #F9FAFB;
+}
+
+.dark [data-page="discussion-civil"] {
+  --color-bg: var(--civil-bg-dark);
+  --color-surface: var(--civil-card-dark);
+  --color-text-primary: var(--civil-text-dark);
+}
+
+[data-page="discussion-civil"] {
+  --color-bg: var(--civil-bg-light);
+}
+
+/* Thread line: vertical connector from parent avatar to last reply */
+.thread-line {
+  position: absolute;
+  left: 20px;
+  top: 50px;
+  bottom: 24px;
+  width: 2px;
+  background: #E5E7EB;
+  transition: background 0.2s;
+  z-index: 0;
+}
+
+.dark .thread-line {
+  background: #374151;
+}
+
+.comment-group:hover .thread-line {
+  background: #FF7A00;
+}
+
+/* Thread curve: horizontal bend from vertical line to reply */
+.thread-curve {
+  position: absolute;
+  left: -20px;
+  top: 0;
+  width: 20px;
+  height: 25px;
+  border-left: 2px solid #E5E7EB;
+  border-bottom: 2px solid #E5E7EB;
+  border-bottom-left-radius: 12px;
+  transition: border-color 0.2s;
+}
+
+.dark .thread-curve {
+  border-color: #374151;
+}
+
+.comment-group:hover .thread-curve {
+  border-color: #FF7A00;
+}
+
+/* Prototype neo shadow */
+.shadow-neo {
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.1);
+}

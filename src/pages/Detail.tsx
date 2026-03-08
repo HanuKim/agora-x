@@ -1,13 +1,13 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { PollSection } from '../components/detail/PollSection';
 import { theme } from '../design/theme';
 import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 
 export const Detail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const numericId = id ? Number(id) : NaN;
     const issueAnalysisForId = Number.isFinite(numericId) ? numericId : undefined;
     const { items } = useNewsWithAISummary(undefined, issueAnalysisForId);
@@ -226,6 +226,7 @@ export const Detail: React.FC = () => {
                     <div className="text-center">
                         <button
                             type="button"
+                            onClick={() => navigate('/discussion-civil')}
                             className="text-primary font-bold text-sm hover:underline underline-offset-[2px]"
                         >
                             전체 댓글 1,204개 보기
