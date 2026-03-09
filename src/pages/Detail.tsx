@@ -1,12 +1,12 @@
 import React from 'react';
-import { CommentItem } from '../components/discussionCivil/CommentItem';
-import { DiscussionInput } from '../components/discussionCivil/DiscussionInput';
+import { CommentItem } from '../components/detail/CommentItem';
+import { DiscussionInput } from '../components/detail/DiscussionInput';
 import { Card } from '../components/ui/Card';
 import { PollSection } from '../components/detail/PollSection';
 import { Button } from '../components/ui/Button';
 import { theme } from '../design/theme';
 import { useDetail } from '../features/detail/useDetail';
-import '../components/discussionCivil/discussionCivil.css';
+import '../components/detail/discussionCivil.css';
 
 export const Detail: React.FC = () => {
   const {

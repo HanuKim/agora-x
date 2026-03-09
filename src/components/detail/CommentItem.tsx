@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { ReplyInput } from './ReplyInput';
 import { getStoredReplies } from './replyStorage';
 import type { CivilComment, CivilReply } from '../../features/detail/useCivilStance';
+import { theme } from '../../design/theme';
 
 const REPLIES_PAGE_SIZE = 5;
 
-const stanceStyles: Record<string, { bg: string; text: string }> = {
-  pro: { bg: 'bg-success/10', text: 'text-success' },
-  con: { bg: 'bg-danger/10', text: 'text-danger' },
-  neutral: { bg: 'bg-surface', text: 'text-text-secondary' },
+/* 시민 토론장 스탠스 뱃지 — ProposalList 카테고리 뱃지와 동일한 형태 (색만 success/danger/surface 유지) */
+const stanceBadgeClass: Record<string, string> = {
+  pro: `${theme.badge.base} ${theme.badge.success}`,
+  con: `${theme.badge.base} ${theme.badge.danger}`,
+  neutral: `${theme.badge.base} ${theme.badge.muted}`,
 };
 
 const stanceLabels: Record<string, string> = {
@@ -46,7 +48,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
 
   if (props.variant === 'reply') {
     const { reply } = props;
-    const style = stanceStyles[reply.stance] ?? stanceStyles.neutral;
+    const badgeClass = stanceBadgeClass[reply.stance] ?? stanceBadgeClass.neutral;
     const label = stanceLabels[reply.stance] ?? '중립';
     const curveHeight = reply.curveHeight ?? 25;
 
@@ -59,9 +61,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
         <div className="bg-surface/80 p-5 rounded-lg border border-border shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-bold text-sm text-text-primary">{reply.authorName}</span>
-            <span className={`px-2 py-0.5 ${style.bg} ${style.text} text-[10px] font-bold rounded`}>
-              {label}
-            </span>
+            <span className={badgeClass}>{label}</span>
             <span className="text-xs text-text-muted">· {reply.timeAgo}</span>
           </div>
           <p className="text-sm text-text-secondary mb-4 break-keep">
@@ -84,7 +84,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
 
   // variant === 'comment' (narrowed by control flow)
   const { comment: commentData, showThreadLine = true, onReplyAdded } = props;
-  const style = stanceStyles[commentData.stance] ?? stanceStyles.neutral;
+  const badgeClass = stanceBadgeClass[commentData.stance] ?? stanceBadgeClass.neutral;
   const label = stanceLabels[commentData.stance] ?? '중립';
   const avatarClass = commentData.avatarGradient ?? 'bg-gradient-to-br from-primary to-gray-brand';
   const initialReplies = commentData.replies ?? [];
@@ -117,9 +117,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
         <div className="flex-grow bg-bg p-6 rounded-lg shadow-md border border-border text-text-primary">
           <div className="flex items-center gap-2 mb-3">
             <span className="font-bold">{commentData.authorName}</span>
-            <span className={`px-2 py-0.5 ${style.bg} ${style.text} text-[10px] font-bold rounded`}>
-              {label}
-            </span>
+            <span className={badgeClass}>{label}</span>
             <span className="text-xs text-text-muted">· {commentData.timeAgo}</span>
           </div>
           <p className="text-text-secondary leading-relaxed mb-4 break-keep">
