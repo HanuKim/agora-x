@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
-import type { CivilStance } from './types';
+import type { CivilStance } from '../../features/detail/useCivilStance';
 
 interface DiscussionInputProps {
   onSubmit?: (stance: CivilStance, body: string) => void;

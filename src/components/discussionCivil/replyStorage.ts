@@ -1,4 +1,4 @@
-import type { CivilReply } from './types';
+import type { CivilReply } from '../../features/detail/useCivilStance';
 
 const STORAGE_KEY = 'agora-civil-replies';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { CivilReply } from './types';
+import type { CivilReply } from '../../features/detail/useCivilStance';
 import { appendStoredReply } from './replyStorage';
 import './discussionCivil.css';
 

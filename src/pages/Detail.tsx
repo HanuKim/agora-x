@@ -195,36 +195,36 @@ export const Detail: React.FC = () => {
                 </div>
 
 
-                {/* 시민 토론장 */}
+                {/* 시민 토론장 — index.css 디자인 토큰 사용 */}
                 <section className="mt-xl pt-lg border-t border-border">
-                    <section className="space-y-6">
-                        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
-                            <h2 className="text-2xl font-bold flex items-center gap-2">
+                    <section className="space-y-lg">
+                        <div className="flex items-center justify-between border-b border-border pb-md">
+                            <h2 className="text-2xl font-bold flex items-center gap-sm text-text-primary">
                                 <span className="material-icons-round text-primary">forum</span>
-                                시민 토론장 <span className="text-gray-400 font-normal">{totalDisplayCount.toLocaleString()}</span>
+                                시민 토론장 <span className="text-text-muted font-normal">{totalDisplayCount.toLocaleString()}</span>
                             </h2>
-                            <div className="flex gap-4 text-sm font-medium">
+                            <div className="flex gap-md text-sm font-medium">
                                 <button
                                     type="button"
-                                    className={sortBy === 'popular' ? 'text-primary border-b-2 border-primary pb-1' : 'text-gray-500 pb-1'}
+                                    className={sortBy === 'popular' ? 'text-primary border-b-2 border-primary pb-1' : 'text-text-secondary pb-1 transition-colors'}
                                 >
                                     인기순
                                 </button>
                                 <button
                                     type="button"
-                                    className={sortBy === 'latest' ? 'text-primary border-b-2 border-primary pb-1' : 'text-gray-500 pb-1'}
+                                    className={sortBy === 'latest' ? 'text-primary border-b-2 border-primary pb-1' : 'text-text-secondary pb-1 transition-colors'}
                                 >
                                     최신순
                                 </button>
                             </div>
                         </div>
 
-                        <section className="mb-12">
+                        <section className="mb-xl">
                             <DiscussionInput onSubmit={handleSubmitOpinion} />
                         </section>
 
                         {hasComments ? (
-                            <div className="space-y-8">
+                            <div className="space-y-xl">
                                 {visibleComments.map((comment) => (
                                     <CommentItem
                                         key={comment.id}
@@ -235,8 +235,8 @@ export const Detail: React.FC = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-20 px-6 mt-4 rounded-3xl border-1 border-border bg-surface/50 transition-all">
-                                <div className="relative mb-6">
+                            <div className="flex flex-col items-center justify-center py-xxl px-lg mt-md rounded-lg border border-border bg-surface/50 transition-all">
+                                <div className="relative mb-lg">
                                     <span className="material-symbols-outlined text-7xl text-text-muted">
                                         chat_bubble_outline
                                     </span>
@@ -244,7 +244,7 @@ export const Detail: React.FC = () => {
                                         lightbulb
                                     </span>
                                 </div>
-                                <div className="text-center space-y-2">
+                                <div className="text-center space-y-sm">
                                     <h3 className="text-xl font-bold text-text-primary">
                                         아직 도착한 의견이 없어요
                                     </h3>
@@ -256,7 +256,7 @@ export const Detail: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                    className="mt-8 flex items-center gap-2 px-6 py-2.5 rounded-full bg-surface border border-border text-sm font-bold text-primary shadow-sm hover:shadow-md hover:border-primary/50 transition-all active:scale-95"
+                                    className="mt-xl flex items-center gap-sm px-lg py-sm rounded-full bg-surface border border-border text-sm font-bold text-primary shadow-sm hover:shadow-md hover:border-primary/50 transition-all active:scale-95"
                                 >
                                     <span className="material-symbols-outlined text-base">add_comment</span>
                                     첫 의견 작성하기
@@ -266,7 +266,7 @@ export const Detail: React.FC = () => {
                     </section>
 
                     {hasComments && hasMoreComments && (
-                        <div className="mt-16 text-center">
+                        <div className="mt-xxl text-center">
                             <Button
                                 type="button"
                                 variant="primary"

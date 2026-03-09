@@ -1,29 +1,9 @@
 /**
- * Civil Discussion page — prototype design preserved.
- * Thread lines, curves, and prototype color overrides for this page only.
+ * 시민 토론장 — 스레드 라인/커브, 답글 입력 애니메이션
+ * (색상/테마는 index.css 전역 토큰 사용)
  */
 
-[data-page="discussion-civil"] {
-  --color-primary: #FF7A00;
-  --color-secondary: #2563EB;
-  --civil-bg-light: #F3F4F6;
-  --civil-bg-dark: #111827;
-  --civil-card-dark: #1F2937;
-  --civil-text-light: #111827;
-  --civil-text-dark: #F9FAFB;
-}
-
-.dark [data-page="discussion-civil"] {
-  --color-bg: var(--civil-bg-dark);
-  --color-surface: var(--civil-card-dark);
-  --color-text-primary: var(--civil-text-dark);
-}
-
-[data-page="discussion-civil"] {
-  --color-bg: var(--civil-bg-light);
-}
-
-/* Thread line: vertical connector from parent avatar to last reply (theme tokens) */
+/* Thread line: vertical connector from parent avatar to last reply */
 .thread-line {
   position: absolute;
   left: 20px;
@@ -39,7 +19,7 @@
   background: var(--color-primary);
 }
 
-/* Thread curve: horizontal bend from vertical line to reply (theme tokens) */
+/* Thread curve: horizontal bend from vertical line to reply */
 .thread-curve {
   position: absolute;
   left: -20px;
@@ -54,11 +34,6 @@
 
 .comment-group:hover .thread-curve {
   border-color: var(--color-primary);
-}
-
-/* Prototype neo shadow */
-.shadow-neo {
-  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 /* Reply input entrance */

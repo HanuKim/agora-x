@@ -1,10 +1,35 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
-import { mapNewsCommentToCivil } from '../../components/discussionCivil/newsComments';
 import { getStoredReplies } from '../../components/discussionCivil/replyStorage';
-import type { CivilComment, CivilStance } from '../../components/discussionCivil/types';
+import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
+import { formatTimeAgo } from '../../utils/timeCalculate';
+import type { CivilComment, CivilStance } from './useCivilStance';
 import rawNewsData from '../../data/selectedNews.json';
+
+// 시민 토론장 타입 재내보내기 (컴포넌트에서 동일 타입 사용)
+export type { CivilStance, CivilComment, CivilReply } from './useCivilStance';
+
+/** selectedNews 댓글 원본 구조 (mapNewsCommentToCivil 입력) */
+interface NewsCommentRaw {
+  comment_id: number;
+  parent_id: number;
+  author: string;
+  created_at: string;
+  content: string;
+  like_count: number;
+  hate_count: number;
+}
+
+function mapNewsCommentToCivil(raw: NewsCommentRaw): CivilComment {
+  return {
+    id: String(raw.comment_id),
+    authorName: raw.author,
+    stance: 'neutral',
+    body: raw.content,
+    timeAgo: formatTimeAgo(raw.created_at),
+    score: raw.like_count,
+  };
+}
 
 const selectedNews = (rawNewsData as {
   selectedNews: Array<{
@@ -68,9 +93,7 @@ export const useDetail = () => {
       articleIndex >= 0 && selectedNews[articleIndex]
         ? selectedNews[articleIndex].comments ?? []
         : [];
-    return raw.map((c) =>
-      mapNewsCommentToCivil(c as Parameters<typeof mapNewsCommentToCivil>[0])
-    );
+    return raw.map((c) => mapNewsCommentToCivil(c as NewsCommentRaw));
   }, [numericId]);
 
   const visibleComments = comments.slice(0, visibleCommentCount);

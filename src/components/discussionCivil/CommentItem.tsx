@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ReplyInput } from './ReplyInput';
 import { getStoredReplies } from './replyStorage';
-import type { CivilComment, CivilReply } from './types';
+import type { CivilComment, CivilReply } from '../../features/detail/useCivilStance';
 
 const REPLIES_PAGE_SIZE = 5;
 
