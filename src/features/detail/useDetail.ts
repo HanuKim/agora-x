@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getStoredReplies } from '../../components/detail/replyStorage';
+import { getStoredReplies } from '../../services/db/detailDB';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 import { formatTimeAgo } from '../../utils/timeCalculate';
 import type { CivilComment, CivilStance } from './useCivilStance';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ReplyInput } from './ReplyInput';
-import { getStoredReplies } from './replyStorage';
+import { getStoredReplies } from '../../services/db/detailDB';
 import type { CivilComment, CivilReply } from '../../features/detail/useCivilStance';
 import { theme } from '../../design/theme';
 

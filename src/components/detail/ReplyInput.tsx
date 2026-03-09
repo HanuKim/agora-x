@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { CivilReply } from '../../features/detail/useCivilStance';
-import { appendStoredReply } from './replyStorage';
+import { appendStoredReply } from '../../services/db/detailDB';
 import './discussionCivil.css';
 
 interface ReplyInputProps {
