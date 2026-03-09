@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDetail } from '../features/detail/useDetail';
+import '../components/discussionCivil/discussionCivil.css';
 
 export const DiscussionCivil: React.FC = () => {
   const { id, debateTopic } = useDetail();

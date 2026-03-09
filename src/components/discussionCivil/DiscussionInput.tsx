@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { theme } from '../../design/theme';
 import { Button } from '../ui/Button';
 import type { CivilStance } from './types';
 
@@ -7,10 +6,10 @@ interface DiscussionInputProps {
   onSubmit?: (stance: CivilStance, body: string) => void;
 }
 
-const stanceOptions: { value: CivilStance; label: string; badgeClass: string }[] = [
-  { value: 'pro', label: '찬성', badgeClass: `${theme.badge.base} ${theme.badge.success}` },
-  { value: 'con', label: '반대', badgeClass: `${theme.badge.base} ${theme.badge.danger}` },
-  { value: 'neutral', label: '중립', badgeClass: `${theme.badge.base} ${theme.badge.muted}` },
+const stanceOptions: { value: CivilStance; label: string; borderClass: string; textClass: string; hoverClass: string }[] = [
+  { value: 'pro', label: '찬성', borderClass: 'border-2 border-success', textClass: 'text-success', hoverClass: 'hover:bg-success/10' },
+  { value: 'con', label: '반대', borderClass: 'border-2 border-danger', textClass: 'text-danger', hoverClass: 'hover:bg-danger/10' },
+  { value: 'neutral', label: '중립', borderClass: 'border-2 border-border', textClass: 'text-text-secondary', hoverClass: 'hover:bg-surface' },
 ];
 
 export const DiscussionInput: React.FC<DiscussionInputProps> = ({ onSubmit }) => {
@@ -24,16 +23,14 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({ onSubmit }) =>
   };
 
   return (
-    <div className="bg-bg rounded-lg p-6 shadow-md border border-border text-text-primary">
+    <div className="rounded-lg p-lg shadow-md border border-border bg-bg text-text-primary">
       <div className="flex flex-wrap gap-3 mb-4">
         {stanceOptions.map((opt) => (
           <button
             key={opt.value}
             type="button"
             onClick={() => setStance(opt.value)}
-            className={`cursor-pointer transition-all duration-200 ${
-              stance === opt.value ? 'ring-2 ring-offset-2 ring-primary' : 'opacity-90 hover:opacity-100'
-            } ${opt.badgeClass}`}
+            className={`px-4 py-2 rounded-full font-bold text-sm transition ${opt.borderClass} ${opt.textClass} ${opt.hoverClass}`}
           >
             {opt.label}
           </button>
@@ -42,7 +39,7 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({ onSubmit }) =>
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        className="w-full bg-gray-50 dark:bg-gray-800 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary min-h-[120px] mb-4 text-gray-700 dark:text-gray-200"
+        className="w-full bg-surface border border-border rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-primary min-h-[120px] mb-4 text-text-primary placeholder-text-muted transition-colors"
         placeholder="당신의 의견을 자유롭게 공유해 주세요..."
       />
       <div className="flex justify-end">
