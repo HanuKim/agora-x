@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { theme } from '../../design/theme';
 import { Button } from '../ui/Button';
 import type { CivilStance } from './types';
 
@@ -6,10 +7,10 @@ interface DiscussionInputProps {
   onSubmit?: (stance: CivilStance, body: string) => void;
 }
 
-const stanceOptions: { value: CivilStance; label: string; borderClass: string; textClass: string; hoverClass: string }[] = [
-  { value: 'pro', label: '찬성', borderClass: 'border-2 border-green-500', textClass: 'text-green-600', hoverClass: 'hover:bg-green-50' },
-  { value: 'con', label: '반대', borderClass: 'border-2 border-red-500', textClass: 'text-red-600', hoverClass: 'hover:bg-red-50' },
-  { value: 'neutral', label: '중립', borderClass: 'border-2 border-gray-300', textClass: 'text-gray-500', hoverClass: 'hover:bg-gray-50' },
+const stanceOptions: { value: CivilStance; label: string; badgeClass: string }[] = [
+  { value: 'pro', label: '찬성', badgeClass: `${theme.badge.base} ${theme.badge.success}` },
+  { value: 'con', label: '반대', badgeClass: `${theme.badge.base} ${theme.badge.danger}` },
+  { value: 'neutral', label: '중립', badgeClass: `${theme.badge.base} ${theme.badge.muted}` },
 ];
 
 export const DiscussionInput: React.FC<DiscussionInputProps> = ({ onSubmit }) => {
@@ -23,14 +24,16 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({ onSubmit }) =>
   };
 
   return (
-    <div className="bg-white dark:bg-[#1F2937] rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700">
+    <div className="bg-bg rounded-lg p-6 shadow-md border border-border text-text-primary">
       <div className="flex flex-wrap gap-3 mb-4">
         {stanceOptions.map((opt) => (
           <button
             key={opt.value}
             type="button"
             onClick={() => setStance(opt.value)}
-            className={`px-4 py-2 rounded-full font-bold text-sm transition ${opt.borderClass} ${opt.textClass} ${opt.hoverClass}`}
+            className={`cursor-pointer transition-all duration-200 ${
+              stance === opt.value ? 'ring-2 ring-offset-2 ring-primary' : 'opacity-90 hover:opacity-100'
+            } ${opt.badgeClass}`}
           >
             {opt.label}
           </button>

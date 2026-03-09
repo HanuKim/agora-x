@@ -1,57 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import {
-  CommentItem,
-  DiscussionInput,
-  type CivilComment,
-  type CivilStance,
-} from '../components/discussionCivil';
-import { mapNewsCommentToCivil } from '../components/discussionCivil/newsComments';
-import { Button } from '../components/ui/Button';
-import { getStoredReplies } from '../components/discussionCivil/replyStorage';
-import rawNewsData from '../data/selectedNews.json';
-import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
-import '../components/discussionCivil/discussionCivil.css';
-
-const selectedNews = (rawNewsData as { selectedNews: Array<{ comments?: Array<{ comment_id: number; author: string; created_at: string; content: string; like_count: number }> }> }).selectedNews;
+import React from 'react';
+import { useDetail } from '../features/detail/useDetail';
 
 export const DiscussionCivil: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const numericId = id ? Number(id) : NaN;
-  const issueAnalysisForId = Number.isFinite(numericId) ? numericId : undefined;
-  const { items } = useNewsWithAISummary(undefined, issueAnalysisForId);
-  const article = items.find((item) => item.id === numericId);
-
-  // 토론 주제: 기사 topic·내용 기반으로 AI가 추출한 debateTopic 우선, 미적용 시 기사 topic (Detail.tsx와 동일)
-  const debateTopic = article?.aiSummary?.debateTopic ?? article?.topic;
-
-  const [sortBy] = useState<'popular' | 'latest'>('popular');
-  const [visibleCommentCount, setVisibleCommentCount] = useState(5);
-  const [, setRepliesVersion] = useState(0);
-
-  // 해당 기사 댓글: selectedNews[articleIndex].comments (id는 1-based → index = numericId - 1)
-  const comments = useMemo<CivilComment[]>(() => {
-    const articleIndex = Number.isFinite(numericId) ? numericId - 1 : -1;
-    const raw = articleIndex >= 0 && selectedNews[articleIndex] ? selectedNews[articleIndex].comments ?? [] : [];
-    return raw.map((c) => mapNewsCommentToCivil(c as Parameters<typeof mapNewsCommentToCivil>[0]));
-  }, [numericId]);
-
-  const visibleComments = comments.slice(0, visibleCommentCount);
-  const hasMoreComments = comments.length > 0 && visibleCommentCount < comments.length;
-  const hasComments = comments.length > 0;
-
-  // 현재 페이지에 표시된 CommentItem + ReplyItem 총 개수 (localStorage 포함)
-  const totalDisplayCount =
-    visibleComments.length +
-    visibleComments.reduce(
-      (sum, c) => sum + (c.replies?.length ?? 0) + getStoredReplies(c.id).length,
-      0
-    );
-
-  const handleSubmitOpinion = (stance: CivilStance, body: string) => {
-    void { stance, body };
-    // TODO: integrate with proposal/opinion or civil discussion API
-  };
+  const { id, debateTopic } = useDetail();
 
   return (
     <div data-page="discussion-civil" className="min-h-screen bg-bg text-text-primary font-sans antialiased transition-colors duration-200">
@@ -75,89 +26,7 @@ export const DiscussionCivil: React.FC = () => {
           )}
         </header>
 
-        <section className="mb-12">
-          <DiscussionInput onSubmit={handleSubmitOpinion} />
-        </section>
-
-        <section className="space-y-6">
-          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <span className="material-icons-round text-primary">forum</span>
-              시민 토론장 <span className="text-gray-400 font-normal">{totalDisplayCount.toLocaleString()}</span>
-            </h2>
-            <div className="flex gap-4 text-sm font-medium">
-              <button
-                type="button"
-                className={sortBy === 'popular' ? 'text-primary border-b-2 border-primary pb-1' : 'text-gray-500 pb-1'}
-              >
-                인기순
-              </button>
-              <button
-                type="button"
-                className={sortBy === 'latest' ? 'text-primary border-b-2 border-primary pb-1' : 'text-gray-500 pb-1'}
-              >
-                최신순
-              </button>
-            </div>
-          </div>
-
-          {/* 의견 작성란 */}
-          {hasComments ? (
-            <div className="space-y-8">
-              {visibleComments.map((comment) => (
-                <CommentItem
-                  key={comment.id}
-                  comment={comment}
-                  showThreadLine={Boolean(comment.replies?.length)}
-                  onReplyAdded={() => setRepliesVersion((prev) => prev + 1)}
-                />
-              ))}
-            </div>
-          ) : (
-            // 의견이 0개라면
-            <div className="flex flex-col items-center justify-center py-20 px-6 mt-4 rounded-3xl border-1 border-border bg-surface/50 transition-all">
-              <div className="relative mb-6">
-                <span className="material-symbols-outlined text-7xl text-text-muted">
-                  chat_bubble_outline
-                </span>
-                <span className="material-symbols-outlined absolute -top-1 -right-1 text-2xl text-primary/40 animate-bounce">
-                  lightbulb
-                </span>
-              </div>
-              <div className="text-center space-y-2">
-                <h3 className="text-xl font-bold text-text-primary">
-                  아직 도착한 의견이 없어요
-                </h3>
-                <p className="text-text-muted text-sm max-w-[280px] mx-auto leading-relaxed">
-                  이 주제에 대해 가장 먼저 <br />
-                  당신의 소중한 생각을 공유해 보시겠어요?
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="mt-8 flex items-center gap-2 px-6 py-2.5 rounded-full bg-surface border border-border text-sm font-bold text-primary shadow-sm hover:shadow-md hover:border-primary/50 transition-all active:scale-95"
-              >
-                <span className="material-symbols-outlined text-base">add_comment</span>
-                첫 의견 작성하기
-              </button>
-            </div>
-          )}
-        </section>
-
-        {hasComments && hasMoreComments && (
-          <div className="mt-16 text-center">
-            <Button
-              type="button"
-              variant="primary"
-              size="md"
-              onClick={() => setVisibleCommentCount((prev) => prev + 5)}
-              className="whitespace-nowrap"
-            >
-              토론 의견 더 불러오기
-            </Button>
-          </div>
-        )}
+        {/* 시민 토론장 레이아웃(의견 입력·목록·더 보기)은 Detail 페이지 시민 토론장 섹션으로 이동됨. 동일 훅(useDetail) 사용. */}
       </main>
     </div>
   );

@@ -1,31 +1,37 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { CommentItem } from '../components/discussionCivil/CommentItem';
+import { DiscussionInput } from '../components/discussionCivil/DiscussionInput';
 import { Card } from '../components/ui/Card';
 import { PollSection } from '../components/detail/PollSection';
+import { Button } from '../components/ui/Button';
 import { theme } from '../design/theme';
-import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
+import { useDetail } from '../features/detail/useDetail';
+import '../components/discussionCivil/discussionCivil.css';
 
 export const Detail: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    const numericId = id ? Number(id) : NaN;
-    const issueAnalysisForId = Number.isFinite(numericId) ? numericId : undefined;
-    const { items } = useNewsWithAISummary(undefined, issueAnalysisForId);
-    const article = items.find((item) => item.id === numericId);
-
-    // 토론 주제: 기사 topic·내용 기반으로 AI가 추출한 debateTopic 우선, 미적용 시 기사 topic
-    const debateTopic =
-        article?.aiSummary?.debateTopic ?? article?.topic;
-
-    const overview = article?.issueAnalysis?.background ?? article?.aiSummary?.overview;
-    const proArguments = article?.aiSummary?.proArguments ?? [];
-    const conArguments = article?.aiSummary?.conArguments ?? [];
-    const proArgumentSummaries = article?.aiSummary?.proArgumentSummaries ?? [];
-    const conArgumentSummaries = article?.aiSummary?.conArgumentSummaries ?? [];
-    const aiLoading = article?.aiLoading ?? false;
+  const {
+    id,
+    numericId,
+    debateTopic,
+    overview,
+    proArguments,
+    conArguments,
+    proArgumentSummaries,
+    conArgumentSummaries,
+    aiLoading,
+    // goToCivilDiscussion,
+    sortBy,
+    comments: visibleComments,
+    hasComments,
+    hasMoreComments,
+    totalDisplayCount,
+    handleSubmitOpinion,
+    loadMoreComments,
+    handleReplyAdded,
+  } = useDetail();
 
     return (
-        <div className={`${theme.section.page} page-bg-muted`}>
+        <div className={theme.section.page}>
             <div className={`${theme.section.container} py-xl`}>
                 {/* Header / Hero */}
                 <header className="max-w-[900px] mx-auto text-center mb-xl">
@@ -188,50 +194,90 @@ export const Detail: React.FC = () => {
                     </section>
                 </div>
 
+
                 {/* 시민 토론장 */}
                 <section className="mt-xl pt-lg border-t border-border">
-                    <h2 className="text-[1.5rem] font-bold mb-md flex items-center gap-sm text-text-primary">
-                        <span className="material-icons-round text-primary">forum</span>
-                        시민 토론장
-                    </h2>
-
-                    <Card padding="lg" className="flex gap-md items-start mb-md">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-gray-brand flex-shrink-0" />
-                        <div className="flex-1">
-                            <div className="flex items-center justify-between mb-xs">
-                                <span className="font-bold text-text-primary">익명_시민_42</span>
-                                <span className="text-[11px] text-text-secondary">2시간 전</span>
-                            </div>
-                            <p className="text-sm text-text-secondary mb-sm break-keep">
-                                생산성이 오른다는 건 사무직 대기업 얘기 아닌가요? 제조업 기반 중소기업들은 납기 맞추려면
-                                사람을 더 뽑아야 하는데 현실적으로 불가능합니다. 업종별 차이를 고려해야 합니다.
-                            </p>
-                            <div className="flex gap-md">
+                    <section className="space-y-6">
+                        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
+                            <h2 className="text-2xl font-bold flex items-center gap-2">
+                                <span className="material-icons-round text-primary">forum</span>
+                                시민 토론장 <span className="text-gray-400 font-normal">{totalDisplayCount.toLocaleString()}</span>
+                            </h2>
+                            <div className="flex gap-4 text-sm font-medium">
                                 <button
                                     type="button"
-                                    className="text-sm text-text-secondary hover:text-primary font-medium"
+                                    className={sortBy === 'popular' ? 'text-primary border-b-2 border-primary pb-1' : 'text-gray-500 pb-1'}
                                 >
-                                    답글
+                                    인기순
                                 </button>
                                 <button
                                     type="button"
-                                    className="text-sm text-text-secondary hover:text-primary font-medium"
+                                    className={sortBy === 'latest' ? 'text-primary border-b-2 border-primary pb-1' : 'text-gray-500 pb-1'}
                                 >
-                                    추천 (24)
+                                    최신순
                                 </button>
                             </div>
                         </div>
-                    </Card>
 
-                    <div className="text-center">
-                        <button
-                            type="button"
-                            onClick={() => id && navigate(`/discussion-civil/${id}`)}
-                            className="cursor-pointer text-primary font-bold text-sm hover:underline underline-offset-[2px]"
-                        >
-                            전체 댓글 1,204개 보기
-                        </button>
-                    </div>
+                        <section className="mb-12">
+                            <DiscussionInput onSubmit={handleSubmitOpinion} />
+                        </section>
+
+                        {hasComments ? (
+                            <div className="space-y-8">
+                                {visibleComments.map((comment) => (
+                                    <CommentItem
+                                        key={comment.id}
+                                        comment={comment}
+                                        showThreadLine={Boolean(comment.replies?.length)}
+                                        onReplyAdded={handleReplyAdded}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-20 px-6 mt-4 rounded-3xl border-1 border-border bg-surface/50 transition-all">
+                                <div className="relative mb-6">
+                                    <span className="material-symbols-outlined text-7xl text-text-muted">
+                                        chat_bubble_outline
+                                    </span>
+                                    <span className="material-symbols-outlined absolute -top-1 -right-1 text-2xl text-primary/40 animate-bounce">
+                                        lightbulb
+                                    </span>
+                                </div>
+                                <div className="text-center space-y-2">
+                                    <h3 className="text-xl font-bold text-text-primary">
+                                        아직 도착한 의견이 없어요
+                                    </h3>
+                                    <p className="text-text-muted text-sm max-w-[280px] mx-auto leading-relaxed">
+                                        이 주제에 대해 가장 먼저 <br />
+                                        당신의 소중한 생각을 공유해 보시겠어요?
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                                    className="mt-8 flex items-center gap-2 px-6 py-2.5 rounded-full bg-surface border border-border text-sm font-bold text-primary shadow-sm hover:shadow-md hover:border-primary/50 transition-all active:scale-95"
+                                >
+                                    <span className="material-symbols-outlined text-base">add_comment</span>
+                                    첫 의견 작성하기
+                                </button>
+                            </div>
+                        )}
+                    </section>
+
+                    {hasComments && hasMoreComments && (
+                        <div className="mt-16 text-center">
+                            <Button
+                                type="button"
+                                variant="primary"
+                                size="md"
+                                onClick={loadMoreComments}
+                                className="whitespace-nowrap"
+                            >
+                                토론 의견 더 불러오기
+                            </Button>
+                        </div>
+                    )}
                 </section>
             </div>
         </div>

@@ -23,45 +23,37 @@
   --color-bg: var(--civil-bg-light);
 }
 
-/* Thread line: vertical connector from parent avatar to last reply */
+/* Thread line: vertical connector from parent avatar to last reply (theme tokens) */
 .thread-line {
   position: absolute;
   left: 20px;
   top: 50px;
   bottom: 24px;
   width: 2px;
-  background: #E5E7EB;
+  background: var(--color-border);
   transition: background 0.2s;
   z-index: 0;
 }
 
-.dark .thread-line {
-  background: #374151;
-}
-
 .comment-group:hover .thread-line {
-  background: #FF7A00;
+  background: var(--color-primary);
 }
 
-/* Thread curve: horizontal bend from vertical line to reply */
+/* Thread curve: horizontal bend from vertical line to reply (theme tokens) */
 .thread-curve {
   position: absolute;
   left: -20px;
   top: 0;
   width: 20px;
   height: 25px;
-  border-left: 2px solid #E5E7EB;
-  border-bottom: 2px solid #E5E7EB;
+  border-left: 2px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border);
   border-bottom-left-radius: 12px;
   transition: border-color 0.2s;
 }
 
-.dark .thread-curve {
-  border-color: #374151;
-}
-
 .comment-group:hover .thread-curve {
-  border-color: #FF7A00;
+  border-color: var(--color-primary);
 }
 
 /* Prototype neo shadow */
