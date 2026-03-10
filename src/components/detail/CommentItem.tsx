@@ -152,19 +152,6 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
           {visibleReplies.map((reply) => (
             <CivilDiscussionItem key={reply.id} variant="reply" reply={reply} />
           ))}
-          {showMoreRepliesButton && (
-            <div className="pl-10 relative">
-              <div className="thread-curve" style={{ height: 15 }} />
-              <button
-                type="button"
-                onClick={loadMoreReplies}
-                className="flex items-center gap-2 text-primary font-bold text-sm hover:underline py-1 transition-colors"
-              >
-                <span className="w-6 h-[2px] bg-primary/30" />
-                답글 {visibleReplyCount === 0 ? repliesList.length : remainingCount}개 더 보기...
-              </button>
-            </div>
-          )}
         </div>
       )}
 
@@ -175,6 +162,20 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
           onCancel={() => setShowReplyInput(false)}
           onSubmit={handleReplySubmit}
         />
+      )}
+
+      {hasReplies && showMoreRepliesButton && (
+        <div className="ml-10 pl-10 relative mt-4">
+          <div className="thread-curve" style={{ height: 15 }} />
+          <button
+            type="button"
+            onClick={loadMoreReplies}
+            className="flex items-center gap-2 text-primary font-bold text-sm hover:underline py-1 transition-colors"
+          >
+            <span className="w-6 h-[2px] bg-primary/30" />
+            답글 {visibleReplyCount === 0 ? repliesList.length : remainingCount}개 더 보기...
+          </button>
+        </div>
       )}
     </div>
   );

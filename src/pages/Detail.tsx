@@ -91,8 +91,12 @@ export const Detail: React.FC = () => {
                                     </p>
                                 </Card>
                                 <Card padding="lg" className="border-l-4 border-success">
-                                    <h3 className="font-bold text-lg mb-xs text-text-primary">—</h3>
-                                    <p className="text-sm text-text-secondary mb-sm break-keep">—</p>
+                                    <h3 className="font-bold text-lg mb-xs text-text-primary">
+                                        {aiLoading ? '찬성 논거 불러오는 중' : '찬성 논거'}
+                                    </h3>
+                                    <p className="text-sm text-text-secondary mb-sm break-keep">
+                                        {aiLoading ? '지식 수준에 맞는 찬성 논거를 생성하고 있습니다.' : '아직 논거가 없습니다.'}
+                                    </p>
                                 </Card>
                             </>
                         ) : (
@@ -156,8 +160,12 @@ export const Detail: React.FC = () => {
                                     </p>
                                 </Card>
                                 <Card padding="lg" className="border-r-4 border-danger">
-                                    <h3 className="font-bold text-lg mb-xs text-text-primary">—</h3>
-                                    <p className="text-sm text-text-secondary mb-sm break-keep">—</p>
+                                    <h3 className="font-bold text-lg mb-xs text-text-primary">
+                                        {aiLoading ? '반대 논거 불러오는 중' : '반대 논거'}
+                                    </h3>
+                                    <p className="text-sm text-text-secondary mb-sm break-keep">
+                                        {aiLoading ? '지식 수준에 맞는 반대 논거를 생성하고 있습니다.' : '아직 논거가 없습니다.'}
+                                    </p>
                                 </Card>
                             </>
                         ) : (
@@ -195,7 +203,7 @@ export const Detail: React.FC = () => {
 
 
                 {/* 시민 토론장 — index.css 디자인 토큰 사용 */}
-                <section className="mt-xl pt-lg border-t border-border">
+                <section className="mt-xl pt-lg border-border">
                     <section className="space-y-lg">
                         <div className="flex items-center justify-between border-b border-border pb-md">
                             <h2 className="text-2xl font-bold flex items-center gap-sm text-text-primary">
