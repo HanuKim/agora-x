@@ -104,7 +104,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) 
                     </>
                 ) : (
                     /* Community 스타일: 텍스트 요약 3줄 */
-                    <p className="text-sm text-text-secondary line-clamp-3 mb-md flex-1">
+                    <p className="text-sm text-text-secondary line-clamp-3 mb-md flex-1 min-h-[3.75rem]">
                         {article.summary || article.topic}
                     </p>
                 )}
