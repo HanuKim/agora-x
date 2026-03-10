@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { getStoredReplies, getStoredComments, appendStoredComment } from '../../services/db/detailDB';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 import { formatTimeAgo } from '../../utils/timeCalculate';
@@ -50,7 +50,6 @@ const selectedNews = (rawNewsData as {
 
 export const useDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   /**
    * 기사 ID 처리 및 유효성 검사
@@ -78,14 +77,6 @@ export const useDetail = () => {
   const proArgumentSummaries = article?.aiSummary?.proArgumentSummaries ?? [];
   const conArgumentSummaries = article?.aiSummary?.conArgumentSummaries ?? [];
   const aiLoading = article?.aiLoading ?? false;
-
-  /**
-   * DiscussionCivil 페이지로 이동하는 이벤트 핸들러 (추후 삭제)
-   */
-  const goToCivilDiscussion = () => {
-    if (id) navigate(`/discussion-civil/${id}`);
-  };
-
 
   // ---------- 시민 토론장 ----------
   const [sortBy] = useState<'popular' | 'latest'>('popular');
@@ -163,7 +154,6 @@ export const useDetail = () => {
     proArgumentSummaries,
     conArgumentSummaries,
     aiLoading,
-    goToCivilDiscussion,
     // 시민 토론장
     sortBy,
     comments: visibleComments,

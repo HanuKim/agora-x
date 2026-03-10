@@ -19,7 +19,6 @@ export const Detail: React.FC = () => {
     proArgumentSummaries,
     conArgumentSummaries,
     aiLoading,
-    // goToCivilDiscussion,
     sortBy,
     comments: visibleComments,
     hasComments,
