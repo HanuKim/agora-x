@@ -21,6 +21,7 @@ export interface NewsCardArticle {
     imageUrl: string | null;
     commentCount: number;
     regDt: string;
+    url?: string;
     /** AI 생성 요약 (showAI=true 일 때 사용) */
     aiSummary?: {
         overview: string;

@@ -34,6 +34,7 @@ function parseArticles(data: Record<string, unknown>[]): NewsCardArticle[] {
             imageUrl: images?.[0]?.image_url ?? null,
             commentCount: comments?.length ?? 0,
             regDt: (article?.reg_dt as string) ?? '',
+            url: (item.article_url as string) || (item.url as string) || '',
         };
     });
 }
@@ -79,7 +80,8 @@ export const ProposalDetail: React.FC = () => {
                 category: proposal.category || '사회',
                 imageUrl: ta.image_url || null,
                 commentCount: 0,
-                regDt: ta.pub_date || new Date().toISOString()
+                regDt: ta.pub_date || new Date().toISOString(),
+                url: ta.article_url || '',
             })) as NewsCardArticle[];
         }
 
@@ -294,7 +296,9 @@ export const ProposalDetail: React.FC = () => {
                                 </h2>
                                 <div className="flex flex-col gap-md">
                                     {relatedNews.slice(0, 3).map((news) => (
-                                        <NewsCard key={news.id} article={news} onClick={() => navigate(`/detail/${news.id}`)} />
+                                        <NewsCard key={news.id} article={news} onClick={() => {
+                                            if (news.url) window.open(news.url, '_blank', 'noopener,noreferrer');
+                                        }} />
                                     ))}
                                 </div>
                             </div>
