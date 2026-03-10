@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getStoredReplies } from '../../services/db/detailDB';
+import { getStoredReplies, getStoredComments, appendStoredComment } from '../../services/db/detailDB';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 import { formatTimeAgo } from '../../utils/timeCalculate';
 import type { CivilComment, CivilStance } from './useCivilStance';
@@ -86,8 +86,16 @@ export const useDetail = () => {
   const [sortBy] = useState<'popular' | 'latest'>('popular');
   const [visibleCommentCount, setVisibleCommentCount] = useState(5);
   const [, setRepliesVersion] = useState(0);
+  /** 로컬 저장 댓글(issueId 기준) — 페이지 로드 시 getStoredComments와 merge */
+  const [userComments, setUserComments] = useState<CivilComment[]>([]);
 
-  const comments = useMemo<CivilComment[]>(() => {
+  useEffect(() => {
+    if (!id) return;
+    const stored = getStoredComments(id);
+    queueMicrotask(() => setUserComments(stored));
+  }, [id]);
+
+  const commentsFromData = useMemo<CivilComment[]>(() => {
     const articleIndex = Number.isFinite(numericId) ? numericId - 1 : -1;
     const raw =
       articleIndex >= 0 && selectedNews[articleIndex]
@@ -96,9 +104,14 @@ export const useDetail = () => {
     return raw.map((c) => mapNewsCommentToCivil(c as NewsCommentRaw));
   }, [numericId]);
 
-  const visibleComments = comments.slice(0, visibleCommentCount);
-  const hasMoreComments = comments.length > 0 && visibleCommentCount < comments.length;
-  const hasComments = comments.length > 0;
+  const allComments = useMemo<CivilComment[]>(
+    () => [...commentsFromData, ...userComments],
+    [commentsFromData, userComments]
+  );
+
+  const visibleComments = allComments.slice(0, visibleCommentCount);
+  const hasMoreComments = allComments.length > 0 && visibleCommentCount < allComments.length;
+  const hasComments = allComments.length > 0;
 
   /**
    * 현재 페이지의 총 Comment + Reply 개수 계산
@@ -111,8 +124,19 @@ export const useDetail = () => {
     );
 
   const handleSubmitOpinion = (stance: CivilStance, body: string) => {
-    void { stance, body };
-    // TODO: integrate with proposal/opinion or civil discussion API
+    if (!id) return;
+    const newComment: CivilComment = {
+      id: `user-${id}-${Date.now()}`,
+      authorName: '나',
+      stance,
+      body,
+      timeAgo: '방금 전',
+      score: 0,
+      replies: [],
+    };
+    appendStoredComment(id, newComment);
+    setUserComments((prev) => [...prev, newComment]);
+    setVisibleCommentCount((prev) => prev + 1);
   };
 
   const loadMoreComments = () => {
