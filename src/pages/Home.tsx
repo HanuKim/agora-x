@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { IssueCard } from '../components/discussion/IssueCard';
 import { NewsCard } from '../components/community/NewsCard';
-import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
+import { useHome } from '../features/home/useHome';
 import issuesData from '../data/koreanSocialIssues.json';
 
 interface Issue {
@@ -17,33 +17,21 @@ interface Issue {
 const issues: Issue[] = (issuesData as { title: string; issues: Issue[] }).issues.slice(0, 10);
 
 export const Home: React.FC = () => {
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const isPaused = useRef(false);
-    const CARD_WIDTH = 236; // 220px card + 16px gap
-
-    // Auto-scroll: 3초마다 카드 하나씩 오른쪽으로, 끝에 도달하면 처음으로
-    useEffect(() => {
-        const timer = setInterval(() => {
-            if (isPaused.current || !scrollRef.current) return;
-            const el = scrollRef.current;
-            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
-            if (atEnd) {
-                el.scrollTo({ left: 0, behavior: 'smooth' });
-            } else {
-                el.scrollBy({ left: CARD_WIDTH, behavior: 'smooth' });
-            }
-        }, 3000);
-        return () => clearInterval(timer);
-    }, []);
-
-    const scroll = (dir: 'left' | 'right') => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollBy({ left: dir === 'right' ? CARD_WIDTH : -CARD_WIDTH, behavior: 'smooth' });
-        }
-    };
     const navigate = useNavigate();
-    // 홈에서는 9건만 처리 (3×3 그리드)
-    const { items: newsItems } = useNewsWithAISummary(9);
+    const {
+        issueScrollRef,
+        isPaused,
+        centerIssueIndex,
+        handleIssueScroll,
+        scrollIssues,
+        proposalScrollRef,
+        activeProposals,
+        currentProposal,
+        activeProposalIndex,
+        scrollProposals,
+        handleProposalClick,
+        newsItems,
+    } = useHome();
 
     return (
         <div className="min-h-screen bg-bg font-sans">
@@ -99,8 +87,132 @@ export const Home: React.FC = () => {
             </header>
 
 
-            {/* ── 1:1 토론하기 (구 "지금 뜨는 이슈") ────────── */}
-            <section className="max-w-[1200px] mx-auto px-xl mt-xxl">
+            {/* ── 논의가 활발한 국민 제안 ────────── */}
+            <section className="max-w-[1200px] mx-auto px-xl mt-[150px]">
+                <div className="flex items-center justify-between mb-xl">
+                    <div>
+                        <h2 className="text-[2.5rem] font-bold mb-xs">
+                            논의가 활발한 국민 제안
+                        </h2>
+                        <p className="text-text-secondary">
+                            시민들이 직접 제안하고 활발하게 논의 중인 안건들을 확인해 보세요.
+                        </p>
+                    </div>
+                    {/* Scroll arrow buttons */}
+                    {activeProposals.length > 1 && (
+                        <div className="flex gap-sm">
+                            <button
+                                onClick={() => scrollProposals('left')}
+                                className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-bg hover:bg-surface hover:border-primary transition-all duration-200 text-text-secondary hover:text-primary cursor-pointer"
+                                aria-label="왼쪽으로 스크롤"
+                            >
+                                ‹
+                            </button>
+                            <button
+                                onClick={() => scrollProposals('right')}
+                                className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-bg hover:bg-surface hover:border-primary transition-all duration-200 text-text-secondary hover:text-primary cursor-pointer"
+                                aria-label="오른쪽으로 스크롤"
+                            >
+                                ›
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {activeProposals.length > 0 && currentProposal ? (
+                    <div className="flex flex-col gap-xl">
+                        {/* Featured Proposal Area (Hero) */}
+                        <div className="flex flex-col md:flex-row gap-xl min-h-[400px]">
+                            {/* Left Image Side */}
+                            <div className="w-full md:w-1/2 relative bg-gray-100 rounded-[1.5rem] overflow-hidden flex-shrink-0 border border-border shadow-md">
+                                <img
+                                    src={`/src/assets/images/banner${(activeProposalIndex % 9) + 1}.png`}
+                                    alt="Proposal Illustration"
+                                    className="w-full h-full object-cover absolute inset-0"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20" />
+                            </div>
+
+                            {/* Right Content Side */}
+                            <div className="w-full md:w-1/2 py-xl flex flex-col justify-center bg-transparent mt-xs md:mt-0 flex-1 relative z-10 min-h-[300px] md:min-h-auto text-left">
+                                <div className="mb-md">
+                                    <span className="text-lg font-bold text-primary">
+                                        {currentProposal.category || '국민 제안'}
+                                    </span>
+                                </div>
+                                <h3 className="text-[2.25rem] font-extrabold mb-lg leading-tight text-text-primary line-clamp-2 break-keep">
+                                    {currentProposal.title}
+                                </h3>
+                                <p className="text-lg text-text-secondary leading-relaxed line-clamp-3 mb-xl break-keep">
+                                    {currentProposal.problem || currentProposal.description}
+                                </p>
+
+                                <div className="mt-auto pt-lg border-t border-border flex items-center">
+                                    <button
+                                        onClick={() => navigate(`/proposals/${currentProposal.id}`)}
+                                        className="inline-flex items-center gap-xs font-bold text-text-primary hover:text-primary transition-colors duration-200 group text-lg cursor-pointer"
+                                    >
+                                        토론 참여하기
+                                        <span className="material-icons-round text-primary transition-transform group-hover:translate-x-1 duration-200">arrow_forward</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Carousel Thumbnails / Indicators */}
+                        {activeProposals.length > 1 && (
+                            <div className="relative mt-md group">
+                                <div ref={proposalScrollRef} className="flex gap-md overflow-x-auto py-sm snap-x scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                    {activeProposals.map((proposal, idx) => {
+                                        const isActive = idx === activeProposalIndex;
+                                        return (
+                                            <button
+                                                key={proposal.id}
+                                                onClick={() => handleProposalClick(idx)}
+                                                className={`group flex flex-col p-md rounded-[1.25rem] border transition-all duration-300 min-w-[280px] max-w-[320px] flex-shrink-0 snap-center cursor-pointer ${isActive
+                                                    ? 'bg-primary/5 border-primary shadow-[0_4px_16px_rgba(243,111,33,0.15)]'
+                                                    : 'bg-surface border-border hover:-translate-y-1 hover:shadow-lg'
+                                                    }`}
+                                            >
+                                                <div className="flex gap-md h-full w-full">
+                                                    <div className="w-[100px] h-[100px] rounded-lg overflow-hidden flex-shrink-0 border border-border">
+                                                        <img
+                                                            src={`/src/assets/images/banner${(idx % 9) + 1}.png`}
+                                                            alt=""
+                                                            className={`w-full h-full object-cover transition-transform duration-500 ${isActive ? 'scale-110' : 'group-hover:scale-105'
+                                                                }`}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col text-left overflow-hidden flex-1 h-full pt-xs">
+                                                        <span className={`text-xs font-bold mb-xs ${isActive ? 'text-primary' : 'text-text-secondary'}`}>
+                                                            {proposal.category || '국민 제안'}
+                                                        </span>
+                                                        <span className={`text-base font-bold line-clamp-4 w-full leading-snug break-keep ${isActive ? 'text-text-primary' : 'text-text-primary/70 group-hover:text-text-primary'}`}>
+                                                            {proposal.title}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex justify-center py-xxl bg-surface rounded-2xl border border-border">
+                        <span className="text-text-secondary flex items-center gap-xs">
+                            <span className="material-icons-round">hourglass_empty</span>
+                            활발한 제안을 불러오는 중입니다...
+                        </span>
+                    </div>
+                )}
+            </section>
+
+            {/* ── 1:1 토론하기 ────────── */}
+            <section className="max-w-[1200px] mx-auto px-xl mt-[150px]">
                 <div className="flex items-center justify-between mb-md">
                     <div>
                         <h2 className="text-[2.5rem] font-bold mb-xs">
@@ -113,15 +225,15 @@ export const Home: React.FC = () => {
                     {/* Scroll arrow buttons */}
                     <div className="flex gap-sm">
                         <button
-                            onClick={() => scroll('left')}
-                            className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-bg hover:bg-surface hover:border-primary transition-all duration-200 text-text-secondary hover:text-primary"
+                            onClick={() => scrollIssues('left')}
+                            className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-bg hover:bg-surface hover:border-primary transition-all duration-200 text-text-secondary hover:text-primary cursor-pointer"
                             aria-label="왼쪽으로 스크롤"
                         >
                             ‹
                         </button>
                         <button
-                            onClick={() => scroll('right')}
-                            className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-bg hover:bg-surface hover:border-primary transition-all duration-200 text-text-secondary hover:text-primary"
+                            onClick={() => scrollIssues('right')}
+                            className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-bg hover:bg-surface hover:border-primary transition-all duration-200 text-text-secondary hover:text-primary cursor-pointer"
                             aria-label="오른쪽으로 스크롤"
                         >
                             ›
@@ -131,19 +243,28 @@ export const Home: React.FC = () => {
 
                 {/* Horizontal scroll container — auto-scrolls every 3s, pauses on hover */}
                 <div
-                    ref={scrollRef}
+                    ref={issueScrollRef}
+                    onScroll={handleIssueScroll}
                     onMouseEnter={() => { isPaused.current = true; }}
                     onMouseLeave={() => { isPaused.current = false; }}
-                    className="flex gap-lg overflow-x-auto pt-sm pb-md snap-x [&::-webkit-scrollbar]:h-[0px]"
+                    className="relative flex gap-lg overflow-x-auto pt-[2rem] pb-xl snap-x items-center  [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth"
                 >
-                    {issues.map((issue) => (
-                        <IssueCard
-                            key={issue.id}
-                            issue={issue}
-                            compact
-                            onClick={() => navigate('/ai-discussion')}
-                        />
-                    ))}
+                    {issues.map((issue, idx) => {
+                        const isCenter = centerIssueIndex === idx;
+                        return (
+                            <div
+                                key={issue.id}
+                                className={`transition-all duration-500 snap-center flex-shrink-0 ${isCenter ? 'scale-110 opacity-100 z-10' : 'scale-[0.85] opacity-50 z-0 hover:opacity-80'
+                                    } origin-center`}
+                            >
+                                <IssueCard
+                                    issue={issue}
+                                    compact
+                                    onClick={() => navigate(`/ai-discussion/${issue.id}`)}
+                                />
+                            </div>
+                        );
+                    })}
                 </div>
 
                 <div className="text-center mt-md">
@@ -153,8 +274,30 @@ export const Home: React.FC = () => {
                 </div>
             </section>
 
-            {/* ── 진행 중인 국민 토론 (구 "이슈 둘러보기") ──── */}
-            <main className="max-w-[1200px] mx-auto px-xl my-xxl">
+            <section>
+                {/* '신뢰할 수 있는 사회, 함께 만들어 갑니다.' 배너 */}
+                <div className="w-full mx-auto px-xl py-[9rem] mt-[150px] my-xxl relative overflow-hidden">
+                    <div className="flex justify-center text-center">
+                        <div>
+                            <div className="relative z-2">
+                                <h2 className="text-[2.5rem] text-[#fff] font-bold mb-xs">
+                                    신뢰할 수 있는 사회, 함께 만들어 갑니다.
+                                </h2>
+                                <p className="text-[#fff] text-lg">
+                                    우리사회의 신뢰 회복은 단절과 배제가 아니라 소통과 상호 존중에서 출발할 수 있습니다,
+                                </p>
+                            </div>
+
+                            {/*배너 이미지로 넣고 투명도 조절 박스로 덮기 */}
+                            <div className="absolute bottom-0 left-0 w-full h-[100%] bg-[#000] opacity-50 z-1"></div>
+                            <img src='/src/assets/images/banner.jpg' className='absolute bottom-[-100%] left-0 z-0' />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── 진행 중인 국민 토론 ──── */}
+            <main className="max-w-[1200px] mx-auto px-xl my-xxl mt-[150px]">
                 <div className="flex justify-between items-end mb-xl">
                     <div>
                         <h2 className="text-[2.5rem] font-bold mb-xs">진행 중인 국민 토론</h2>

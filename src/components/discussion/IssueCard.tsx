@@ -32,16 +32,16 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick, compact })
     if (compact) {
         return (
             <Card
-                className="snap-start flex-shrink-0 w-[220px] flex flex-col gap-sm cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+                className={`snap-start flex-shrink-0 w-[300px] h-[200px] flex flex-col gap-sm cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]`}
                 onClick={onClick}
             >
                 <span className={`self-start text-xs font-bold px-sm py-[2px] rounded-full ${badgeClass}`}>
                     {issue.category}
                 </span>
-                <h3 className="text-sm font-semibold text-text-primary leading-snug line-clamp-3">
+                <h3 className="text-lg font-semibold text-text-primary leading-snug line-clamp-3">
                     {issue.topic}
                 </h3>
-                <p className="text-xs text-text-secondary line-clamp-3 flex-1">
+                <p className="text-sm text-text-secondary line-clamp-3 flex-1">
                     {loading ? (
                         <span className="animate-pulse">AI 요약 생성 중...</span>
                     ) : (
@@ -57,7 +57,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick, compact })
 
     return (
         <Card
-            className="flex flex-col gap-sm cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+            className={`flex flex-col gap-sm cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]`}
             onClick={onClick}
         >
             <span className={`self-start text-xs font-bold px-sm py-[2px] rounded-full ${badgeClass}`}>
