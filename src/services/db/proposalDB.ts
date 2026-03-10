@@ -9,7 +9,7 @@ import { type ContentCategory } from '../../features/user';
 import dummyData from '../../data/proposalDummy.json';
 
 const DB_NAME = 'agora-x-proposals';
-const DB_VERSION = 4; // Bumped version to flush old seeded data and re-evaluate the schema
+const DB_VERSION = 5; // Bumped version to flush old seeded data and re-evaluate the schema
 
 export interface Proposal {
     id: string; // generate UUID/timestamp string
