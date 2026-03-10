@@ -24,6 +24,8 @@ export interface CommentItemProps {
   comment: CivilComment;
   showThreadLine?: boolean;
   onReplyAdded?: () => void;
+  /** 기사 issueId — 답글 작성 시 동일 기사 내 익명 닉네임 생성용 */
+  issueId?: string;
 }
 
 // --- Reply props (variant: 'reply')
@@ -83,7 +85,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   }
 
   // variant === 'comment' (narrowed by control flow)
-  const { comment: commentData, showThreadLine = true, onReplyAdded } = props;
+  const { comment: commentData, showThreadLine = true, onReplyAdded, issueId } = props;
   const badgeClass = stanceBadgeClass[commentData.stance] ?? stanceBadgeClass.neutral;
   const label = stanceLabels[commentData.stance] ?? '중립';
   const avatarClass = commentData.avatarGradient ?? 'bg-gradient-to-br from-primary to-gray-brand';
@@ -169,6 +171,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
       {showReplyInput && (
         <ReplyInput
           commentId={commentData.id}
+          issueId={issueId}
           onCancel={() => setShowReplyInput(false)}
           onSubmit={handleReplySubmit}
         />

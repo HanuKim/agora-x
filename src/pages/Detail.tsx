@@ -231,6 +231,7 @@ export const Detail: React.FC = () => {
                                         comment={comment}
                                         showThreadLine={Boolean(comment.replies?.length)}
                                         onReplyAdded={handleReplyAdded}
+                                        issueId={id}
                                     />
                                 ))}
                             </div>

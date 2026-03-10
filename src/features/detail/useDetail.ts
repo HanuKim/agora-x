@@ -3,8 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getStoredReplies, getStoredComments, appendStoredComment } from '../../services/db/detailDB';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 import { formatTimeAgo } from '../../utils/timeCalculate';
+import { generateNickname } from '../../utils/nicknameGenerator';
 import type { CivilComment, CivilStance } from './useCivilStance';
 import rawNewsData from '../../data/selectedNews.json';
+
+const DEFAULT_USER_ID = 'anonymous';
+const CURRENT_USER_ID = 'current-user';
 
 // 시민 토론장 타입 재내보내기 (컴포넌트에서 동일 타입 사용)
 export type { CivilStance, CivilComment, CivilReply } from './useCivilStance';
@@ -20,10 +24,11 @@ interface NewsCommentRaw {
   hate_count: number;
 }
 
-function mapNewsCommentToCivil(raw: NewsCommentRaw): CivilComment {
+function mapNewsCommentToCivil(raw: NewsCommentRaw, issueId: string): CivilComment {
+  const userId = (raw.author ?? '').trim() || DEFAULT_USER_ID;
   return {
     id: String(raw.comment_id),
-    authorName: raw.author,
+    authorName: generateNickname(userId, issueId),
     stance: 'neutral',
     body: raw.content,
     timeAgo: formatTimeAgo(raw.created_at),
@@ -96,13 +101,14 @@ export const useDetail = () => {
   }, [id]);
 
   const commentsFromData = useMemo<CivilComment[]>(() => {
+    const issueId = id ?? '';
     const articleIndex = Number.isFinite(numericId) ? numericId - 1 : -1;
     const raw =
       articleIndex >= 0 && selectedNews[articleIndex]
         ? selectedNews[articleIndex].comments ?? []
         : [];
-    return raw.map((c) => mapNewsCommentToCivil(c as NewsCommentRaw));
-  }, [numericId]);
+    return raw.map((c) => mapNewsCommentToCivil(c as NewsCommentRaw, issueId));
+  }, [numericId, id]);
 
   const allComments = useMemo<CivilComment[]>(
     () => [...commentsFromData, ...userComments],
@@ -127,7 +133,7 @@ export const useDetail = () => {
     if (!id) return;
     const newComment: CivilComment = {
       id: `user-${id}-${Date.now()}`,
-      authorName: '나',
+      authorName: generateNickname(CURRENT_USER_ID, id),
       stance,
       body,
       timeAgo: '방금 전',
