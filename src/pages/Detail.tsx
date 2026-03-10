@@ -243,7 +243,7 @@ export const Detail: React.FC = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-xxl px-lg mt-md rounded-lg border border-border bg-surface/50 transition-all">
+                            <div className="flex flex-col items-center justify-center py-xxl px-lg mt-md rounded-lg transition-all">
                                 <div className="relative mb-lg">
                                     <span className="material-symbols-outlined text-7xl text-text-muted">
                                         chat_bubble_outline
