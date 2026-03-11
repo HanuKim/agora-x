@@ -10,7 +10,7 @@ interface ProposalCardProps {
 export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, onClick }) => {
     return (
         <div
-            className="flex flex-col bg-surface rounded-xl border border-border p-lg cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] h-full"
+            className="flex flex-col rounded-xl border border-border p-lg cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] h-full"
             onClick={onClick}
         >
             <div className="flex flex-col justify-between h-full">
