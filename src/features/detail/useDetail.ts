@@ -16,20 +16,25 @@ export type { CivilStance, CivilComment, CivilReply } from './useCivilStance';
 /** selectedNews 댓글 원본 구조 (mapNewsCommentToCivil 입력) */
 interface NewsCommentRaw {
   comment_id: number;
-  parent_id: number;
+  parent_id?: number;
   author: string;
   created_at: string;
   content: string;
   like_count: number;
-  hate_count: number;
+  hate_count?: number;
+  /** 찬성(pro) / 반대(con) / 중립(neutral) — 없으면 neutral */
+  stance?: 'pro' | 'con' | 'neutral';
 }
+
+const VALID_STANCE = new Set<string>(['pro', 'con', 'neutral']);
 
 function mapNewsCommentToCivil(raw: NewsCommentRaw, issueId: string): CivilComment {
   const userId = (raw.author ?? '').trim() || DEFAULT_USER_ID;
+  const stance = raw.stance && VALID_STANCE.has(raw.stance) ? raw.stance : 'neutral';
   return {
     id: String(raw.comment_id),
     authorName: generateNickname(userId, issueId),
-    stance: 'neutral',
+    stance,
     body: raw.content,
     timeAgo: formatTimeAgo(raw.created_at),
     score: raw.like_count,
@@ -40,10 +45,11 @@ const selectedNews = (rawNewsData as {
   selectedNews: Array<{
     comments?: Array<{
       comment_id: number;
-      author: string;
+      author?: string;
       created_at: string;
       content: string;
       like_count: number;
+      stance?: 'pro' | 'con' | 'neutral';
     }>;
   }>;
 }).selectedNews;
