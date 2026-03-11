@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Proposal } from '../../services/db/proposalDB';
-import { getActiveCategoryColorClass } from '../../pages/ProposalList';
+import { getActiveCategoryColorClass } from '../../design/categoryColors';
 
 interface ProposalCardProps {
     proposal: Proposal;

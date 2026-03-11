@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { PollSection } from '../components/detail/PollSection';
 import { theme } from '../design/theme';
 import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';

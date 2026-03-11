@@ -13,10 +13,10 @@ import React, { createContext, useCallback, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
     DEFAULT_KNOWLEDGE_PREFS,
-    type ContentCategory,
     type KnowledgeLevel,
     type UserKnowledgePrefs,
 } from '../types';
+import type { ContentCategory } from '../../common/types';
 import { invalidateCategoryCache } from '../../../services/ai/aiCacheDB';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
