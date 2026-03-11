@@ -122,7 +122,7 @@ export const Home: React.FC = () => {
                 {activeProposals.length > 0 && currentProposal ? (
                     <div className="flex flex-col gap-xl">
                         {/* Featured Proposal Area (Hero) */}
-                        <div className="flex flex-col md:flex-row gap-xl min-h-[400px]">
+                        <div className="flex flex-col md:flex-row gap-[80px] min-h-[400px]">
                             {/* Left Image Side */}
                             <div className="w-full md:w-1/2 relative bg-gray-100 rounded-[1.5rem] overflow-hidden flex-shrink-0 border border-border shadow-md">
                                 <img
@@ -140,7 +140,7 @@ export const Home: React.FC = () => {
                                         {currentProposal.category || '국민 제안'}
                                     </span>
                                 </div>
-                                <h3 className="text-[2.25rem] font-extrabold mb-lg leading-tight text-text-primary line-clamp-2 break-keep">
+                                <h3 className="text-[2rem] min-h-[80px] font-extrabold mb-lg leading-tight text-text-primary line-clamp-2 break-keep">
                                     {currentProposal.title}
                                 </h3>
                                 <p className="text-lg text-text-secondary leading-relaxed line-clamp-3 mb-xl break-keep">
@@ -152,7 +152,7 @@ export const Home: React.FC = () => {
                                         onClick={() => navigate(`/proposals/${currentProposal.id}`)}
                                         className="inline-flex items-center gap-xs font-bold text-text-primary hover:text-primary transition-colors duration-200 group text-lg cursor-pointer"
                                     >
-                                        토론 참여하기
+                                        논의 참여하기
                                         <span className="material-icons-round text-primary transition-transform group-hover:translate-x-1 duration-200">arrow_forward</span>
                                     </button>
                                 </div>

@@ -17,32 +17,10 @@ export const KNOWLEDGE_LEVEL_LABELS: Record<KnowledgeLevel, string> = {
     low: '하 (입문자)',
 };
 
-/**
- * 앱에서 사용하는 컨텐츠 분류 분야.
- * selectedNews.json의 middle_code_nm 값과 koreanSocialIssues.json category 값을 커버합니다.
- */
-export type ContentCategory =
-    | '정치'
-    | '경제'
-    | '사회'
-    | '국제'
-    | '문화'
-    | '기술'
-    | '기타';
+import type { ContentCategory } from '../common/types';
 
 /** 모든 분야에 대한 지식 수준 맵 */
 export type UserKnowledgePrefs = Record<ContentCategory, KnowledgeLevel>;
-
-/** 분야 목록 (Profile UI 렌더링용) */
-export const CONTENT_CATEGORIES: ContentCategory[] = [
-    '정치',
-    '경제',
-    '사회',
-    '국제',
-    '문화',
-    '기술',
-    '기타',
-];
 
 /** 기본 지식 수준 (신규 사용자) */
 export const DEFAULT_KNOWLEDGE_PREFS: UserKnowledgePrefs = {
