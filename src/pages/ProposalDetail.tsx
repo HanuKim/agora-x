@@ -10,7 +10,7 @@ import { Button } from '../components/ui/Button';
 import { OpinionItem } from '../components/proposal/OpinionItem';
 import { NewsCard, type NewsCardArticle } from '../components/community/NewsCard';
 import { EmptyState } from '../components/ui/EmptyState';
-import { getActiveCategoryColorClass } from './ProposalList';
+import { getActiveCategoryColorClass } from '../design/categoryColors';
 
 // Real mock data
 import rawNewsData from '../data/selectedNews.json';

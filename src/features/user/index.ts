@@ -11,7 +11,8 @@ export { useUserPrefs } from './hooks/useUserPrefs';
 export {
     DEFAULT_KNOWLEDGE_PREFS,
     KNOWLEDGE_LEVEL_LABELS,
-    CONTENT_CATEGORIES,
     mapToContentCategory,
 } from './types';
-export type { KnowledgeLevel, ContentCategory, UserKnowledgePrefs } from './types';
+export { CONTENT_CATEGORIES } from '../common/types';
+export type { KnowledgeLevel, UserKnowledgePrefs } from './types';
+export type { ContentCategory } from '../common/types';
