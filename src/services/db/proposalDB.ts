@@ -6,9 +6,10 @@
  */
 
 import { type ContentCategory } from '../../features/user';
+import dummyData from '../../data/proposalDummy.json';
 
 const DB_NAME = 'agora-x-proposals';
-const DB_VERSION = 1;
+const DB_VERSION = 5; // Bumped version to flush old seeded data and re-evaluate the schema
 
 export interface Proposal {
     id: string; // generate UUID/timestamp string
@@ -29,6 +30,8 @@ export interface Proposal {
     scrapedBy?: string[];
     opinionCount?: number;
     relatedArticleCount?: number;
+    targetArticles?: any[];
+    topic?: string;
 }
 
 export interface Opinion {
@@ -52,6 +55,19 @@ function openDB(): Promise<IDBDatabase> {
 
         request.onupgradeneeded = (event) => {
             const db = (event.target as IDBOpenDBRequest).result;
+
+            // If upgrading and the stores exist, let's clear them so we can re-seed with the new schema (targetArticles)
+            if (event.oldVersion > 0 && event.oldVersion < DB_VERSION) {
+                if (db.objectStoreNames.contains('proposals')) {
+                    const tx = (event.target as IDBOpenDBRequest).transaction;
+                    if (tx) tx.objectStore('proposals').clear();
+                }
+                if (db.objectStoreNames.contains('opinions')) {
+                    const tx = (event.target as IDBOpenDBRequest).transaction;
+                    if (tx) tx.objectStore('opinions').clear();
+                }
+            }
+
             if (!db.objectStoreNames.contains('proposals')) {
                 const store = db.createObjectStore('proposals', { keyPath: 'id' });
                 store.createIndex('createdAt', 'createdAt', { unique: false });
@@ -74,6 +90,52 @@ function openDB(): Promise<IDBDatabase> {
     return dbPromise;
 }
 
+// ─── Dummy Data Seeding ────────────────────────────────────────────────────
+
+export async function seedDummyDataIfEmpty(): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(['proposals', 'opinions'], 'readwrite');
+        const proposalsStore = tx.objectStore('proposals');
+
+        // Check if there are any proposals
+        const countRequest = proposalsStore.count();
+        countRequest.onsuccess = () => {
+            if (countRequest.result === 0) {
+                console.log('[proposalDB] Seeding dummy proposals and opinions...');
+                const opinionsStore = tx.objectStore('opinions');
+
+                try {
+                    dummyData.proposals.forEach((dummyProp) => {
+                        const { comments, ...proposalData } = dummyProp;
+                        // For hackathon, we save targetArticles together with the proposal
+
+                        proposalsStore.add(proposalData as unknown as Proposal);
+
+                        if (comments && Array.isArray(comments)) {
+                            comments.forEach((comment) => {
+                                opinionsStore.add({
+                                    ...comment,
+                                    proposalId: dummyProp.id
+                                } as Opinion);
+                            });
+                        }
+                    });
+                    // Transaction will complete automatically when all operations finish
+                } catch (e) {
+                    console.error('[proposalDB] Error seeding dummy data:', e);
+                }
+            }
+        };
+        countRequest.onerror = () => {
+            console.error('[proposalDB] Error counting proposals:', countRequest.error);
+        };
+
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
 // ─── Proposals ─────────────────────────────────────────────────────────────
 
 export async function createProposal(proposal: Proposal): Promise<void> {
@@ -88,6 +150,8 @@ export async function createProposal(proposal: Proposal): Promise<void> {
 }
 
 export async function getProposals(): Promise<Proposal[]> {
+    await seedDummyDataIfEmpty();
+
     const db = await openDB();
     return new Promise((resolve, reject) => {
         const tx = db.transaction('proposals', 'readonly');

@@ -34,6 +34,7 @@ function parseArticles(data: Record<string, unknown>[]): NewsCardArticle[] {
             imageUrl: images?.[0]?.image_url ?? null,
             commentCount: comments?.length ?? 0,
             regDt: (article?.reg_dt as string) ?? '',
+            url: (item.article_url as string) || (item.url as string) || '',
         };
     });
 }
@@ -69,6 +70,21 @@ export const ProposalDetail: React.FC = () => {
     // In a real scenario, API would handle fuzzy matching or AI embedding search.
     const relatedNews = useMemo(() => {
         if (!proposal) return [];
+        // If the proposal has explicitly defined targetArticles (from our dummy seed), use them
+        if (proposal.targetArticles && proposal.targetArticles.length > 0) {
+            return proposal.targetArticles.map((ta: any) => ({
+                id: ta.article_id || ta.id || Math.random(),
+                title: ta.title || '',
+                summary: ta.summary || '',
+                topic: proposal.topic || '', // Fallback to proposal topic
+                category: proposal.category || '사회',
+                imageUrl: ta.image_url || null,
+                commentCount: 0,
+                regDt: ta.pub_date || new Date().toISOString(),
+                url: ta.article_url || '',
+            })) as NewsCardArticle[];
+        }
+
         const words = proposal.title.split(' '); // pseudo keyword generator
 
         const matched = allParsedArticles.filter(n => {
@@ -280,7 +296,9 @@ export const ProposalDetail: React.FC = () => {
                                 </h2>
                                 <div className="flex flex-col gap-md">
                                     {relatedNews.slice(0, 3).map((news) => (
-                                        <NewsCard key={news.id} article={news} onClick={() => navigate(`/detail/${news.id}`)} />
+                                        <NewsCard key={news.id} article={news} onClick={() => {
+                                            if (news.url) window.open(news.url, '_blank', 'noopener,noreferrer');
+                                        }} />
                                     ))}
                                 </div>
                             </div>
