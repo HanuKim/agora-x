@@ -1,23 +1,31 @@
 import React, { useState } from 'react';
 import type { CivilReply } from '../../features/detail/useCivilStance';
 import { appendStoredReply } from '../../services/db/detailDB';
+import { generateNickname } from '../../utils/nicknameGenerator';
 import './discussionCivil.css';
+
+const CURRENT_USER_ID = 'current-user';
+const FALLBACK_REPLY_NAME = '익명';
 
 interface ReplyInputProps {
   commentId: string;
+  /** 기사 issueId — 동일 기사 내 익명 닉네임 생성 (없으면 FALLBACK_REPLY_NAME) */
+  issueId?: string;
   onCancel?: () => void;
   onSubmit?: (reply: CivilReply) => void;
 }
 
-export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, onCancel, onSubmit }) => {
+export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, onCancel, onSubmit }) => {
   const [body, setBody] = useState('');
+
+  const replyAuthorName = issueId ? generateNickname(CURRENT_USER_ID, issueId) : FALLBACK_REPLY_NAME;
 
   const handleSubmit = () => {
     const trimmed = body.trim();
     if (!trimmed) return;
     const reply: CivilReply = {
       id: `reply-${commentId}-${Date.now()}`,
-      authorName: '나',
+      authorName: replyAuthorName,
       stance: 'neutral',
       body: trimmed,
       timeAgo: '방금 전',
@@ -37,7 +45,7 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, onCancel, onS
       <div className="thread-curve" style={{ height: 25 }} />
       <div className="bg-surface/80 p-5 rounded-lg border border-border shadow-sm text-text-primary">
         <div className="flex items-center gap-2 mb-2">
-          <span className="font-bold text-sm text-text-primary">나</span>
+          <span className="font-bold text-sm text-text-primary">{replyAuthorName}</span>
           <span className="text-xs text-text-muted">· 답글 작성</span>
         </div>
         <textarea

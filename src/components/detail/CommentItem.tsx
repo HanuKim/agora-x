@@ -24,6 +24,8 @@ export interface CommentItemProps {
   comment: CivilComment;
   showThreadLine?: boolean;
   onReplyAdded?: () => void;
+  /** 기사 issueId — 답글 작성 시 동일 기사 내 익명 닉네임 생성용 */
+  issueId?: string;
 }
 
 // --- Reply props (variant: 'reply')
@@ -83,7 +85,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   }
 
   // variant === 'comment' (narrowed by control flow)
-  const { comment: commentData, showThreadLine = true, onReplyAdded } = props;
+  const { comment: commentData, showThreadLine = true, onReplyAdded, issueId } = props;
   const badgeClass = stanceBadgeClass[commentData.stance] ?? stanceBadgeClass.neutral;
   const label = stanceLabels[commentData.stance] ?? '중립';
   const avatarClass = commentData.avatarGradient ?? 'bg-gradient-to-br from-primary to-gray-brand';
@@ -150,28 +152,30 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
           {visibleReplies.map((reply) => (
             <CivilDiscussionItem key={reply.id} variant="reply" reply={reply} />
           ))}
-          {showMoreRepliesButton && (
-            <div className="pl-10 relative">
-              <div className="thread-curve" style={{ height: 15 }} />
-              <button
-                type="button"
-                onClick={loadMoreReplies}
-                className="flex items-center gap-2 text-primary font-bold text-sm hover:underline py-1 transition-colors"
-              >
-                <span className="w-6 h-[2px] bg-primary/30" />
-                답글 {visibleReplyCount === 0 ? repliesList.length : remainingCount}개 더 보기...
-              </button>
-            </div>
-          )}
         </div>
       )}
 
       {showReplyInput && (
         <ReplyInput
           commentId={commentData.id}
+          issueId={issueId}
           onCancel={() => setShowReplyInput(false)}
           onSubmit={handleReplySubmit}
         />
+      )}
+
+      {hasReplies && showMoreRepliesButton && (
+        <div className="ml-10 pl-10 relative mt-4">
+          <div className="thread-curve" style={{ height: 15 }} />
+          <button
+            type="button"
+            onClick={loadMoreReplies}
+            className="flex items-center gap-2 text-primary font-bold text-sm hover:underline py-1 transition-colors"
+          >
+            <span className="w-6 h-[2px] bg-primary/30" />
+            답글 {visibleReplyCount === 0 ? repliesList.length : remainingCount}개 더 보기...
+          </button>
+        </div>
       )}
     </div>
   );

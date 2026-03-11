@@ -44,7 +44,7 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({ onSubmit }) =>
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        className="w-full bg-surface border border-border rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-primary min-h-[120px] mb-4 text-text-primary placeholder-text-muted transition-colors"
+        className="w-full bg-bg border border-border rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-primary min-h-[120px] mb-4 text-text-primary placeholder-text-muted transition-colors"
         placeholder="당신의 의견을 자유롭게 공유해 주세요..."
       />
       <div className="flex justify-end">
