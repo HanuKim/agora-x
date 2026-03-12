@@ -11,13 +11,15 @@
  *  - showAI    : true → AI 개요 + 토론 주제 박스 표시 (Home용). 기본값 false
  */
 import React from 'react';
+import type { ContentCategory } from '../../features/common/types';
+import { getActiveCategoryColorClass } from '../../design/categoryColors';
 
 export interface NewsCardArticle {
     id: number;
     title: string;
     summary: string;
     topic: string;
-    category: string;
+    category: ContentCategory;
     imageUrl: string | null;
     commentCount: number;
     regDt: string;
@@ -52,16 +54,14 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) 
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute top-3 left-3">
-                        <span className="inline-flex items-center px-sm py-[4px] rounded-full text-xs font-bold bg-white/90 dark:bg-surface text-gray-800 dark:text-text-primary shadow-sm">
-                            <span className="w-2 h-2 rounded-full mr-2 bg-primary" />
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border ${getActiveCategoryColorClass(article.category)}`}>
                             {article.category}
                         </span>
                     </div>
                 </div>
             ) : (
                 <div className="relative h-[200px] bg-surface flex items-center justify-center">
-                    <span className="inline-flex items-center px-sm py-[4px] rounded-full text-xs font-bold bg-white/90 dark:bg-surface text-gray-800 dark:text-text-primary shadow-sm absolute top-3 left-3">
-                        <span className="w-2 h-2 rounded-full mr-2 bg-primary" />
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border ${getActiveCategoryColorClass(article.category)} absolute top-3 left-3`}>
                         {article.category}
                     </span>
                     <span className="text-4xl opacity-20">📰</span>

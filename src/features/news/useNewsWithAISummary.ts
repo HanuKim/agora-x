@@ -14,13 +14,14 @@ import { claudeService, type IssueAIAnalysis, type NewsAISummary } from '../../s
 import { getCachedAIResult, setCachedAIResult, cacheKey } from '../../services/ai/aiCacheDB';
 import { useUserPrefs } from '../user/hooks/useUserPrefs';
 import { mapToContentCategory } from '../user/types';
+import type { ContentCategory } from '../common/types';
 
 export interface NewsArticle {
     id: number;
     title: string;
     summary: string;
     topic: string;
-    category: string;
+    category: ContentCategory;
     imageUrl: string | null;
     commentCount: number;
     regDt: string;
@@ -49,7 +50,7 @@ function parseArticles(data: Record<string, unknown>[]): NewsArticle[] {
             title: (article?.title as string) ?? '',
             summary: summary?.summary ?? '',
             topic: (item.topic as string) ?? '',
-            category: categories?.[0]?.middle_code_nm ?? '기타',
+            category: mapToContentCategory(categories?.[0]?.middle_code_nm ?? '기타'),
             imageUrl: images?.[0]?.image_url ?? null,
             commentCount: comments?.length ?? 0,
             regDt: (article?.reg_dt as string) ?? '',

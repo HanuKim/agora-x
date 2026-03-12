@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getStoredReplies, getStoredComments, appendStoredComment } from '../../services/db/detailDB';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
+import type { ContentCategory } from '../common/types';
 import { formatTimeAgo } from '../../utils/timeCalculate';
 import { generateNickname } from '../../utils/nicknameGenerator';
 import type { CivilComment, CivilStance } from './useCivilStance';
@@ -84,6 +85,7 @@ export const useDetail = () => {
   const proArgumentSummaries = article?.aiSummary?.proArgumentSummaries ?? [];
   const conArgumentSummaries = article?.aiSummary?.conArgumentSummaries ?? [];
   const aiLoading = article?.aiLoading ?? false;
+  const category: ContentCategory = article?.category ?? '기타';
 
   // ---------- 시민 토론장 ----------
   const [sortBy] = useState<'popular' | 'latest'>('popular');
@@ -158,6 +160,7 @@ export const useDetail = () => {
     numericId,
     debateTopic,
     overview,
+    category,
     proArguments,
     conArguments,
     proArgumentSummaries,

@@ -47,12 +47,6 @@ export const Detail: React.FC = () => {
                         {debateTopic ?? '토론 주제를 불러오는 중입니다.'}
                     </h1>
 
-                    {id && (
-                        <p className="mt-sm text-xs text-text-secondary">
-                            이슈 ID: <span className="font-semibold text-primary">{id}</span>
-                        </p>
-                    )}
-
                     <div className="mt-lg">
                         <Card variant="glass" padding="xl" className="relative">
                             <div className="flex items-center justify-center gap-xs mb-sm text-primary text-[11px] font-bold tracking-[0.16em] uppercase">
