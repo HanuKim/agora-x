@@ -10,7 +10,7 @@ export const Community: React.FC = () => {
 
     return (
         <div className="px-xl py-xl max-w-[1200px] mx-auto">
-            <h1 className="text-[2.25rem] font-bold mb-sm">K-Agora 커뮤니티</h1>
+            <h1 className="text-[2.25rem] font-bold mb-sm">국민 토론</h1>
             <p className="text-text-secondary mb-xl">
                 현 시점 한국 사회의 가장 뜨거운 뉴스 기사를 중심으로 토론합니다.
             </p>
