@@ -227,11 +227,11 @@ export const Detail: React.FC = () => {
                         </div>
 
                         <section className="mb-xl">
-                            <DiscussionInput onSubmit={handleSubmitOpinion} />
+                            <DiscussionInput onSubmit={handleSubmitOpinion} issueId={id} />
                         </section>
 
                         {hasComments ? (
-                            <div className="space-y-xl">
+                            <div className="space-y-md">
                                 {visibleComments.map((comment) => (
                                     <CommentItem
                                         key={comment.id}

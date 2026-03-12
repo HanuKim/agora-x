@@ -37,6 +37,7 @@ function mapNewsCommentToCivil(raw: NewsCommentRaw, issueId: string): CivilComme
     stance,
     body: raw.content,
     timeAgo: formatTimeAgo(raw.created_at),
+    createdAt: raw.created_at,
     score: raw.like_count,
   };
 }
@@ -128,12 +129,14 @@ export const useDetail = () => {
 
   const handleSubmitOpinion = (stance: CivilStance, body: string) => {
     if (!id) return;
+    const now = new Date();
     const newComment: CivilComment = {
       id: `user-${id}-${Date.now()}`,
       authorName: generateNickname(CURRENT_USER_ID, id),
       stance,
       body,
       timeAgo: '방금 전',
+      createdAt: now.toISOString(),
       score: 0,
       replies: [],
     };
