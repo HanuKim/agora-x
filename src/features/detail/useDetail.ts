@@ -22,7 +22,6 @@ interface NewsCommentRaw {
   created_at: string;
   content: string;
   like_count: number;
-  hate_count?: number;
   /** 찬성(pro) / 반대(con) / 중립(neutral) — 없으면 neutral */
   stance?: 'pro' | 'con' | 'neutral';
 }

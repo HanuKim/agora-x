@@ -3,6 +3,7 @@ import { ReplyInput } from './ReplyInput';
 import { getStoredReplies } from '../../services/db/detailDB';
 import type { CivilComment, CivilReply } from '../../features/detail/useCivilStance';
 import { theme } from '../../design/theme';
+import { formatCivilDate } from '../../utils/commentDate';
 
 const REPLIES_PAGE_SIZE = 5;
 
@@ -18,17 +19,6 @@ const stanceLabels: Record<string, string> = {
   con: '반대',
   neutral: '중립',
 };
-
-/** createdAt(ISO 또는 'YYYY-MM-DD HH:mm:ss') → 'oooo년 oo월 oo일' */
-function formatCivilDate(createdAt?: string): string | null {
-  if (!createdAt) return null;
-  const d = new Date(createdAt.replace(' ', 'T'));
-  if (Number.isNaN(d.getTime())) return null;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}년 ${m}월 ${day}일`;
-}
 
 // --- Comment props (variant: 'comment')
 export interface CommentItemProps {
