@@ -3,6 +3,7 @@ import { ReplyInput } from './ReplyInput';
 import { getStoredReplies } from '../../services/db/detailDB';
 import type { CivilComment, CivilReply } from '../../features/detail/useCivilStance';
 import { theme } from '../../design/theme';
+import { formatCivilDate } from '../../utils/commentDate';
 
 const REPLIES_PAGE_SIZE = 5;
 
@@ -41,7 +42,6 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   const isReply = props.variant === 'reply';
   const commentForHook = isReply ? undefined : (props as CommentItemProps & { variant: 'comment' }).comment;
 
-  // Hooks must run unconditionally (same order every render)
   const [storedReplies, setStoredReplies] = useState<CivilReply[]>(() =>
     commentForHook ? getStoredReplies(commentForHook.id) : []
   );
@@ -52,31 +52,28 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
     const { reply } = props;
     const badgeClass = stanceBadgeClass[reply.stance] ?? stanceBadgeClass.neutral;
     const label = stanceLabels[reply.stance] ?? '중립';
-    const curveHeight = reply.curveHeight ?? 25;
+    const dateStr = formatCivilDate(reply.createdAt) ?? reply.timeAgo;
 
     return (
       <div className="relative pl-10">
-        <div
-          className="thread-curve"
-          style={{ height: curveHeight }}
-        />
-        <div className="bg-surface/80 p-5 rounded-lg border border-border shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-bold text-sm text-text-primary">{reply.authorName}</span>
+        <div className="thread-curve" style={{ height: reply.curveHeight ?? 25 }} />
+        <div className="flex flex-col gap-sm p-lg rounded-xl bg-surface/50 border border-border">
+          <div className="flex items-center gap-sm">
+            <span className="flex items-center font-bold text-sm text-text-primary">{reply.authorName}</span>
             <span className={badgeClass}>{label}</span>
-            <span className="text-xs text-text-muted">· {reply.timeAgo}</span>
+            <span className="text-xs text-text-secondary">· {dateStr}</span>
           </div>
-          <p className="text-sm text-text-secondary mb-4 break-keep">
+          <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep my-xs">
             {reply.body}
           </p>
-          <div className="flex items-center gap-6">
-            <button type="button" className="cursor-pointer flex items-center gap-1 text-sm text-text-secondary font-medium hover:text-primary transition-colors" aria-label="좋아요">
-              <span className="material-symbols-outlined text-base">thumb_up</span>
-              좋아요
-            </button>
-            <button type="button" className="cursor-pointer flex items-center gap-1 text-sm text-text-secondary font-medium hover:text-primary transition-colors" aria-label="신고">
-              <span className="material-symbols-outlined text-base">siren</span>
-              신고
+          <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
+            <button
+              type="button"
+              className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+              aria-label="공감"
+            >
+              <span className="material-icons-round text-[16px]">thumb_up_off_alt</span>
+              공감
             </button>
           </div>
         </div>
@@ -84,11 +81,10 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
     );
   }
 
-  // variant === 'comment' (narrowed by control flow)
   const { comment: commentData, showThreadLine = true, onReplyAdded, issueId } = props;
   const badgeClass = stanceBadgeClass[commentData.stance] ?? stanceBadgeClass.neutral;
   const label = stanceLabels[commentData.stance] ?? '중립';
-  const avatarClass = commentData.avatarGradient ?? 'bg-gradient-to-br from-primary to-gray-brand';
+  const dateStr = formatCivilDate(commentData.createdAt) ?? commentData.timeAgo;
   const initialReplies = commentData.replies ?? [];
   const repliesList = [...initialReplies, ...storedReplies];
   const hasReplies = repliesList.length > 0;
@@ -111,37 +107,33 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
     <div className={`comment-group relative ${showThreadLine && hasReplies ? '' : ''}`}>
       {showThreadLine && hasReplies && <div className="thread-line" />}
 
-      <div className="flex gap-4 group relative z-10">
-        <div className="flex flex-col items-center gap-2 pt-4">
-          <div className={`w-10 h-10 rounded-full flex-shrink-0 ${avatarClass}`} />
-        </div>
-
-        <div className="flex-grow bg-bg p-6 rounded-lg shadow-md border border-border text-text-primary">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="font-bold">{commentData.authorName}</span>
+      <div className="group relative z-10">
+        <div className="flex flex-col gap-sm p-lg rounded-xl bg-surface/50 border border-border">
+          <div className="flex items-center gap-sm">
+            <span className="flex items-center font-bold text-sm text-text-primary">{commentData.authorName}</span>
             <span className={badgeClass}>{label}</span>
-            <span className="text-xs text-text-muted">· {commentData.timeAgo}</span>
+            <span className="text-xs text-text-secondary">· {dateStr}</span>
           </div>
-          <p className="text-text-secondary leading-relaxed mb-4 break-keep">
+          <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep my-xs">
             {commentData.body}
           </p>
-          <div className="flex items-center gap-6">
-            <button type="button" className="cursor-pointer flex items-center gap-1 text-sm text-text-secondary font-medium hover:text-primary transition-colors" aria-label="좋아요">
-              <span className="material-symbols-outlined text-base">thumb_up</span>
-              좋아요
+          <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
+            <button
+              type="button"
+              className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+              aria-label="공감"
+            >
+              <span className="material-icons-round text-[16px]">thumb_up_off_alt</span>
+              공감 {commentData.score > 0 ? commentData.score : ''}
             </button>
             <button
               type="button"
               onClick={() => setShowReplyInput((prev) => !prev)}
-              className="cursor-pointer flex items-center gap-1 text-sm text-text-secondary font-medium hover:text-primary transition-colors"
+              className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
               aria-label="답글 달기"
             >
-              <span className="material-symbols-outlined text-base">chat_bubble</span>
+              <span className="material-icons-round text-[16px]">chat_bubble</span>
               답글 달기
-            </button>
-            <button type="button" className="cursor-pointer flex items-center gap-1 text-sm text-text-secondary font-medium hover:text-primary transition-colors" aria-label="신고">
-              <span className="material-symbols-outlined text-base">siren</span>
-              신고
             </button>
           </div>
         </div>

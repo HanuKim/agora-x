@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getStoredReplies, getStoredComments, appendStoredComment } from '../../services/db/detailDB';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
+import type { ContentCategory } from '../common/types';
 import { formatTimeAgo } from '../../utils/timeCalculate';
 import { generateNickname } from '../../utils/nicknameGenerator';
 import type { CivilComment, CivilStance } from './useCivilStance';
@@ -21,7 +22,6 @@ interface NewsCommentRaw {
   created_at: string;
   content: string;
   like_count: number;
-  hate_count?: number;
   /** 찬성(pro) / 반대(con) / 중립(neutral) — 없으면 neutral */
   stance?: 'pro' | 'con' | 'neutral';
 }
@@ -37,6 +37,7 @@ function mapNewsCommentToCivil(raw: NewsCommentRaw, issueId: string): CivilComme
     stance,
     body: raw.content,
     timeAgo: formatTimeAgo(raw.created_at),
+    createdAt: raw.created_at,
     score: raw.like_count,
   };
 }
@@ -83,6 +84,7 @@ export const useDetail = () => {
   const proArgumentSummaries = article?.aiSummary?.proArgumentSummaries ?? [];
   const conArgumentSummaries = article?.aiSummary?.conArgumentSummaries ?? [];
   const aiLoading = article?.aiLoading ?? false;
+  const category: ContentCategory = article?.category ?? '기타';
 
   // ---------- 시민 토론장 ----------
   const [sortBy] = useState<'popular' | 'latest'>('popular');
@@ -128,12 +130,14 @@ export const useDetail = () => {
 
   const handleSubmitOpinion = (stance: CivilStance, body: string) => {
     if (!id) return;
+    const now = new Date();
     const newComment: CivilComment = {
       id: `user-${id}-${Date.now()}`,
       authorName: generateNickname(CURRENT_USER_ID, id),
       stance,
       body,
       timeAgo: '방금 전',
+      createdAt: now.toISOString(),
       score: 0,
       replies: [],
     };
@@ -155,6 +159,7 @@ export const useDetail = () => {
     numericId,
     debateTopic,
     overview,
+    category,
     proArguments,
     conArguments,
     proArgumentSummaries,
