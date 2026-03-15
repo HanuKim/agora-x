@@ -5,14 +5,45 @@ import { getActiveCategoryColorClass } from '../../design/categoryColors';
 interface ProposalCardProps {
     proposal: Proposal;
     onClick: () => void;
+    onEdit?: (e: React.MouseEvent) => void;
+    onDelete?: (e: React.MouseEvent) => void;
 }
 
-export const ProposalCard: React.FC<ProposalCardProps> = ({ proposal, onClick }) => {
+export const ProposalCard: React.FC<ProposalCardProps> = ({ 
+    proposal, 
+    onClick,
+    onEdit,
+    onDelete 
+}) => {
     return (
         <div
-            className="flex flex-col rounded-xl border border-border p-lg cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] h-full"
+            className="group relative flex flex-col rounded-xl border border-border p-lg cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] h-full"
             onClick={onClick}
         >
+            {/* CRUD Actions Overlay */}
+            {(onEdit || onDelete) && (
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    {onEdit && (
+                        <button
+                            onClick={onEdit}
+                            className="w-8 h-8 rounded-full bg-white/90 dark:bg-black/90 text-text-primary shadow-sm flex items-center justify-center hover:text-primary transition-colors border-none cursor-pointer"
+                            title="수정"
+                        >
+                            <span className="material-icons-round text-sm">edit</span>
+                        </button>
+                    )}
+                    {onDelete && (
+                        <button
+                            onClick={onDelete}
+                            className="w-8 h-8 rounded-full bg-white/90 dark:bg-black/90 text-text-primary shadow-sm flex items-center justify-center hover:text-danger transition-colors border-none cursor-pointer"
+                            title="삭제"
+                        >
+                            <span className="material-icons-round text-sm">delete</span>
+                        </button>
+                    )}
+                </div>
+            )}
+
             <div className="flex flex-col justify-between h-full">
                 <div>
                     <div className="mb-md">

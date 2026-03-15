@@ -1,17 +1,38 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../features/auth/hooks/useAuth';
 import { useProposals } from '../features/proposal/useProposals';
 import { ProposalCard } from '../components/proposal/ProposalCard';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { SearchFilter } from '../components/common/SearchFilter';
+import { GlobalDialog } from '../components/common/GlobalDialog';
 import { CONTENT_CATEGORIES } from '../features/common/types';
 
 export const ProposalList: React.FC = () => {
-    const { proposals, loading, fetchAllProposals } = useProposals();
+    const { user } = useAuth();
+    const { proposals, loading, fetchAllProposals, removeProposal } = useProposals();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = React.useState('');
     const [activeTab, setActiveTab] = React.useState('전체');
+    const [dialogConfig, setDialogConfig] = React.useState<{
+        isOpen: boolean;
+        type: 'alert' | 'confirm' | 'prompt';
+        title: string;
+        message: string;
+        confirmText?: string;
+        isDestructive?: boolean;
+        defaultValue?: string;
+        onConfirm: (val?: string) => void;
+    }>({
+        isOpen: false,
+        type: 'confirm',
+        title: '',
+        message: '',
+        onConfirm: () => { }
+    });
+
+    const closeDialog = () => setDialogConfig(prev => ({ ...prev, isOpen: false }));
 
     const tabs = ['전체', ...CONTENT_CATEGORIES];
 
@@ -69,6 +90,25 @@ export const ProposalList: React.FC = () => {
                                 key={proposal.id}
                                 proposal={proposal}
                                 onClick={() => navigate(`/proposals/${proposal.id}`)}
+                                onEdit={user?.id === proposal.authorId ? (e) => {
+                                    e.stopPropagation();
+                                    navigate(`/proposals/${proposal.id}/edit`);
+                                } : undefined}
+                                onDelete={user?.id === proposal.authorId ? (e) => {
+                                    e.stopPropagation();
+                                    setDialogConfig({
+                                        isOpen: true,
+                                        type: 'confirm',
+                                        title: '게시물 삭제',
+                                        message: '정말로 이 게시물을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.',
+                                        confirmText: '삭제',
+                                        isDestructive: true,
+                                        onConfirm: () => {
+                                            removeProposal(proposal.id);
+                                            closeDialog();
+                                        }
+                                    });
+                                } : undefined}
                             />
                         ))}
                     </div>
@@ -83,9 +123,20 @@ export const ProposalList: React.FC = () => {
                     className="rounded-full! shadow-lg! flex items-center gap-2 px-4! py-3! hover:-translate-y-1 transition-transform"
                 >
                     <span className="material-icons-round text-sm!">edit</span>
-                    {/* <span className="font-bold">제안하기</span> */}
                 </Button>
             </div>
+
+            <GlobalDialog
+                isOpen={dialogConfig.isOpen}
+                type={dialogConfig.type}
+                title={dialogConfig.title}
+                message={dialogConfig.message}
+                confirmText={dialogConfig.confirmText}
+                defaultValue={dialogConfig.defaultValue}
+                isDestructive={dialogConfig.isDestructive}
+                onConfirm={dialogConfig.onConfirm}
+                onCancel={closeDialog}
+            />
         </div>
     );
 };

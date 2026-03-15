@@ -179,6 +179,45 @@ export async function getProposalById(id: string): Promise<Proposal | null> {
     });
 }
 
+export async function updateProposal(proposal: Proposal): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('proposals', 'readwrite');
+        const store = tx.objectStore('proposals');
+        const req = store.put(proposal);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+
+export async function deleteProposal(id: string): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(['proposals', 'opinions'], 'readwrite');
+        const pStore = tx.objectStore('proposals');
+        const oStore = tx.objectStore('opinions');
+
+        // Delete the proposal
+        pStore.delete(id);
+
+        // Delete all associated opinions
+        const index = oStore.index('proposalId');
+        const range = IDBKeyRange.only(id);
+        const req = index.openCursor(range);
+
+        req.onsuccess = (event) => {
+            const cursor = (event.target as IDBRequest<IDBCursorWithValue | null>).result;
+            if (cursor) {
+                cursor.delete();
+                cursor.continue();
+            }
+        };
+
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
 // ─── Opinions ──────────────────────────────────────────────────────────────
 
 export async function createOpinion(opinion: Opinion): Promise<void> {
@@ -212,6 +251,42 @@ export async function createOpinion(opinion: Opinion): Promise<void> {
             console.error('[proposalDB] Failed to create opinion:', (event.target as IDBRequest).error);
             reject((event.target as IDBRequest).error);
         };
+    });
+}
+
+export async function updateOpinion(opinion: Opinion): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('opinions', 'readwrite');
+        const store = tx.objectStore('opinions');
+        const req = store.put(opinion);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+
+export async function deleteOpinion(opinionId: string, proposalId: string): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(['opinions', 'proposals'], 'readwrite');
+        const oStore = tx.objectStore('opinions');
+        const pStore = tx.objectStore('proposals');
+
+        // Delete the opinion
+        oStore.delete(opinionId);
+
+        // Update the proposal count
+        const propRequest = pStore.get(proposalId);
+        propRequest.onsuccess = () => {
+            const doc = propRequest.result;
+            if (doc) {
+                doc.opinionCount = Math.max(0, (doc.opinionCount || 1) - 1);
+                pStore.put(doc);
+            }
+        };
+
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
     });
 }
 
@@ -335,6 +410,17 @@ export async function getOpinionsByProposalId(proposalId: string): Promise<Opini
             const results = (req.result as Opinion[]).sort((a, b) => b.createdAt - a.createdAt); // newest first
             resolve(results);
         };
+        req.onerror = () => reject(req.error);
+    });
+}
+
+export async function getAllOpinions(): Promise<Opinion[]> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('opinions', 'readonly');
+        const store = tx.objectStore('opinions');
+        const req = store.getAll();
+        req.onsuccess = () => resolve(req.result as Opinion[]);
         req.onerror = () => reject(req.error);
     });
 }
