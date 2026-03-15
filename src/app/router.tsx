@@ -7,7 +7,7 @@ import React, { Suspense } from 'react';
 const Home = React.lazy(() => import('../pages/Home').then(m => ({ default: m.Home })));
 const Detail = React.lazy(() => import('../pages/Detail').then(m => ({ default: m.Detail })));
 const Community = React.lazy(() => import('../pages/Community').then(m => ({ default: m.Community })));
-const Profile = React.lazy(() => import('../pages/Profile').then(m => ({ default: m.Profile })));
+const Mypage = React.lazy(() => import('../pages/Mypage').then(m => ({ default: m.Mypage })));
 const Login = React.lazy(() => import('../pages/Login').then(m => ({ default: m.Login })));
 const DiscussionAI = React.lazy(() => import('../pages/DiscussionAI').then(m => ({ default: m.DiscussionAI })));
 const DiscussionAIDetail = React.lazy(() => import('../pages/DiscussionAIDetail').then(m => ({ default: m.DiscussionAIDetail })));
@@ -35,13 +35,14 @@ export const router = createBrowserRouter([
             { path: '/ai-discussion/:id', element: <DiscussionAIDetail /> },
             { path: '/proposals', element: <ProposalList /> },
             { path: '/proposals/new', element: <ProposalCreate /> },
+            { path: '/proposals/:id/edit', element: <ProposalCreate /> },
             { path: '/proposals/:id', element: <ProposalDetail /> },
             { path: '/guide', element: <Guide /> },
             {
-                path: '/profile',
+                path: '/mypage',
                 element: (
                     <ProtectedRoute>
-                        <Profile />
+                        <Mypage />
                     </ProtectedRoute>
                 ),
             },
