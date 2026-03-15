@@ -157,6 +157,7 @@ export const useDetail = () => {
   return {
     id,
     numericId,
+    articleUrl: article?.articleUrl ?? '',
     debateTopic,
     overview,
     category,
