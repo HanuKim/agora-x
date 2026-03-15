@@ -198,3 +198,18 @@ export async function setChatSession(issueId: number | string, sessionData: AICh
     const key = cacheKey.chatSession(issueId);
     return setCachedAIResult<AIChatSession>(key, sessionData);
 }
+
+/**
+ * 특정 이슈의 채팅 세션을 초기화(삭제)합니다.
+ */
+export async function clearChatSession(issueId: number | string): Promise<void> {
+    const key = cacheKey.chatSession(issueId);
+    const db = await openDB();
+    return new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.delete(key);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
