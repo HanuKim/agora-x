@@ -12,9 +12,14 @@ import {
     createProposal,
     getOpinionsByProposalId,
     createOpinion,
+    getAllOpinions,
     toggleProposalLike as dbToggleProposalLike,
     toggleProposalScrap as dbToggleProposalScrap,
-    toggleOpinionLike as dbToggleOpinionLike
+    toggleOpinionLike as dbToggleOpinionLike,
+    updateProposal as dbUpdateProposal,
+    deleteProposal as dbDeleteProposal,
+    updateOpinion as dbUpdateOpinion,
+    deleteOpinion as dbDeleteOpinion
 } from '../../services/db/proposalDB';
 
 export function useProposals() {
@@ -63,13 +68,78 @@ export function useProposals() {
         }
     }, []);
 
+    const fetchLikedOpinions = useCallback(async (userId: string) => {
+        try {
+            const [allOpinions, allProposals] = await Promise.all([
+                getAllOpinions(),
+                getProposals(),
+            ]);
+            const proposalMap = new Map(allProposals.map(p => [p.id, p]));
+            const liked = allOpinions
+                .filter(op => op.likedBy?.includes(userId))
+                .map(op => ({
+                    opinion: op,
+                    proposal: proposalMap.get(op.proposalId) ?? null,
+                }));
+            return liked;
+        } catch (err) {
+            console.error(err);
+            return [];
+        }
+    }, []);
+
+    const editProposal = async (proposal: Proposal) => {
+        try {
+            await dbUpdateProposal(proposal);
+            await fetchAllProposals();
+        } catch (err) {
+            console.error(err);
+            throw new Error('국민 제안을 수정하는데 실패했습니다.');
+        }
+    };
+
+    const removeProposal = async (id: string) => {
+        try {
+            await dbDeleteProposal(id);
+            await fetchAllProposals();
+        } catch (err) {
+            console.error(err);
+            throw new Error('국민 제안을 삭제하는데 실패했습니다.');
+        }
+    };
+
+    const editOpinion = async (opinion: Opinion) => {
+        try {
+            await dbUpdateOpinion(opinion);
+            // This hook handles global opinions, so no need for proposalId-specific refresh here
+            // but we might want to refresh whatever is using this.
+        } catch (err) {
+            console.error(err);
+            throw new Error('의견을 수정하는데 실패했습니다.');
+        }
+    };
+
+    const removeOpinion = async (opinionId: string, proposalId: string) => {
+        try {
+            await dbDeleteOpinion(opinionId, proposalId);
+        } catch (err) {
+            console.error(err);
+            throw new Error('의견을 삭제하는데 실패했습니다.');
+        }
+    };
+
     return {
         proposals,
         loading,
         error,
         fetchAllProposals,
         addProposal,
-        fetchUserInteractions
+        editProposal,
+        removeProposal,
+        editOpinion,
+        removeOpinion,
+        fetchUserInteractions,
+        fetchLikedOpinions,
     };
 }
 
@@ -137,6 +207,48 @@ export function useProposalDetail(proposalId: string | undefined) {
         }
     };
 
+    const editOpinion = async (opinion: Opinion) => {
+        try {
+            await dbUpdateOpinion(opinion);
+            await fetchDetail();
+        } catch (err) {
+            console.error(err);
+            throw new Error('의견을 수정하는데 실패했습니다.');
+        }
+    };
+
+    const removeOpinion = async (opinionId: string) => {
+        if (!proposalId) return;
+        try {
+            await dbDeleteOpinion(opinionId, proposalId);
+            await fetchDetail();
+        } catch (err) {
+            console.error(err);
+            throw new Error('의견을 삭제하는데 실패했습니다.');
+        }
+    };
+
+    const editProposal = async (p: Proposal) => {
+        if (!proposalId) return;
+        try {
+            await dbUpdateProposal(p);
+            await fetchDetail();
+        } catch (err) {
+            console.error(err);
+            throw new Error('국민 제안을 수정하는데 실패했습니다.');
+        }
+    };
+
+    const removeProposal = async () => {
+        if (!proposalId) return;
+        try {
+            await dbDeleteProposal(proposalId);
+        } catch (err) {
+            console.error(err);
+            throw new Error('국민 제안을 삭제하는데 실패했습니다.');
+        }
+    };
+
     return {
         proposal,
         opinions,
@@ -144,6 +256,10 @@ export function useProposalDetail(proposalId: string | undefined) {
         error,
         fetchDetail,
         addOpinion,
+        editOpinion,
+        removeOpinion,
+        editProposal,
+        removeProposal,
         toggleProposalLike,
         toggleProposalScrap,
         toggleOpinionLike

@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { useProposals } from '../features/proposal/useProposals';
 import { CONTENT_CATEGORIES, type ContentCategory } from '../features/user';
 import { generateNickname } from '../utils/nicknameGenerator';
 import { Button } from '../components/ui/Button';
+import { getProposalById } from '../services/db/proposalDB';
 
 export const ProposalCreate: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const isEditMode = !!id;
     const { user, isAuthenticated, openLoginModal } = useAuth();
-    const { addProposal, loading } = useProposals();
+    const { addProposal, editProposal, loading } = useProposals();
     const navigate = useNavigate();
 
     const [title, setTitle] = useState('');
@@ -18,9 +21,36 @@ export const ProposalCreate: React.FC = () => {
     const [currentSituation, setCurrentSituation] = useState('');
     const [solution, setSolution] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+    const [fetchLoading, setFetchLoading] = useState(isEditMode);
 
     // Minimum length requirement for structured fields
     const MIN_LENGTH = 20;
+
+    useEffect(() => {
+        const loadProposal = async () => {
+            if (isEditMode && id) {
+                try {
+                    setFetchLoading(true);
+                    const proposal = await getProposalById(id);
+                    if (proposal) {
+                        setTitle(proposal.title);
+                        setCategory(proposal.category || '');
+                        setProblem(proposal.problem || '');
+                        setReason(proposal.reason || '');
+                        setCurrentSituation(proposal.currentSituation || '');
+                        setSolution(proposal.solution || '');
+                    } else {
+                        setErrorMsg('게시물을 찾을 수 없습니다.');
+                    }
+                } catch (err) {
+                    setErrorMsg('게시물을 불러오는 중 오류가 발생했습니다.');
+                } finally {
+                    setFetchLoading(false);
+                }
+            }
+        };
+        loadProposal();
+    }, [id, isEditMode]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -45,36 +75,60 @@ export const ProposalCreate: React.FC = () => {
             return;
         }
 
-        // Generate a context ID for this proposal (random string for now)
-        const proposalId = `prop_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        const nickname = generateNickname(user.id, proposalId);
-
         try {
-            await addProposal({
-                id: proposalId,
-                title: title.trim(),
-                description: `${problem}\n\n${reason}\n\n${currentSituation}\n\n${solution}`, // Fallback for backwards compatibility if needed
-                problem: problem.trim(),
-                reason: reason.trim(),
-                currentSituation: currentSituation.trim(),
-                solution: solution.trim(),
-                category: category as ContentCategory,
-                authorId: user.id,
-                authorNickname: nickname,
-                createdAt: Date.now(),
-                upvotes: 0
-            });
-            // Go to the detail page of the new proposal
-            navigate(`/proposals/${proposalId}`);
+            if (isEditMode && id) {
+                // Edit existing proposal
+                const proposal = await getProposalById(id);
+                if (proposal) {
+                    await editProposal({
+                        ...proposal,
+                        title: title.trim(),
+                        problem: problem.trim(),
+                        reason: reason.trim(),
+                        currentSituation: currentSituation.trim(),
+                        solution: solution.trim(),
+                        category: category as ContentCategory,
+                    });
+                    navigate(`/proposals/${id}`);
+                }
+            } else {
+                // Create new proposal
+                const proposalId = `prop_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+                const nickname = generateNickname(user.id, proposalId);
+
+                await addProposal({
+                    id: proposalId,
+                    title: title.trim(),
+                    description: `${problem}\n\n${reason}\n\n${currentSituation}\n\n${solution}`,
+                    problem: problem.trim(),
+                    reason: reason.trim(),
+                    currentSituation: currentSituation.trim(),
+                    solution: solution.trim(),
+                    category: category as ContentCategory,
+                    authorId: user.id,
+                    authorNickname: nickname,
+                    createdAt: Date.now(),
+                    upvotes: 0
+                });
+                navigate(`/proposals/${proposalId}`);
+            }
         } catch (err) {
             setErrorMsg('저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
         }
     };
 
+    if (fetchLoading) {
+        return (
+            <div className="flex justify-center py-xxl min-h-[50vh] items-center">
+                <span className="text-3xl animate-spin text-primary">🐻</span>
+            </div>
+        );
+    }
+
     return (
         <div className="px-xl py-xl w-full max-w-[1200px] mx-auto">
             <h1 className="text-[2.5rem] font-bold mb-lg text-text-primary">
-                국민 제안 작성
+                {isEditMode ? '국민 제안 수정' : '국민 제안 작성'}
             </h1>
 
             {!isAuthenticated && (
@@ -200,11 +254,11 @@ export const ProposalCreate: React.FC = () => {
                 </div>
 
                 <div className="flex justify-end gap-sm mt-md">
-                    <Button type="button" variant="outline" onClick={() => navigate('/proposals')} disabled={loading}>
+                    <Button type="button" variant="outline" onClick={() => navigate(-1)} disabled={loading}>
                         취소
                     </Button>
                     <Button type="submit" disabled={loading || !isAuthenticated}>
-                        {loading ? '등록 중...' : '국민 제안 등록'}
+                        {loading ? '저장 중...' : (isEditMode ? '수정 완료' : '국민 제안 등록')}
                     </Button>
                 </div>
             </form>

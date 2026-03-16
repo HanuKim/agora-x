@@ -4,6 +4,10 @@ import { useAuth } from '../features/auth/hooks/useAuth';
 import { useProposalDetail } from '../features/proposal/useProposals';
 import { generateNickname } from '../utils/nicknameGenerator';
 import { claudeService } from '../services/ai/claudeService';
+import { useGamification } from '../features/user/hooks/useGamification';
+import { useReport } from '../features/user/hooks/useReport';
+import { useNotifications } from '../features/notification';
+import { XP_REWARDS } from '../services/db/gamificationDB';
 
 // Components
 import { Button } from '../components/ui/Button';
@@ -11,6 +15,9 @@ import { OpinionItem } from '../components/proposal/OpinionItem';
 import { NewsCard, type NewsCardArticle } from '../components/community/NewsCard';
 import { EmptyState } from '../components/ui/EmptyState';
 import { getActiveCategoryColorClass } from '../design/categoryColors';
+import { ReportModal } from '../components/report/ReportModal';
+import { LevelUpToast } from '../components/notification/LevelUpToast';
+import { GlobalDialog } from '../components/common/GlobalDialog';
 
 // Real mock data
 import rawNewsData from '../data/selectedNews.json';
@@ -45,6 +52,26 @@ export const ProposalDetail: React.FC = () => {
     const navigate = useNavigate();
     const { user, isAuthenticated, openLoginModal } = useAuth();
 
+    const [levelUpLevel, setLevelUpLevel] = useState<number | null>(null);
+    const [dialogConfig, setDialogConfig] = useState<{
+        isOpen: boolean;
+        type: 'alert' | 'confirm' | 'prompt';
+        title: string;
+        message: string;
+        confirmText?: string;
+        isDestructive?: boolean;
+        defaultValue?: string;
+        onConfirm: (val?: string) => void;
+    }>({
+        isOpen: false,
+        type: 'confirm',
+        title: '',
+        message: '',
+        onConfirm: () => { }
+    });
+
+    const closeDialog = () => setDialogConfig(prev => ({ ...prev, isOpen: false }));
+
     const {
         proposal,
         opinions,
@@ -52,15 +79,23 @@ export const ProposalDetail: React.FC = () => {
         error,
         fetchDetail,
         addOpinion,
+        editOpinion,
+        removeOpinion,
+        removeProposal,
         toggleProposalLike,
         toggleProposalScrap,
         toggleOpinionLike
     } = useProposalDetail(id);
 
+    const { addXP } = useGamification();
+    const { submitReport } = useReport();
+    const { addNotification } = useNotifications();
+
     // Form states
     const [newOpinion, setNewOpinion] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [opinionError, setOpinionError] = useState('');
+    const [isReportOpen, setIsReportOpen] = useState(false);
 
     useEffect(() => {
         fetchDetail();
@@ -126,6 +161,42 @@ export const ProposalDetail: React.FC = () => {
                 createdAt: Date.now()
             });
 
+            // XP gain + level-up check
+            const xpResult = await addXP(user.id, XP_REWARDS.COMMENT);
+            if (xpResult.leveledUp) {
+                setLevelUpLevel(xpResult.userLevel.level);
+                await addNotification(
+                    'level_up',
+                    `축하합니다! 레벨 ${xpResult.userLevel.level}로 승급했습니다!`,
+                    '/mypage'
+                );
+            }
+
+            // Notification logic:
+            // 1) Notify proposal author (if not me) that a new opinion was posted
+            if (proposal!.authorId && proposal!.authorId !== user.id) {
+                await addNotification(
+                    'comment',
+                    `"${proposal!.title}" 제안에 새로운 의견이 등록되었습니다.`,
+                    `/proposals/${proposal!.id}`
+                );
+            }
+
+            // 2) Notify fellow commenters (other users who already commented on this proposal)
+            // In a real app this would be per-user notifications; for prototype we create one
+            const otherCommenters = new Set(
+                opinions
+                    .filter((op) => op.authorId !== user.id && op.authorId !== proposal!.authorId)
+                    .map((op) => op.authorId)
+            );
+            if (otherCommenters.size > 0) {
+                await addNotification(
+                    'comment',
+                    `"${proposal!.title}" 제안에 새로운 의견이 등록되었습니다.`,
+                    `/proposals/${proposal!.id}`
+                );
+            }
+
             setNewOpinion('');
         } catch (err) {
             console.error(err);
@@ -156,8 +227,26 @@ export const ProposalDetail: React.FC = () => {
     const currentViewerNickname = isAuthenticated && user ? generateNickname(user.id, proposal.id) : null;
     const isViewerAuthor = currentViewerNickname === proposal.authorNickname;
 
+    const handleProposalReport = async (reason: string, detail: string) => {
+        if (!user || !proposal) return;
+        await submitReport({
+            reporterId: user.id,
+            targetType: 'proposal',
+            targetId: proposal.id,
+            reason,
+            detail,
+        });
+    };
+
     return (
         <div className="px-xl py-xl max-w-[1200px] mx-auto">
+            {/* Level Up Toast */}
+            {levelUpLevel !== null && (
+                <LevelUpToast
+                    level={levelUpLevel}
+                    onClose={() => setLevelUpLevel(null)}
+                />
+            )}
             {/* 1. Header & Breadcrumb */}
             <button onClick={() => navigate('/proposals')} className="bg-transparent border-0 flex items-center gap-xs text-text-secondary hover:text-primary transition-colors cursor-pointer text-sm font-bold mb-lg">
                 <span className="material-icons-round text-sm">arrow_back</span>
@@ -184,13 +273,46 @@ export const ProposalDetail: React.FC = () => {
                             <span className="material-icons-round text-[20px]!">person</span>
                             <span className="text-text-primary font-bold">{proposal.authorNickname} {isViewerAuthor && "(나)"}</span>
                         </div>
-                        <span>
-                            {new Date(proposal.createdAt).toLocaleDateString('ko-KR', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                            })}
-                        </span>
+                        <div className="flex items-center gap-sm">
+                            {isViewerAuthor && (
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => navigate(`/proposals/${proposal.id}/edit`)}
+                                        className="w-8 h-8 rounded-full bg-surface border border-border text-text-secondary flex items-center justify-center hover:text-primary transition-colors cursor-pointer"
+                                        title="수정"
+                                    >
+                                        <span className="material-icons-round text-sm">edit</span>
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setDialogConfig({
+                                                isOpen: true,
+                                                type: 'confirm',
+                                                title: '게시물 삭제',
+                                                message: '정말로 이 게시물을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.',
+                                                confirmText: '삭제',
+                                                isDestructive: true,
+                                                onConfirm: async () => {
+                                                    await removeProposal();
+                                                    navigate('/proposals');
+                                                }
+                                            });
+                                        }}
+                                        className="w-8 h-8 rounded-full bg-surface border border-border text-text-secondary flex items-center justify-center hover:text-danger transition-colors cursor-pointer"
+                                        title="삭제"
+                                    >
+                                        <span className="material-icons-round text-sm">delete</span>
+                                    </button>
+                                </div>
+                            )}
+                            <span className="ml-sm">
+                                {new Date(proposal.createdAt).toLocaleDateString('ko-KR', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                })}
+                            </span>
+                        </div>
                     </div>
 
                     {/* Interactions */}
@@ -227,6 +349,16 @@ export const ProposalDetail: React.FC = () => {
                             </span>
                             스크랩 {proposal.scraps || 0}
                         </button>
+                        {/* Report Button */}
+                        {isAuthenticated && user && proposal.authorId !== user.id && (
+                            <button
+                                className="flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold text-text-secondary hover:text-danger"
+                                onClick={() => setIsReportOpen(true)}
+                            >
+                                <span className="material-icons-round text-[15px]!">flag</span>
+                                신고
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -362,12 +494,61 @@ export const ProposalDetail: React.FC = () => {
                                     isAuthor={op.authorNickname === proposal.authorNickname}
                                     currentUserId={user?.id}
                                     onLike={(opinionId) => toggleOpinionLike(opinionId, user?.id || '')}
+                                    onEdit={(opinion) => {
+                                        setDialogConfig({
+                                            isOpen: true,
+                                            type: 'prompt',
+                                            title: '의견 수정',
+                                            message: '의견 내용을 수정해주세요.',
+                                            confirmText: '수정',
+                                            defaultValue: opinion.content,
+                                            onConfirm: (val) => {
+                                                if (val) editOpinion({ ...opinion, content: val });
+                                                closeDialog();
+                                            }
+                                        });
+                                    }}
+                                    onDelete={(opinionId) => {
+                                        setDialogConfig({
+                                            isOpen: true,
+                                            type: 'confirm',
+                                            title: '의견 삭제',
+                                            message: '정말로 이 의견을 삭제하시겠습니까?',
+                                            confirmText: '삭제',
+                                            isDestructive: true,
+                                            onConfirm: () => {
+                                                removeOpinion(opinionId);
+                                                closeDialog();
+                                            }
+                                        });
+                                    }}
                                 />
                             ))
                         )}
                     </div>
                 </div>
             </div >
+
+            {/* Report Modal */}
+            <ReportModal
+                isOpen={isReportOpen}
+                onClose={() => setIsReportOpen(false)}
+                onSubmit={handleProposalReport}
+                targetLabel="국민 제안"
+            />
+
+            {/* Global Dialog */}
+            <GlobalDialog
+                isOpen={dialogConfig.isOpen}
+                type={dialogConfig.type}
+                title={dialogConfig.title}
+                message={dialogConfig.message}
+                confirmText={dialogConfig.confirmText}
+                defaultValue={dialogConfig.defaultValue}
+                isDestructive={dialogConfig.isDestructive}
+                onConfirm={dialogConfig.onConfirm}
+                onCancel={closeDialog}
+            />
         </div >
     );
 };
