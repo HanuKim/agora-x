@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useIssueWithAI } from '../features/discussion/useIssueWithAI';
 import { claudeService, type UserArgumentAnalysis } from '../services/ai/claudeService';
-import { getChatSession, setChatSession } from '../services/ai/aiCacheDB';
+import { getChatSession, setChatSession, clearChatSession } from '../services/ai/aiCacheDB';
 import { useUserPrefs } from '../features/user/hooks/useUserPrefs';
+import { GlobalDialog } from '../components/common/GlobalDialog';
 
 export const DiscussionAIDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -36,6 +37,8 @@ export const DiscussionAIDetail: React.FC = () => {
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
     // Initial setup & Restore Chat History
     useEffect(() => {
@@ -163,6 +166,26 @@ export const DiscussionAIDetail: React.FC = () => {
         setIsRecording(true);
     };
 
+    const handleResetChat = async () => {
+        if (!issue) return;
+        try {
+            await clearChatSession(issue.id);
+            setMessages([{
+                role: 'assistant',
+                content: `대화가 초기화되었습니다. 다시 **'${issue.topic}'** 주제에 대해 이야기해볼까요?\n\n어느 입장에 서서 발제하시겠습니까?`
+            }]);
+            setOpinionAnalysis({
+                clarity: 0,
+                relevance: 0,
+                logicValid: 0,
+                feedback: "대기 중"
+            });
+            setIsResetDialogOpen(false);
+        } catch (error) {
+            console.error("Reset Error:", error);
+        }
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter') {
             // "엔터 말고 해당 버튼으로만 보내지도록 해주세요" 요청 반영
@@ -221,6 +244,14 @@ export const DiscussionAIDetail: React.FC = () => {
                     <div className="space-y-4">
                         <h3 className="text-sm font-semibold uppercase tracking-wide text-text-secondary flex items-center justify-between">
                             AI 배경 분석
+                            <button
+                                onClick={() => setIsResetDialogOpen(true)}
+                                className="flex items-center gap-1 text-[10px] bg-surface-variant hover:bg-danger/10 hover:text-danger px-2 py-1 rounded transition-colors border border-border cursor-pointer"
+                                title="대화 내용 초기화"
+                            >
+                                <span className="material-icons-round text-xs">restart_alt</span>
+                                대화 초기화
+                            </button>
                         </h3>
 
                         <div className="p-4 rounded-xl bg-bg border border-border hover:border-primary/30 transition-colors cursor-default">
@@ -432,6 +463,16 @@ export const DiscussionAIDetail: React.FC = () => {
                     </div>
                 </div>
             </section>
+
+            <GlobalDialog
+                isOpen={isResetDialogOpen}
+                title="토론 내역 초기화"
+                message={"지금까지의 AI와의 대화 내역이 모두 삭제됩니다.\n정말로 초기화하시겠습니까?"}
+                confirmText="초기화"
+                isDestructive={true}
+                onConfirm={handleResetChat}
+                onCancel={() => setIsResetDialogOpen(false)}
+            />
         </div>
     );
 };
