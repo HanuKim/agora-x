@@ -4,6 +4,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { router } from './app/router';
 import { AuthProvider, useAuth } from './features/auth';
 import { UserPrefsProvider } from './features/user';
+import { NotificationProvider } from './features/notification';
 import './index.css';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
@@ -88,7 +89,6 @@ function OAuthPostMessageListener() {
             body: new URLSearchParams(tokenBody),
           });
           const tokenData = await tokenRes.json();
-          console.debug('[Kakao] token response:', tokenData);
 
           if (!tokenData.access_token) {
             throw new Error(`Token exchange failed: ${JSON.stringify(tokenData)}`);
@@ -189,9 +189,11 @@ function App() {
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <AuthProvider>
         <UserPrefsProvider>
-          <OAuthCallbackBridge />
-          <OAuthPostMessageListener />
-          <RouterProvider router={router} />
+          <NotificationProvider>
+            <OAuthCallbackBridge />
+            <OAuthPostMessageListener />
+            <RouterProvider router={router} />
+          </NotificationProvider>
         </UserPrefsProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
