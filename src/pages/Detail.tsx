@@ -209,20 +209,6 @@ export const Detail: React.FC = () => {
                                 <span className="material-icons-round text-primary">forum</span>
                                 시민 토론장 <span className="text-text-muted font-normal">{totalDisplayCount.toLocaleString()}</span>
                             </h2>
-                            <div className="flex gap-md text-sm font-medium">
-                                <button
-                                    type="button"
-                                    className={sortBy === 'popular' ? 'text-primary border-b-2 border-primary pb-1' : 'text-text-secondary pb-1 transition-colors'}
-                                >
-                                    인기순
-                                </button>
-                                <button
-                                    type="button"
-                                    className={sortBy === 'latest' ? 'text-primary border-b-2 border-primary pb-1' : 'text-text-secondary pb-1 transition-colors'}
-                                >
-                                    최신순
-                                </button>
-                            </div>
                         </div>
 
                         <section className="mb-xl">
