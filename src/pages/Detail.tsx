@@ -29,6 +29,8 @@ export const Detail: React.FC = () => {
     handleSubmitOpinion,
     loadMoreComments,
     handleReplyAdded,
+    editComment,
+    deleteComment,
   } = useDetail();
 
     return (
@@ -239,6 +241,14 @@ export const Detail: React.FC = () => {
                                         onReplyAdded={handleReplyAdded}
                                         issueId={id}
                                         currentUserId={user?.id}
+                                        onEdit={
+                                          id
+                                            ? (commentId, updates) => editComment(id, commentId, updates)
+                                            : undefined
+                                        }
+                                        onDelete={
+                                          id ? (commentId) => deleteComment(id, commentId) : undefined
+                                        }
                                     />
                                 ))}
                             </div>

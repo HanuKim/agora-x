@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { ReplyInput } from './ReplyInput';
-import { getStoredReplies } from '../../services/db/detailDB';
+import { getStoredReplies, updateStoredReply, removeStoredReply } from '../../services/db/detailDB';
 import type { CivilComment, CivilReply } from '../../features/detail/useCivilStance';
 import { theme } from '../../design/theme';
 import { formatCivilDate } from '../../utils/commentDate';
 import { ReportModal } from '../report/ReportModal';
 import { useReport } from '../../features/user/hooks/useReport';
+import { GlobalDialog, type DialogType } from '../common/GlobalDialog';
 
 const REPLIES_PAGE_SIZE = 5;
 
@@ -29,12 +30,17 @@ export interface CommentItemProps {
   onReplyAdded?: () => void;
   issueId?: string;
   currentUserId?: string;
+  onEdit?: (commentId: string, updates: Partial<Pick<CivilComment, 'body' | 'stance'>>) => void;
+  onDelete?: (commentId: string) => void;
 }
 
 // --- Reply props (variant: 'reply')
 export interface ReplyItemProps {
   reply: CivilReply;
   currentUserId?: string;
+  commentId?: string;
+  onEditReply?: (replyId: string, updates: Partial<Pick<CivilReply, 'body' | 'stance'>>) => void;
+  onDeleteReply?: (replyId: string) => void;
 }
 
 type CivilDiscussionItemProps =
@@ -52,9 +58,27 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const { submitReport } = useReport();
+  const [dialogConfig, setDialogConfig] = useState<{
+    isOpen: boolean;
+    type: DialogType;
+    title: string;
+    message: string;
+    confirmText?: string;
+    isDestructive?: boolean;
+    placeholder?: string;
+    defaultValue?: string;
+    onConfirm: (val?: string) => void;
+  }>({
+    isOpen: false,
+    type: 'confirm',
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+  const closeDialog = () => setDialogConfig((prev) => ({ ...prev, isOpen: false }));
 
   if (props.variant === 'reply') {
-    const { reply, currentUserId: replyCurrentUserId } = props;
+    const { reply, currentUserId: replyCurrentUserId, commentId, onEditReply, onDeleteReply } = props;
     const badgeClass = stanceBadgeClass[reply.stance] ?? stanceBadgeClass.neutral;
     const label = stanceLabels[reply.stance] ?? '중립';
     const dateStr = formatCivilDate(reply.createdAt) ?? reply.timeAgo;
@@ -105,9 +129,60 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
                   신고
                 </button>
               )}
+              {isOwnReply && commentId && onEditReply && onDeleteReply && (
+                <div className="flex gap-md ml-auto">
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+                    onClick={() =>
+                      setDialogConfig({
+                        isOpen: true,
+                        type: 'prompt',
+                        title: '답글 수정',
+                        message: '답글 내용을 수정합니다.',
+                        defaultValue: reply.body,
+                        placeholder: '답글을 입력하세요',
+                        onConfirm: (val) => {
+                          if (val != null && val.trim()) onEditReply(reply.id, { body: val.trim() });
+                          closeDialog();
+                        },
+                      })
+                    }
+                    aria-label="수정"
+                    title="수정"
+                  >
+                    <span className="material-icons-round text-[16px]">edit</span>
+                    수정
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
+                    onClick={() =>
+                      setDialogConfig({
+                        isOpen: true,
+                        type: 'confirm',
+                        title: '답글 삭제',
+                        message: '정말로 이 답글을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.',
+                        confirmText: '삭제',
+                        isDestructive: true,
+                        onConfirm: () => {
+                          onDeleteReply(reply.id);
+                          closeDialog();
+                        },
+                      })
+                    }
+                    aria-label="삭제"
+                    title="삭제"
+                  >
+                    <span className="material-icons-round text-[16px]">delete</span>
+                    삭제
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
+        <GlobalDialog {...dialogConfig} onCancel={closeDialog} />
         <ReportModal
           isOpen={isReportOpen}
           onClose={() => setIsReportOpen(false)}
@@ -118,13 +193,14 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
     );
   }
 
-  const { comment: commentData, showThreadLine = true, onReplyAdded, issueId, currentUserId } = props;
+  const { comment: commentData, showThreadLine = true, onReplyAdded, issueId, currentUserId, onEdit, onDelete } = props;
   const badgeClass = stanceBadgeClass[commentData.stance] ?? stanceBadgeClass.neutral;
   const label = stanceLabels[commentData.stance] ?? '중립';
   const dateStr = formatCivilDate(commentData.createdAt) ?? commentData.timeAgo;
   const initialReplies = commentData.replies ?? [];
   const repliesList = [...initialReplies, ...storedReplies];
   const hasReplies = repliesList.length > 0;
+  const isOwnComment = currentUserId && commentData.authorId === currentUserId;
 
   const handleReport = async (reason: string, detail: string) => {
     if (!currentUserId) return;
@@ -149,6 +225,18 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
     setVisibleReplyCount((prev) => Math.min(prev + 1, repliesList.length + 1));
     setShowReplyInput(false);
     onReplyAdded?.();
+  };
+
+  const handleEditReply = (replyId: string, updates: Partial<Pick<CivilReply, 'body' | 'stance'>>) => {
+    if (!commentData.id) return;
+    updateStoredReply(commentData.id, replyId, updates);
+    setStoredReplies((prev) => prev.map((r) => (r.id === replyId ? { ...r, ...updates } : r)));
+  };
+
+  const handleDeleteReply = (replyId: string) => {
+    if (!commentData.id) return;
+    removeStoredReply(commentData.id, replyId);
+    setStoredReplies((prev) => prev.filter((r) => r.id !== replyId));
   };
 
   return (
@@ -194,9 +282,61 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
                 신고
               </button>
             )}
+            {isOwnComment && (
+              <div className="flex gap-md ml-auto">
+                <button
+                  type="button"
+                  className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+                  onClick={() =>
+                    setDialogConfig({
+                      isOpen: true,
+                      type: 'prompt',
+                      title: '댓글 수정',
+                      message: '댓글 내용을 수정합니다.',
+                      defaultValue: commentData.body,
+                      placeholder: '댓글을 입력하세요',
+                      onConfirm: (val) => {
+                        if (val != null && val.trim()) onEdit?.(commentData.id, { body: val.trim() });
+                        closeDialog();
+                      },
+                    })
+                  }
+                  aria-label="수정"
+                  title="수정"
+                >
+                  <span className="material-icons-round text-[16px]">edit</span>
+                  수정
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
+                  onClick={() =>
+                    setDialogConfig({
+                      isOpen: true,
+                      type: 'confirm',
+                      title: '댓글 삭제',
+                      message: '정말로 이 댓글을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.',
+                      confirmText: '삭제',
+                      isDestructive: true,
+                      onConfirm: () => {
+                        onDelete?.(commentData.id);
+                        closeDialog();
+                      },
+                    })
+                  }
+                  aria-label="삭제"
+                  title="삭제"
+                >
+                  <span className="material-icons-round text-[16px]">delete</span>
+                  삭제
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      <GlobalDialog {...dialogConfig} onCancel={closeDialog} />
 
       <ReportModal
         isOpen={isReportOpen}
@@ -213,6 +353,9 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
               variant="reply"
               reply={reply}
               currentUserId={currentUserId}
+              commentId={commentData.id}
+              onEditReply={handleEditReply}
+              onDeleteReply={handleDeleteReply}
             />
           ))}
         </div>

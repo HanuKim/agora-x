@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getStoredReplies, getStoredComments, appendStoredComment } from '../../services/db/detailDB';
+import {
+  getStoredReplies,
+  getStoredComments,
+  appendStoredComment,
+  updateStoredComment,
+  removeStoredComment,
+} from '../../services/db/detailDB';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 import type { ContentCategory } from '../common/types';
 import { formatTimeAgo } from '../../utils/timeCalculate';
@@ -155,6 +161,22 @@ export const useDetail = () => {
     setRepliesVersion((prev) => prev + 1);
   };
 
+  const editComment = (
+    issueId: string,
+    commentId: string,
+    updates: Partial<Pick<CivilComment, 'body' | 'stance'>>
+  ) => {
+    updateStoredComment(issueId, commentId, updates);
+    setUserComments((prev) =>
+      prev.map((c) => (c.id === commentId ? { ...c, ...updates } : c))
+    );
+  };
+
+  const deleteComment = (issueId: string, commentId: string) => {
+    removeStoredComment(issueId, commentId);
+    setUserComments((prev) => prev.filter((c) => c.id !== commentId));
+  };
+
   return {
     id,
     numericId,
@@ -175,5 +197,7 @@ export const useDetail = () => {
     handleSubmitOpinion,
     loadMoreComments,
     handleReplyAdded,
+    editComment,
+    deleteComment,
   };
 };
