@@ -2,6 +2,24 @@ import type { CivilComment, CivilReply } from '../../features/detail/useCivilSta
 
 const COMMENTS_STORAGE_KEY = 'agora-civil-comments';
 const REPLIES_STORAGE_KEY = 'agora-civil-replies';
+const LIKED_DISCUSSIONS_STORAGE_KEY = 'agora-liked-discussions';
+const LIKE_COUNT_DELTA_KEY = 'agora-discussion-like-count-delta';
+
+/** 시민 토론장에서 공감한 댓글/답글 한 건 (LikedOpinionsTab 표시용) */
+export interface Discussion {
+  id: string;
+  issueId: string;
+  type: 'comment' | 'reply';
+  targetId: string;
+  authorName: string;
+  body: string;
+  stance: 'pro' | 'con' | 'neutral';
+  createdAt: number;
+  articleTitle?: string;
+  scoreAtLike?: number;
+}
+
+type StoredLikedDiscussions = Record<string, Discussion[]>;
 
 type StoredComments = Record<string, CivilComment[]>;
 type StoredReplies = Record<string, CivilReply[]>;
@@ -102,4 +120,84 @@ export function removeStoredReply(commentId: string, replyId: string): void {
   const list = data[commentId] ?? [];
   data[commentId] = list.filter((r) => r.id !== replyId);
   setRepliesStorage(data);
+}
+
+// ─── 공감한 시민 토론 (댓글/답글) — userId 기준 ─────────────────────────────
+
+function getLikedDiscussionsStorage(): StoredLikedDiscussions {
+  try {
+    const raw = localStorage.getItem(LIKED_DISCUSSIONS_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as StoredLikedDiscussions) : {};
+  } catch {
+    return {};
+  }
+}
+
+function setLikedDiscussionsStorage(data: StoredLikedDiscussions): void {
+  try {
+    localStorage.setItem(LIKED_DISCUSSIONS_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // ignore
+  }
+}
+
+export function getLikedDiscussions(userId: string): Discussion[] {
+  return getLikedDiscussionsStorage()[userId] ?? [];
+}
+
+export function addLikedDiscussion(userId: string, discussion: Discussion): void {
+  const data = getLikedDiscussionsStorage();
+  const list = data[userId] ?? [];
+  if (list.some((d) => d.targetId === discussion.targetId)) return;
+  data[userId] = [...list, discussion];
+  setLikedDiscussionsStorage(data);
+}
+
+export function removeLikedDiscussion(userId: string, targetId: string): void {
+  const data = getLikedDiscussionsStorage();
+  const list = data[userId] ?? [];
+  data[userId] = list.filter((d) => d.targetId !== targetId);
+  setLikedDiscussionsStorage(data);
+}
+
+// ─── 공감 시 like_count 증분 (댓글/답글별 +1 반영, selectedNews.json 대신 저장) ─────
+
+type LikeCountDelta = Record<string, number>;
+
+function getLikeCountDeltaStorage(): LikeCountDelta {
+  try {
+    const raw = localStorage.getItem(LIKE_COUNT_DELTA_KEY);
+    return raw ? (JSON.parse(raw) as LikeCountDelta) : {};
+  } catch {
+    return {};
+  }
+}
+
+function setLikeCountDeltaStorage(data: LikeCountDelta): void {
+  try {
+    localStorage.setItem(LIKE_COUNT_DELTA_KEY, JSON.stringify(data));
+  } catch {
+    // ignore
+  }
+}
+
+export function getLikeCountDelta(targetId: string): number {
+  return getLikeCountDeltaStorage()[targetId] ?? 0;
+}
+
+export function incrementLikeCount(targetId: string): void {
+  const data = getLikeCountDeltaStorage();
+  data[targetId] = (data[targetId] ?? 0) + 1;
+  setLikeCountDeltaStorage(data);
+}
+
+export function decrementLikeCount(targetId: string): void {
+  const data = getLikeCountDeltaStorage();
+  const current = data[targetId] ?? 0;
+  if (current <= 1) {
+    delete data[targetId];
+  } else {
+    data[targetId] = current - 1;
+  }
+  setLikeCountDeltaStorage(data);
 }

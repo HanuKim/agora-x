@@ -15,6 +15,7 @@ import { useGamification } from '../features/user/hooks/useGamification';
 import { getScrapedArticles, type ArticleScrap } from '../services/db/gamificationDB';
 import { getAllOpinions, type Proposal } from '../services/db/proposalDB';
 import { getProposals } from '../services/db/proposalDB';
+import { getLikedDiscussions } from '../services/db/detailDB';
 
 // MyPage components
 import { ProfileSidebar, type MyPageTab } from '../components/mypage/ProfileSidebar';
@@ -63,6 +64,28 @@ export const Mypage: React.FC = () => {
     const loadData = useCallback(async () => {
         if (!user) return;
 
+        // 공감한 의견은 다른 로직과 분리해 먼저 로드해 항상 탭에 반영
+        const loadLikedOpinions = async () => {
+            try {
+                const [likedFromProposals, likedDiscussions] = await Promise.all([
+                    fetchLikedOpinions(user.id),
+                    Promise.resolve(getLikedDiscussions(user.id)),
+                ]);
+                setLikedOpinions([
+                    ...likedFromProposals,
+                    ...likedDiscussions.map((d) => ({ opinion: null, proposal: null, discussion: d })),
+                ]);
+            } catch (err) {
+                console.error('[Mypage] Liked opinions load failed:', err);
+                try {
+                    setLikedOpinions(await fetchLikedOpinions(user.id));
+                } catch {
+                    setLikedOpinions([]);
+                }
+            }
+        };
+        void loadLikedOpinions();
+
         // Init level if first visit
         await initLevel(user.id);
         await fetchUserLevel(user.id);
@@ -73,10 +96,6 @@ export const Mypage: React.FC = () => {
 
         const artScraps = await getScrapedArticles(user.id);
         setScrapedArticles(artScraps);
-
-        // Liked opinions
-        const liked = await fetchLikedOpinions(user.id);
-        setLikedOpinions(liked);
 
         // My posts & opinions
         const allProposals = await getProposals();

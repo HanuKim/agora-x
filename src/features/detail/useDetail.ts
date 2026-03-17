@@ -6,6 +6,12 @@ import {
   appendStoredComment,
   updateStoredComment,
   removeStoredComment,
+  getLikedDiscussions,
+  addLikedDiscussion,
+  removeLikedDiscussion,
+  incrementLikeCount,
+  decrementLikeCount,
+  type Discussion,
 } from '../../services/db/detailDB';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 import type { ContentCategory } from '../common/types';
@@ -61,7 +67,19 @@ const selectedNews = (rawNewsData as {
   }>;
 }).selectedNews;
 
-export const useDetail = () => {
+/** 공감 토글 시 전달하는 payload (CommentItem → Detail) */
+export interface LikeDiscussionPayload {
+  targetId: string;
+  type: 'comment' | 'reply';
+  issueId: string;
+  authorName: string;
+  body: string;
+  stance: 'pro' | 'con' | 'neutral';
+  createdAt?: string;
+  scoreAtLike?: number;
+}
+
+export const useDetail = (userId?: string) => {
   const { id } = useParams<{ id: string }>();
 
   /**
@@ -98,12 +116,24 @@ export const useDetail = () => {
   const [, setRepliesVersion] = useState(0);
   /** 로컬 저장 댓글(issueId 기준) — 페이지 로드 시 getStoredComments와 merge */
   const [userComments, setUserComments] = useState<CivilComment[]>([]);
+  /** 공감한 시민 토론 targetId 집합 — 마이페이지 연동 및 공감 버튼 상태 */
+  const [likedTargetIds, setLikedTargetIds] = useState<Set<string>>(() =>
+    userId ? new Set(getLikedDiscussions(userId).map((d) => d.targetId)) : new Set()
+  );
 
   useEffect(() => {
     if (!id) return;
     const stored = getStoredComments(id);
     queueMicrotask(() => setUserComments(stored));
   }, [id]);
+
+  useEffect(() => {
+    if (!userId) {
+      setLikedTargetIds(new Set());
+      return;
+    }
+    setLikedTargetIds(new Set(getLikedDiscussions(userId).map((d) => d.targetId)));
+  }, [userId]);
 
   const commentsFromData = useMemo<CivilComment[]>(() => {
     const issueId = id ?? '';
@@ -177,9 +207,47 @@ export const useDetail = () => {
     setUserComments((prev) => prev.filter((c) => c.id !== commentId));
   };
 
+  const toggleLikeDiscussion = (
+    uid: string,
+    payload: LikeDiscussionPayload,
+    articleTitle?: string
+  ) => {
+    const { targetId, type, issueId, authorName, body, stance, createdAt, scoreAtLike } = payload;
+    const list = getLikedDiscussions(uid);
+    const already = list.some((d) => d.targetId === targetId);
+    if (already) {
+      removeLikedDiscussion(uid, targetId);
+      decrementLikeCount(targetId);
+      setLikedTargetIds((prev) => {
+        const next = new Set(prev);
+        next.delete(targetId);
+        return next;
+      });
+    } else {
+      incrementLikeCount(targetId);
+      const discussion: Discussion = {
+        id: `${uid}-${targetId}`,
+        issueId,
+        type,
+        targetId,
+        authorName,
+        body,
+        stance,
+        createdAt: createdAt ? new Date(createdAt).getTime() : Date.now(),
+        articleTitle,
+        scoreAtLike: scoreAtLike ?? 0,
+      };
+      addLikedDiscussion(uid, discussion);
+      setLikedTargetIds((prev) => new Set(prev).add(targetId));
+    }
+  };
+
+  const isLikedDiscussion = (targetId: string) => likedTargetIds.has(targetId);
+
   return {
     id,
     numericId,
+    article,
     articleUrl: article?.articleUrl ?? '',
     debateTopic,
     overview,
@@ -200,5 +268,7 @@ export const useDetail = () => {
     handleReplyAdded,
     editComment,
     deleteComment,
+    toggleLikeDiscussion,
+    isLikedDiscussion,
   };
 };

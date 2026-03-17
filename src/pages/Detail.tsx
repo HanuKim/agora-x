@@ -14,6 +14,7 @@ export const Detail: React.FC = () => {
   const {
     id,
     numericId,
+    article,
     articleUrl,
     debateTopic,
     overview,
@@ -32,7 +33,11 @@ export const Detail: React.FC = () => {
     handleReplyAdded,
     editComment,
     deleteComment,
-  } = useDetail();
+    toggleLikeDiscussion,
+    isLikedDiscussion,
+  } = useDetail(user?.id);
+
+  const articleTitle = article?.title ?? debateTopic ?? '';
 
     return (
         <div className={theme.section.page}>
@@ -245,6 +250,13 @@ export const Detail: React.FC = () => {
                                         onDelete={
                                           id ? (commentId) => deleteComment(id, commentId) : undefined
                                         }
+                                        onLike={
+                                          user?.id && id
+                                            ? (payload) =>
+                                                toggleLikeDiscussion(user.id, payload, articleTitle)
+                                            : undefined
+                                        }
+                                        isLiked={isLikedDiscussion}
                                     />
                                 ))}
                             </div>

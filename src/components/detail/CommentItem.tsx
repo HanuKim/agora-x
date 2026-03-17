@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ReplyInput } from './ReplyInput';
-import { getStoredReplies, updateStoredReply, removeStoredReply } from '../../services/db/detailDB';
+import { getStoredReplies, updateStoredReply, removeStoredReply, getLikeCountDelta } from '../../services/db/detailDB';
 import type { CivilComment, CivilReply } from '../../features/detail/useCivilStance';
+import type { LikeDiscussionPayload } from '../../features/detail/useDetail';
 import { theme } from '../../design/theme';
 import { formatCivilDate } from '../../utils/commentDate';
 import { ReportModal } from '../report/ReportModal';
@@ -32,6 +33,8 @@ export interface CommentItemProps {
   currentUserId?: string;
   onEdit?: (commentId: string, updates: Partial<Pick<CivilComment, 'body' | 'stance'>>) => void;
   onDelete?: (commentId: string) => void;
+  onLike?: (payload: LikeDiscussionPayload) => void;
+  isLiked?: (targetId: string) => boolean;
 }
 
 // --- Reply props (variant: 'reply')
@@ -39,8 +42,11 @@ export interface ReplyItemProps {
   reply: CivilReply;
   currentUserId?: string;
   commentId?: string;
+  issueId?: string;
   onEditReply?: (replyId: string, updates: Partial<Pick<CivilReply, 'body' | 'stance'>>) => void;
   onDeleteReply?: (replyId: string) => void;
+  onLike?: (payload: LikeDiscussionPayload) => void;
+  isLiked?: (targetId: string) => boolean;
 }
 
 type CivilDiscussionItemProps =
@@ -78,12 +84,13 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   const closeDialog = () => setDialogConfig((prev) => ({ ...prev, isOpen: false }));
 
   if (props.variant === 'reply') {
-    const { reply, currentUserId: replyCurrentUserId, commentId, onEditReply, onDeleteReply } = props;
+    const { reply, currentUserId: replyCurrentUserId, commentId, issueId, onEditReply, onDeleteReply, onLike, isLiked } = props;
     const badgeClass = stanceBadgeClass[reply.stance] ?? stanceBadgeClass.neutral;
     const label = stanceLabels[reply.stance] ?? '중립';
     const dateStr = formatCivilDate(reply.createdAt) ?? reply.timeAgo;
     const isOwnReply = replyCurrentUserId && reply.authorId === replyCurrentUserId;
     const showReport = replyCurrentUserId && !isOwnReply;
+    const liked = isLiked?.(reply.id);
 
     const handleReplyReport = async (reason: string, detail: string) => {
       if (!replyCurrentUserId) return;
@@ -94,6 +101,21 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
         reason,
         detail,
       });
+    };
+
+    const handleLike = () => {
+      if (issueId && onLike) {
+        onLike({
+          targetId: reply.id,
+          type: 'reply',
+          issueId,
+          authorName: reply.authorName,
+          body: reply.body,
+          stance: reply.stance,
+          createdAt: reply.createdAt,
+          scoreAtLike: 0,
+        });
+      }
     };
 
     return (
@@ -112,10 +134,11 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
             <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
               <button
                 type="button"
-                className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+                onClick={onLike ? handleLike : undefined}
+                className={`flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 ${liked ? 'text-primary' : 'hover:text-primary'}`}
                 aria-label="공감"
               >
-                <span className="material-icons-round text-[16px]">thumb_up_off_alt</span>
+                <span className="material-icons-round text-[16px]">{liked ? 'thumb_up' : 'thumb_up_off_alt'}</span>
                 공감
               </button>
               {showReport && (
@@ -193,7 +216,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
     );
   }
 
-  const { comment: commentData, showThreadLine = true, onReplyAdded, issueId, currentUserId, onEdit, onDelete } = props;
+  const { comment: commentData, showThreadLine = true, onReplyAdded, issueId, currentUserId, onEdit, onDelete, onLike, isLiked } = props;
   const badgeClass = stanceBadgeClass[commentData.stance] ?? stanceBadgeClass.neutral;
   const label = stanceLabels[commentData.stance] ?? '중립';
   const dateStr = formatCivilDate(commentData.createdAt) ?? commentData.timeAgo;
@@ -201,6 +224,24 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   const repliesList = [...initialReplies, ...storedReplies];
   const hasReplies = repliesList.length > 0;
   const isOwnComment = currentUserId && commentData.authorId === currentUserId;
+  const commentLiked = isLiked?.(commentData.id);
+
+  const handleCommentLike = () => {
+    if (issueId && onLike) {
+      onLike({
+        targetId: commentData.id,
+        type: 'comment',
+        issueId,
+        authorName: commentData.authorName,
+        body: commentData.body,
+        stance: commentData.stance,
+        createdAt: commentData.createdAt,
+        scoreAtLike: commentData.score,
+      });
+    }
+  };
+
+  const commentDisplayScore = commentData.score + getLikeCountDelta(commentData.id);
 
   const handleReport = async (reason: string, detail: string) => {
     if (!currentUserId) return;
@@ -256,11 +297,12 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
           <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
             <button
               type="button"
-              className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+              onClick={onLike ? handleCommentLike : undefined}
+              className={`flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 ${commentLiked ? 'text-primary' : 'hover:text-primary'}`}
               aria-label="공감"
             >
-              <span className="material-icons-round text-[16px]">thumb_up_off_alt</span>
-              공감 {commentData.score > 0 ? commentData.score : ''}
+              <span className="material-icons-round text-[16px]">{commentLiked ? 'thumb_up' : 'thumb_up_off_alt'}</span>
+              공감 {commentDisplayScore > 0 ? commentDisplayScore : ''}
             </button>
             <button
               type="button"
@@ -354,8 +396,11 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
               reply={reply}
               currentUserId={currentUserId}
               commentId={commentData.id}
+              issueId={issueId}
               onEditReply={handleEditReply}
               onDeleteReply={handleDeleteReply}
+              onLike={onLike}
+              isLiked={isLiked}
             />
           ))}
         </div>
