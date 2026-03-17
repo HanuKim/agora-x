@@ -9,10 +9,10 @@ export type CivilStance = 'pro' | 'con' | 'neutral';
 export interface CivilComment {
   id: string;
   authorName: string;
+  authorId?: string;
   stance: CivilStance;
   body: string;
   timeAgo: string;
-  /** ISO 또는 'YYYY-MM-DD HH:mm:ss' 형식 — 'oooo년 oo월 oo일' 표시용 */
   createdAt?: string;
   score: number;
   avatarGradient?: string;
@@ -23,10 +23,10 @@ export interface CivilComment {
 export interface CivilReply {
   id: string;
   authorName: string;
+  authorId?: string;
   stance: CivilStance;
   body: string;
   timeAgo: string;
-  /** ISO 또는 'YYYY-MM-DD HH:mm:ss' 형식 — 'oooo년 oo월 oo일' 표시용 */
   createdAt?: string;
   curveHeight?: number;
 }

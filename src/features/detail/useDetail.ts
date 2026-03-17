@@ -128,12 +128,13 @@ export const useDetail = () => {
       0
     );
 
-  const handleSubmitOpinion = (stance: CivilStance, body: string) => {
+  const handleSubmitOpinion = (stance: CivilStance, body: string, authorId?: string) => {
     if (!id) return;
     const now = new Date();
     const newComment: CivilComment = {
       id: `user-${id}-${Date.now()}`,
       authorName: generateNickname(CURRENT_USER_ID, id),
+      authorId,
       stance,
       body,
       timeAgo: '방금 전',

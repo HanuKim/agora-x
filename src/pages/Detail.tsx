@@ -6,9 +6,11 @@ import { PollSection } from '../components/detail/PollSection';
 import { Button } from '../components/ui/Button';
 import { theme } from '../design/theme';
 import { useDetail } from '../features/detail/useDetail';
+import { useAuth } from '../features/auth';
 import '../components/detail/discussionCivil.css';
 
 export const Detail: React.FC = () => {
+  const { user } = useAuth();
   const {
     id,
     numericId,
@@ -221,7 +223,10 @@ export const Detail: React.FC = () => {
                         </div>
 
                         <section className="mb-xl">
-                            <DiscussionInput onSubmit={handleSubmitOpinion} issueId={id} />
+                            <DiscussionInput
+                              onSubmit={(stance, body) => handleSubmitOpinion(stance, body, user?.id)}
+                              issueId={id}
+                            />
                         </section>
 
                         {hasComments ? (
@@ -233,6 +238,7 @@ export const Detail: React.FC = () => {
                                         showThreadLine={Boolean(comment.replies?.length)}
                                         onReplyAdded={handleReplyAdded}
                                         issueId={id}
+                                        currentUserId={user?.id}
                                     />
                                 ))}
                             </div>
