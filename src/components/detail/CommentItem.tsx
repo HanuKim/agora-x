@@ -60,7 +60,12 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   const [storedReplies, setStoredReplies] = useState<CivilReply[]>(() =>
     commentForHook ? getStoredReplies(commentForHook.id) : []
   );
-  const [visibleReplyCount, setVisibleReplyCount] = useState(0);
+  const [visibleReplyCount, setVisibleReplyCount] = useState(() => {
+    if (!commentForHook) return 0;
+    const initial = (commentForHook.replies ?? []).length;
+    const stored = getStoredReplies(commentForHook.id).length;
+    return Math.min(REPLIES_PAGE_SIZE, initial + stored);
+  });
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const { submitReport } = useReport();
@@ -425,7 +430,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
             className="flex items-center gap-2 text-primary font-bold text-sm hover:underline py-1 transition-colors"
           >
             <span className="w-6 h-[2px] bg-primary/30" />
-            답글 {visibleReplyCount === 0 ? repliesList.length : remainingCount}개 더 보기...
+            답글 {remainingCount}개 더보기
           </button>
         </div>
       )}
