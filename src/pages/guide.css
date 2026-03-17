@@ -1,0 +1,97 @@
+/* Guide page: accordion and guideline card styles. Uses design tokens (--color-*). */
+
+/* Accordion container: fixed-size grid, smooth column transition */
+.guide-accordion-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  transition: grid-template-columns 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.guide-accordion-container--expanded-0 {
+  grid-template-columns: 1fr 0fr 0fr;
+}
+
+.guide-accordion-container--expanded-1 {
+  grid-template-columns: 0fr 1fr 0fr;
+}
+
+.guide-accordion-container--expanded-2 {
+  grid-template-columns: 0fr 0fr 1fr;
+}
+
+.guide-accordion-item {
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 4px solid transparent;
+  background-color: var(--color-bg);
+  min-width: 0;
+}
+
+/* Hover grow only when no panel is expanded */
+.guide-accordion-container:not([class*="expanded"]) .guide-accordion-item:hover {
+  background-color: var(--color-surface);
+  border-bottom-color: var(--color-primary);
+}
+
+.guide-accordion-item h2 {
+  transition: color 0.3s ease;
+}
+
+.guide-accordion-container:not([class*="expanded"]) .guide-accordion-item:hover h2 {
+  color: var(--color-primary);
+}
+
+.guide-accordion-item--expanded h2 {
+  color: var(--color-primary);
+}
+
+.guide-accordion-item--expanded {
+  background-color: var(--color-surface);
+  border-bottom-color: var(--color-primary);
+}
+
+.guide-content-fade {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.guide-content-fade--visible,
+.guide-accordion-container:not([class*="expanded"]) .guide-accordion-item:hover .guide-content-fade {
+  opacity: 1;
+}
+
+.guide-accordion-item .guide-preview {
+  opacity: 0.3;
+  transition: opacity 0.3s ease-in-out, transform 0.5s ease;
+}
+
+.guide-accordion-item--expanded .guide-preview,
+.guide-accordion-container:not([class*="expanded"]) .guide-accordion-item:hover .guide-preview {
+  opacity: 1;
+}
+
+.guide-accordion-item--expanded .guide-preview img,
+.guide-accordion-container:not([class*="expanded"]) .guide-accordion-item:hover .guide-preview img {
+  transform: translateY(0) scale(1.05);
+}
+
+.guide-accordion-item .guide-preview {
+  overflow: hidden;
+}
+
+.guide-accordion-item .guide-preview img {
+  transition: transform 0.5s ease;
+  transform: translateY(1rem);
+  transform-origin: top center;
+  object-position: top;
+}
+
+.guide-guideline-card {
+  transition: transform 0.2s ease;
+}
+
+.guide-guideline-card:hover {
+  transform: translateY(-4px);
+}
