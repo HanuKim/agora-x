@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   getStoredReplies,
@@ -11,14 +11,39 @@ import {
   removeLikedDiscussion,
   incrementLikeCount,
   decrementLikeCount,
+  getMyWrittenDiscussions,
+  updateStoredReply,
+  removeStoredReply,
+  getLikeCountDelta,
   type Discussion,
 } from '../../services/db/detailDB';
+import { mapToContentCategory } from '../user/types';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 import type { ContentCategory } from '../common/types';
 import { formatTimeAgo } from '../../utils/timeCalculate';
 import { generateNickname } from '../../utils/nicknameGenerator';
 import type { CivilComment, CivilStance } from './useCivilStance';
 import rawNewsData from '../../data/selectedNews.json';
+
+// 내가 쓴 토론 목록 보강용 (useMyDiscussions)
+const allRawArticlesForDiscussions = (rawNewsData as { selectedNews: Record<string, unknown>[] }).selectedNews;
+const articleTitleMapForDiscussions = new Map<number, string>();
+const articleCategoryMapForDiscussions = new Map<number, string>();
+allRawArticlesForDiscussions.forEach((item, idx) => {
+  const article = item.article as Record<string, unknown>;
+  const categories = item.categories as Array<{ middle_code_nm?: string }> | undefined;
+  articleTitleMapForDiscussions.set(idx + 1, (article?.title as string) ?? `기사 #${idx + 1}`);
+  articleCategoryMapForDiscussions.set(idx + 1, mapToContentCategory(categories?.[0]?.middle_code_nm ?? '기타'));
+});
+
+function enrichDiscussions(list: Discussion[]): Discussion[] {
+  return list.map((d) => ({
+    ...d,
+    articleTitle: articleTitleMapForDiscussions.get(Number(d.issueId)),
+    category: articleCategoryMapForDiscussions.get(Number(d.issueId)) ?? '기타',
+    likes: (d.scoreAtLike ?? 0) + getLikeCountDelta(d.targetId),
+  }));
+}
 
 const DEFAULT_USER_ID = 'anonymous';
 const CURRENT_USER_ID = 'current-user';
@@ -272,3 +297,57 @@ export const useDetail = (userId?: string) => {
     isLikedDiscussion,
   };
 };
+
+/**
+ * 내가 작성한 시민 토론(댓글/답글) 목록 및 수정·삭제.
+ * MyPostsTab에서 useProposals()와 동일하게 훅으로 사용.
+ */
+export function useMyDiscussions(userId: string | undefined) {
+  const [myDiscussions, setMyDiscussions] = useState<Discussion[]>(() =>
+    userId ? enrichDiscussions(getMyWrittenDiscussions(userId)) : []
+  );
+
+  useEffect(() => {
+    if (!userId) {
+      setMyDiscussions([]);
+      return;
+    }
+    setMyDiscussions(enrichDiscussions(getMyWrittenDiscussions(userId)));
+  }, [userId]);
+
+  const editDiscussion = useCallback(
+    (
+      issueId: string,
+      targetId: string,
+      type: 'comment' | 'reply',
+      updates: { body: string },
+      parentCommentId?: string
+    ) => {
+      if (type === 'comment') {
+        updateStoredComment(issueId, targetId, updates);
+      } else if (parentCommentId) {
+        updateStoredReply(parentCommentId, targetId, updates);
+      }
+      setMyDiscussions((prev) =>
+        prev.map((d) =>
+          d.targetId === targetId && d.issueId === issueId ? { ...d, body: updates.body } : d
+        )
+      );
+    },
+    []
+  );
+
+  const deleteDiscussion = useCallback(
+    (issueId: string, targetId: string, type: 'comment' | 'reply', parentCommentId?: string) => {
+      if (type === 'comment') {
+        removeStoredComment(issueId, targetId);
+      } else if (parentCommentId) {
+        removeStoredReply(parentCommentId, targetId);
+      }
+      setMyDiscussions((prev) => prev.filter((d) => !(d.targetId === targetId && d.issueId === issueId)));
+    },
+    []
+  );
+
+  return { myDiscussions, editDiscussion, deleteDiscussion };
+}

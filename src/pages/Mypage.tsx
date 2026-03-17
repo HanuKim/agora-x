@@ -25,10 +25,9 @@ import { ScrapTab } from '../components/mypage/ScrapTab';
 import { LikedOpinionsTab, type LikedOpinionItem } from '../components/mypage/LikedOpinionsTab';
 import { GlobalDialog } from '../components/common/GlobalDialog';
 
-// For article title lookup
+// For article title lookup (scrap display)
 import rawNewsData from '../data/selectedNews.json';
 
-// Build article title map for scrap display
 const allRawArticles = (rawNewsData as { selectedNews: Record<string, unknown>[] }).selectedNews;
 const articleTitleMap = new Map<number, { title: string; topic: string }>();
 allRawArticles.forEach((item, idx) => {
@@ -97,7 +96,7 @@ export const Mypage: React.FC = () => {
         const artScraps = await getScrapedArticles(user.id);
         setScrapedArticles(artScraps);
 
-        // My posts & opinions
+        // My posts & opinions (국민 제안 / 국민제안 의견 / 국민토론 의견 — 각각 별도 배열로 동일 패턴)
         const allProposals = await getProposals();
         const mine = allProposals.filter((p) => p.authorId === user.id);
         setMyProposals(mine);
@@ -169,6 +168,7 @@ export const Mypage: React.FC = () => {
                         <MyPostsTab
                             myProposals={myProposals}
                             myOpinions={myOpinions}
+                            userId={user?.id}
                         />
                     )}
                     {activeTab === 'scraps' && (

@@ -5,7 +5,7 @@ const REPLIES_STORAGE_KEY = 'agora-civil-replies';
 const LIKED_DISCUSSIONS_STORAGE_KEY = 'agora-liked-discussions';
 const LIKE_COUNT_DELTA_KEY = 'agora-discussion-like-count-delta';
 
-/** 시민 토론장에서 공감한 댓글/답글 한 건 (LikedOpinionsTab 표시용) */
+/** 시민 토론장 댓글/답글 한 건 (공감 목록·내가 쓴 목록 공용) */
 export interface Discussion {
   id: string;
   issueId: string;
@@ -17,6 +17,11 @@ export interface Discussion {
   createdAt: number;
   articleTitle?: string;
   scoreAtLike?: number;
+  parentCommentId?: string;
+  /** 기사 카테고리(정치·경제 등) — 국민 제안/의견과 동일한 분류(selectedNews categories 기준) */
+  category?: string;
+  /** 표시용 공감 수 (scoreAtLike + delta, Proposal 의견의 likes와 동일하게 엔티티에서 읽음) */
+  likes?: number;
 }
 
 type StoredLikedDiscussions = Record<string, Discussion[]>;
@@ -143,6 +148,49 @@ function setLikedDiscussionsStorage(data: StoredLikedDiscussions): void {
 
 export function getLikedDiscussions(userId: string): Discussion[] {
   return getLikedDiscussionsStorage()[userId] ?? [];
+}
+
+/** 내가 작성한 시민 토론장 댓글/답글 목록 (MyPostsTab용) */
+export function getMyWrittenDiscussions(userId: string): Discussion[] {
+  const out: Discussion[] = [];
+  const commentsData = getCommentsStorage();
+  const repliesData = getRepliesStorage();
+
+  for (const [issueId, comments] of Object.entries(commentsData)) {
+    for (const c of comments) {
+      if (c.authorId !== userId) continue;
+      out.push({
+        id: `comment-${issueId}-${c.id}`,
+        issueId,
+        type: 'comment',
+        targetId: c.id,
+        authorName: c.authorName,
+        body: c.body,
+        stance: c.stance,
+        createdAt: c.createdAt ? new Date(c.createdAt).getTime() : Date.now(),
+        parentCommentId: undefined,
+      });
+    }
+    for (const c of comments) {
+      const replies = repliesData[c.id] ?? [];
+      for (const r of replies) {
+        if (r.authorId !== userId) continue;
+        out.push({
+          id: `reply-${c.id}-${r.id}`,
+          issueId,
+          type: 'reply',
+          targetId: r.id,
+          authorName: r.authorName,
+          body: r.body,
+          stance: r.stance,
+          createdAt: r.createdAt ? new Date(r.createdAt).getTime() : Date.now(),
+          parentCommentId: c.id,
+        });
+      }
+    }
+  }
+
+  return out;
 }
 
 export function addLikedDiscussion(userId: string, discussion: Discussion): void {

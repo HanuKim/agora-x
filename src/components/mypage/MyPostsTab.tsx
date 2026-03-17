@@ -13,6 +13,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { ProposalCard } from '../proposal/ProposalCard';
 import { GlobalDialog, type DialogType } from '../common/GlobalDialog';
 import { useProposals } from '../../features/proposal/useProposals';
+import { useMyDiscussions } from '../../features/detail/useDetail';
 import type { Proposal, Opinion } from '../../services/db/proposalDB';
 
 type PostCategory = '전체' | '국민제안' | '국민제안 의견' | '국민토론 의견';
@@ -25,7 +26,7 @@ const SORT_OPTIONS: { key: SortOption; label: string }[] = [
     { key: 'likes', label: '공감순' },
 ];
 
-// Content category colors for the ratio chart
+// Content category colors for the ratio chart (국민 제안·국민제안 의견·국민토론 의견 공통 분류)
 const CATEGORY_COLORS: Record<string, string> = {
     정치: 'bg-red-500',
     경제: 'bg-blue-500',
@@ -36,6 +37,7 @@ const CATEGORY_COLORS: Record<string, string> = {
     기타: 'bg-gray-400',
 };
 
+/** 국민제안 의견 한 건 (proposalDB 기준, myOpinions 전용) */
 export interface MyOpinionItem {
     opinion: Opinion;
     proposal: Proposal | null;
@@ -44,14 +46,18 @@ export interface MyOpinionItem {
 interface MyPostsTabProps {
     myProposals: Proposal[];
     myOpinions: MyOpinionItem[];
+    /** 내 게시물/의견 로드와 동일하게 훅에서 사용하기 위한 userId (useMyDiscussions용) */
+    userId?: string;
 }
 
 export const MyPostsTab: React.FC<MyPostsTabProps> = ({
     myProposals,
     myOpinions,
+    userId,
 }) => {
     const navigate = useNavigate();
     const { editProposal, removeProposal, editOpinion, removeOpinion } = useProposals();
+    const { myDiscussions, editDiscussion, deleteDiscussion } = useMyDiscussions(userId);
     
     const [activeCategory, setActiveCategory] = useState<PostCategory>('전체');
     const [sortOption, setSortOption] = useState<SortOption>('newest');
@@ -77,8 +83,9 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
 
     const closeDialog = () => setDialogConfig(prev => ({ ...prev, isOpen: false }));
 
-    // Separate opinions by source
-    const proposalOpinions = myOpinions; // All opinions are from 국민제안 (proposalDB)
+    // 데이터 소스별 구분 (myProposals / myOpinions / myDiscussions 동일 패턴)
+    const proposalOpinions = myOpinions;
+    const discussionList = myDiscussions;
 
     // Sort function
     const sortItems = <T extends { createdAt: number; likes?: number }>(items: T[]): T[] => {
@@ -91,15 +98,20 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
 
     const showProposals = activeCategory === '전체' || activeCategory === '국민제안';
     const showProposalOpinions = activeCategory === '전체' || activeCategory === '국민제안 의견';
+    const showDiscussionOpinions = activeCategory === '전체' || activeCategory === '국민토론 의견';
 
     const sortedProposals = sortItems(myProposals);
     const sortedProposalOpinions = sortItems(
         proposalOpinions.map((o) => ({ ...o, createdAt: o.opinion.createdAt, likes: o.opinion.likes }))
     );
+    const sortedDiscussionOpinions = sortItems(
+        discussionList.map((d) => ({ ...d, createdAt: d.createdAt, likes: d.likes ?? 0 }))
+    );
 
     const totalCount =
         (showProposals ? sortedProposals.length : 0) +
-        (showProposalOpinions ? sortedProposalOpinions.length : 0);
+        (showProposalOpinions ? sortedProposalOpinions.length : 0) +
+        (showDiscussionOpinions ? sortedDiscussionOpinions.length : 0);
 
     // Category ratio calculation
     const categoryStats = useMemo(() => {
@@ -111,8 +123,13 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
             counts[cat] = (counts[cat] ?? 0) + 1;
             total++;
         });
-        myOpinions.forEach(({ proposal }) => {
-            const cat = proposal?.category ?? '기타';
+        myOpinions.forEach((item) => {
+            const cat = item.proposal?.category ?? '기타';
+            counts[cat] = (counts[cat] ?? 0) + 1;
+            total++;
+        });
+        myDiscussions.forEach((d) => {
+            const cat = d.category ?? '기타';
             counts[cat] = (counts[cat] ?? 0) + 1;
             total++;
         });
@@ -124,7 +141,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                 ratio: total > 0 ? Math.round((count / total) * 100) : 0,
             }))
             .sort((a, b) => b.count - a.count);
-    }, [myProposals, myOpinions]);
+    }, [myProposals, myOpinions, myDiscussions]);
 
     return (
         <div className="flex flex-col gap-lg">
@@ -353,6 +370,95 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                                                             removeOpinion(opinion.id, opinion.proposalId);
                                                             closeDialog();
                                                         }
+                                                    });
+                                                }}
+                                                className="w-10 h-10 rounded-full bg-surface-variant text-text-primary shadow-sm flex items-center justify-center hover:text-danger transition-colors border border-border"
+                                            >
+                                                <span className="material-icons-round text-lg">delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 국민토론 의견 */}
+                    {showDiscussionOpinions && sortedDiscussionOpinions.length > 0 && (
+                        <div>
+                            {activeCategory === '전체' && (
+                                <h3 className="text-sm font-bold text-text-secondary mb-md flex items-center gap-xs">
+                                    <span className="material-icons-round text-[16px]">forum</span>
+                                    국민토론 의견 ({sortedDiscussionOpinions.length})
+                                </h3>
+                            )}
+                            <div className="flex flex-col gap-md">
+                                {sortedDiscussionOpinions.map((discussion) => (
+                                    <div key={discussion.id} className="relative group">
+                                        <Card
+                                            className="p-lg cursor-pointer hover:-translate-y-[1px] hover:shadow-md transition-all pr-20"
+                                            onClick={() => navigate(`/detail/${discussion.issueId}`)}
+                                        >
+                                            <div className="flex items-center gap-xs mb-sm">
+                                                <span className="material-icons-round text-[14px] text-primary">
+                                                    article
+                                                </span>
+                                                <span className="text-xs font-bold text-primary line-clamp-1">
+                                                    {discussion.articleTitle ?? `기사 #${discussion.issueId}`}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep m-0 line-clamp-3">
+                                                {discussion.body}
+                                            </p>
+                                            <div className="flex items-center justify-between mt-sm">
+                                                <span className="text-xs text-text-secondary flex items-center gap-xs">
+                                                    <span className="material-icons-round text-[14px]">schedule</span>
+                                                    {new Date(discussion.createdAt).toLocaleDateString('ko-KR', {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                    })}
+                                                </span>
+                                                <span className="flex items-center gap-xs text-xs text-text-secondary">
+                                                    <span className="material-icons-round text-[14px] text-primary">thumb_up</span>
+                                                    {discussion.likes ?? 0}
+                                                </span>
+                                            </div>
+                                        </Card>
+                                        <div className="absolute top-1/2 -translate-y-1/2 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDialogConfig({
+                                                        isOpen: true,
+                                                        type: 'prompt',
+                                                        title: discussion.type === 'reply' ? '답글 수정' : '댓글 수정',
+                                                        message: '내용을 수정합니다.',
+                                                        defaultValue: discussion.body,
+                                                        placeholder: '내용을 입력하세요',
+                                                        onConfirm: (val) => {
+                                                            if (val) editDiscussion(discussion.issueId, discussion.targetId, discussion.type, { body: val }, discussion.parentCommentId);
+                                                            closeDialog();
+                                                        },
+                                                    });
+                                                }}
+                                                className="w-10 h-10 rounded-full bg-surface-variant text-text-primary shadow-sm flex items-center justify-center hover:text-primary transition-colors border border-border"
+                                            >
+                                                <span className="material-icons-round text-lg">edit</span>
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDialogConfig({
+                                                        isOpen: true,
+                                                        type: 'confirm',
+                                                        title: discussion.type === 'reply' ? '답글 삭제' : '댓글 삭제',
+                                                        message: '정말로 삭제하시겠습니까?',
+                                                        confirmText: '삭제',
+                                                        isDestructive: true,
+                                                        onConfirm: () => {
+                                                            deleteDiscussion(discussion.issueId, discussion.targetId, discussion.type, discussion.parentCommentId);
+                                                            closeDialog();
+                                                        },
                                                     });
                                                 }}
                                                 className="w-10 h-10 rounded-full bg-surface-variant text-text-primary shadow-sm flex items-center justify-center hover:text-danger transition-colors border border-border"
