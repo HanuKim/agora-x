@@ -1,9 +1,0 @@
-/* Guide page: community guideline card styles (accordion styles moved to PageInformation.tsx). */
-
-.guide-guideline-card {
-  transition: transform 0.2s ease;
-}
-
-.guide-guideline-card:hover {
-  transform: translateY(-4px);
-}
