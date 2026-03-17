@@ -400,9 +400,9 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                                             onClick={() => navigate(`/detail/${discussion.issueId}`)}
                                         >
                                             <div className="flex items-center gap-xs mb-sm">
-                                                <span className="material-icons-round text-[14px] text-primary">
-                                                    article
-                                                </span>
+<span className="material-icons-round text-[14px] text-primary">
+                                                        description
+                                                    </span>
                                                 <span className="text-xs font-bold text-primary line-clamp-1">
                                                     {discussion.articleTitle ?? `기사 #${discussion.issueId}`}
                                                 </span>

@@ -58,7 +58,7 @@ export const LikedOpinionsTab: React.FC<LikedOpinionsTabProps> = ({ items }) => 
                                 {(proposal ?? discussion?.articleTitle) && (
                                     <div className="flex items-center gap-xs mb-sm">
                                         <span className="material-icons-round text-[14px] text-primary">
-                                            {isDiscussion ? 'article' : 'description'}
+                                            description
                                         </span>
                                         <span className="text-xs font-bold text-primary line-clamp-1">
                                             {isDiscussion ? (discussion.articleTitle ?? `기사 #${discussion.issueId}`) : proposal!.title}
