@@ -1,41 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { useGuide } from '../features/guide/useGuide';
 import { theme } from '../design/theme';
 import guideProposalImg from '../assets/images/guide-proposal.png';
 import guideDiscussionImg from '../assets/images/guide-discussion.png';
 import guideAiDebateImg from '../assets/images/guide-aiDebate.png';
 import './guide.css';
 
-type AccordionId = 'proposal' | 'discussion' | 'ai-chat' | null;
-
-const ACCORDION_IDS: AccordionId[] = ['proposal', 'discussion', 'ai-chat'];
-
 export const Guide: React.FC = () => {
-  const [expandedId, setExpandedId] = useState<AccordionId>(null);
-
-  const handleAccordionClick = useCallback((id: AccordionId) => {
-    setExpandedId((prev) => (prev === id ? null : id));
-  }, []);
-
-  const containerClass =
-    expandedId === null
-      ? 'guide-accordion-container'
-      : `guide-accordion-container guide-accordion-container--expanded-${ACCORDION_IDS.indexOf(expandedId)}`;
+  const { expandedId, handleAccordionClick, containerClass } = useGuide();
 
   return (
     <div className={`${theme.section.container} py-xl w-full`}>
       {/* Hero */}
-      {/* <section className="py-16 px-4 bg-gradient-to-b from-bg to-surface border-b border-border">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-[2.25rem] font-bold mb-sm tracking-[0.02em] text-text-primary">
-            이용 가이드
-          </h1>
-          <p className="text-text-secondary text-lg md:text-xl leading-relaxed">
-            아고라-X와 함께 건강하고 안전한 토론 문화를 경험하세요. 참여자 모두를 위한
-            가이드라인을 확인해 주세요.
-          </p>
-        </div>
-      </section> */}
       <div className="flex-1">
             <h1 className="text-[2.25rem] font-extrabold mb-sm">
                 이용 가이드
