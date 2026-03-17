@@ -104,15 +104,6 @@ export const Detail: React.FC = () => {
                                         {proArgumentSummaries[i] || `찬성 논거 ${i + 1}`}
                                     </h3>
                                     <p className="text-sm text-text-secondary mb-sm break-keep">{arg}</p>
-                                    <div className="flex items-center gap-md text-xs text-text-secondary">
-                                        <button
-                                            type="button"
-                                            className="inline-flex items-center gap-[2px] text-text-secondary hover:text-success transition-colors"
-                                        >
-                                            <span className="material-icons-round text-[14px]">arrow_upward</span>
-                                            추천
-                                        </button>
-                                    </div>
                                 </Card>
                             ))
                         )}
@@ -173,15 +164,6 @@ export const Detail: React.FC = () => {
                                         {conArgumentSummaries[i] || `반대 논거 ${i + 1}`}
                                     </h3>
                                     <p className="text-sm text-text-secondary mb-sm break-keep">{arg}</p>
-                                    <div className="flex items-center gap-md text-xs text-text-secondary justify-end">
-                                        <button
-                                            type="button"
-                                            className="inline-flex items-center gap-[2px] text-text-secondary hover:text-danger transition-colors"
-                                        >
-                                            <span className="material-icons-round text-[14px]">arrow_upward</span>
-                                            추천
-                                        </button>
-                                    </div>
                                 </Card>
                             ))
                         )}
