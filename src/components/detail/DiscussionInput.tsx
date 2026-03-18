@@ -2,20 +2,19 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import type { CivilStance } from '../../features/detail/useCivilStance';
 import { claudeService } from '../../services/ai/claudeService';
+import { generateNickname } from '../../utils/nicknameGenerator';
 
 interface DiscussionInputProps {
   onSubmit?: (stance: CivilStance, body: string) => void;
-  /** 기사 issueId (로그인 유도 시 등에서 사용) */
   issueId?: string;
-  /** 로그인 여부 (없으면 항상 입력 폼 표시) */
+  currentUserId?: string;
   isAuthenticated?: boolean;
-  /** 비로그인 시 로그인 모달 열기 (있고 isAuthenticated false일 때만 로그인 유도 영역 표시) */
   openLoginModal?: () => void;
 }
 
 /* ProposalList 카테고리 뱃지와 동일한 형태: base + 비선택/선택 색 (찬성=success, 반대=danger, 중립=surface) */
 const STANCE_BADGE_BASE =
-  'whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-bold transition-all border cursor-pointer';
+  'whitespace-nowrap px-3 py-1 mb-1 rounded-full text-[9pt] font-bold transition-all border cursor-pointer';
 const stanceOptionConfig: {
   value: CivilStance;
   label: string;
@@ -44,6 +43,8 @@ const stanceOptionConfig: {
 
 export const DiscussionInput: React.FC<DiscussionInputProps> = ({
   onSubmit,
+  issueId,
+  currentUserId,
   isAuthenticated = true,
   openLoginModal,
 }) => {
@@ -51,6 +52,7 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
   const [body, setBody] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [opinionError, setOpinionError] = useState('');
+  const nickname = issueId ? generateNickname(currentUserId ?? 'current-user', issueId) : '';
 
   const handleSubmit = async () => {
     const trimmed = body.trim();
@@ -78,7 +80,7 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
   const showLoginPrompt = openLoginModal && isAuthenticated === false;
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-md mb-lg">
+    <div className="bg-surface border border-border rounded-xl p-md pt-3 mb-lg">
       {showLoginPrompt ? (
         <div className="text-center py-xl">
           <p className="mb-md text-text-secondary font-medium">로그인 후 의견을 남길 수 있습니다.</p>
@@ -87,21 +89,26 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-sm">
-          <div className="flex flex-wrap gap-2">
-            {stanceOptionConfig.map((opt) => {
-              const isActive = stance === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setStance(opt.value)}
-                  className={`${STANCE_BADGE_BASE} ${isActive ? opt.activeClass : opt.inactiveClass}`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
+        <div className="flex flex-col gap-xs">
+          <div className="flex items-center gap-sm flex-wrap pl-2">
+            {nickname ? (
+              <span className="font-bold text-[11pt] text-text-primary">{nickname}</span>
+            ) : null}
+            <div className="flex flex-wrap gap-1 pl-2">
+              {stanceOptionConfig.map((opt) => {
+                const isActive = stance === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setStance(opt.value)}
+                    className={`${STANCE_BADGE_BASE} ${isActive ? opt.activeClass : opt.inactiveClass}`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <textarea
             value={body}
@@ -115,10 +122,10 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
             </div>
           )}
           <div className="flex justify-between items-center gap-2 flex-wrap">
-            <span className="flex items-center gap-1 text-[10px] bg-bg py-[2px] px-sm rounded text-text-secondary">
-              <span className="material-icons text-sm">warning</span>
-              AI가 부적절한 발언을 검사 중입니다.
-            </span>
+          <p className="text-[11px] text-text-muted flex items-center gap-1 m-0">
+              <span className="material-symbols-outlined text-xs inline-block align-middle">info</span>
+              AI가 부적절한 발언을 검사중입니다.
+            </p>
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting || !body.trim()}

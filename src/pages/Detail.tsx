@@ -279,6 +279,7 @@ export const Detail: React.FC = () => {
                                 handleSubmitOpinion(stance, body, user.id);
                               }}
                               issueId={id}
+                              currentUserId={user?.id}
                               isAuthenticated={isAuthenticated}
                               openLoginModal={openLoginModal}
                             />
