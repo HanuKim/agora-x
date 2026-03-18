@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { LoginModal } from '../../features/auth';
+import { GlobalFloatingButton } from '../common/GlobalFloatingButton';
 
 export const MainLayout: React.FC = () => {
     const location = useLocation();
@@ -31,6 +32,7 @@ export const MainLayout: React.FC = () => {
 
             {!isLogin && !isAIPractice && <Footer />}
             <LoginModal />
+            {!isLogin && <GlobalFloatingButton />}
         </div>
     );
 };
