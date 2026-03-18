@@ -9,6 +9,8 @@ import { useDetail } from '../features/detail/useDetail';
 import { useAuth } from '../features/auth';
 import { useReport } from '../features/user/hooks/useReport';
 import { ReportModal } from '../components/report/ReportModal';
+import { AssistantModal } from '../components/detail/AssistantModal';
+import { sendAssistantUserMessage } from '../features/detail/useAssistant';
 import '../components/detail/discussionCivil.css';
 
 export const Detail: React.FC = () => {
@@ -45,6 +47,7 @@ export const Detail: React.FC = () => {
   } = useDetail(user?.id);
 
   const articleTitle = article?.title ?? debateTopic ?? '';
+  const assistantTopic = debateTopic ?? article?.topic ?? '토론 주제';
 
     return (
         <div className={theme.section.page}>
@@ -272,6 +275,7 @@ export const Detail: React.FC = () => {
                                   openLoginModal();
                                   return;
                                 }
+                                sendAssistantUserMessage(assistantTopic, `[${stance === 'pro' ? '찬성' : stance === 'con' ? '반대' : '중립'}] ${body}`);
                                 handleSubmitOpinion(stance, body, user.id);
                               }}
                               issueId={id}
@@ -354,6 +358,9 @@ export const Detail: React.FC = () => {
                     )}
                 </section>
             </div>
+
+            {/* Floating AI assistant (always bottom-right on scroll) */}
+            <AssistantModal issueTopic={assistantTopic} />
 
             <ReportModal
                 isOpen={isReportOpen}
