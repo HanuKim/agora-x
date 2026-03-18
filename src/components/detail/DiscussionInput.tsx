@@ -3,6 +3,7 @@ import { Button } from '../ui/Button';
 import type { CivilStance } from '../../features/detail/useCivilStance';
 import { claudeService } from '../../services/ai/claudeService';
 import { generateNickname } from '../../utils/nicknameGenerator';
+import { useCivilStancePreference } from '../../features/detail/useCivilStance';
 
 interface DiscussionInputProps {
   onSubmit?: (stance: CivilStance, body: string) => void;
@@ -48,7 +49,11 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
   isAuthenticated = true,
   openLoginModal,
 }) => {
-  const [stance, setStance] = useState<CivilStance>('pro');
+  const { stance, setStance } = useCivilStancePreference({
+    issueId,
+    userId: currentUserId,
+    defaultStance: 'neutral',
+  });
   const [body, setBody] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [opinionError, setOpinionError] = useState('');
@@ -89,12 +94,12 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-xs">
-          <div className="flex items-center gap-sm flex-wrap pl-2">
+        <div className="flex flex-col gap-xs pt-1">
+          <div className="flex items-center gap-sm flex-wrap pl-3">
             {nickname ? (
               <span className="font-bold text-[11pt] text-text-primary">{nickname}</span>
             ) : null}
-            <div className="flex flex-wrap gap-1 pl-2">
+            <div className="flex flex-wrap gap-1 pl-1">
               {stanceOptionConfig.map((opt) => {
                 const isActive = stance === opt.value;
                 return (

@@ -3,6 +3,7 @@ import type { CivilReply, CivilStance } from '../../features/detail/useCivilStan
 import { appendStoredReply } from '../../services/db/detailDB';
 import { generateNickname } from '../../utils/nicknameGenerator';
 import { claudeService } from '../../services/ai/claudeService';
+import { useCivilStancePreference } from '../../features/detail/useCivilStance';
 import './discussionCivil.css';
 
 const CURRENT_USER_ID = 'current-user';
@@ -47,7 +48,11 @@ interface ReplyInputProps {
 }
 
 export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, currentUserId, onCancel, onSubmit }) => {
-  const [stance, setStance] = useState<CivilStance>('neutral');
+  const { stance, setStance } = useCivilStancePreference({
+    issueId,
+    userId: currentUserId,
+    defaultStance: 'neutral',
+  });
   const [body, setBody] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyError, setReplyError] = useState('');
@@ -75,7 +80,6 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, curr
         id: `reply-${commentId}-${Date.now()}`,
         authorName: replyAuthorName,
         authorId: currentUserId,
-        stance: 'neutral',
         stance,
         body: trimmed,
         timeAgo: '방금 전',
