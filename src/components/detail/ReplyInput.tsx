@@ -21,7 +21,9 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, curr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyError, setReplyError] = useState('');
 
-  const replyAuthorName = issueId ? generateNickname(CURRENT_USER_ID, issueId) : FALLBACK_REPLY_NAME;
+  const replyAuthorName = issueId
+    ? generateNickname(currentUserId ?? CURRENT_USER_ID, issueId)
+    : FALLBACK_REPLY_NAME;
 
   const handleSubmit = async () => {
     const trimmed = body.trim();
