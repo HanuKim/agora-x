@@ -12,6 +12,7 @@ export const Detail: React.FC = () => {
   const {
     id,
     numericId,
+    articleUrl,
     debateTopic,
     overview,
     proArguments,
@@ -48,7 +49,7 @@ export const Detail: React.FC = () => {
                     </h1>
 
                     <div className="mt-lg">
-                        <Card variant="glass" padding="xl" className="relative">
+                        <Card variant="glass" padding="xl" className="relative pb-lg">
                             <div className="flex items-center justify-center gap-xs mb-sm text-primary text-[11px] font-bold tracking-[0.16em] uppercase">
                                 <span className="material-icons-round text-base">auto_awesome</span>
                                 <span>AI 핵심 요약 (AI Summary)</span>
@@ -56,6 +57,19 @@ export const Detail: React.FC = () => {
                             <p className="text-base md:text-lg text-text-secondary leading-relaxed break-keep">
                                 {overview ?? 'AI 개요를 불러오는 중입니다.'}
                             </p>
+                            {articleUrl ? (
+                                <a
+                                    href={articleUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-md inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover transition-colors group"
+                                >
+                                    <span className="inline-flex items-center gap-xs border-b border-transparent group-hover:border-primary-hover pb-px transition-all">
+                                        <span className="material-icons-round text-base leading-none">open_in_new</span>
+                                        <span className="leading-none text-xs">매일경제 뉴스 기사 바로가기</span>
+                                    </span>
+                                </a>
+                            ) : null}
                         </Card>
                     </div>
                 </header>
