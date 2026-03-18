@@ -24,7 +24,7 @@ export function useReport() {
     const submitReport = useCallback(
         async (params: {
             reporterId: string;
-            targetType: 'proposal' | 'opinion';
+            targetType: 'proposal' | 'opinion' | 'article';
             targetId: string;
             reason: string;
             detail: string;

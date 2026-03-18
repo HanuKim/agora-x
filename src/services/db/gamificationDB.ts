@@ -23,7 +23,7 @@ export interface UserLevel {
 export interface Report {
     id: string;
     reporterId: string;
-    targetType: 'proposal' | 'opinion';
+    targetType: 'proposal' | 'opinion' | 'article';
     targetId: string;
     reason: string;
     detail: string;

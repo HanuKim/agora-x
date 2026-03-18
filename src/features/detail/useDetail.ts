@@ -17,6 +17,7 @@ import {
   getLikeCountDelta,
   type Discussion,
 } from '../../services/db/detailDB';
+import { toggleArticleScrap as toggleArticleScrapDB, isArticleScraped as isArticleScrapedDB } from '../../services/db/gamificationDB';
 import { mapToContentCategory } from '../user/types';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 import type { ContentCategory } from '../common/types';
@@ -145,12 +146,22 @@ export const useDetail = (userId?: string) => {
   const [likedTargetIds, setLikedTargetIds] = useState<Set<string>>(() =>
     userId ? new Set(getLikedDiscussions(userId).map((d) => d.targetId)) : new Set()
   );
+  /** 기사 스크랩 여부 (gamificationDB articleScraps) */
+  const [articleScraped, setArticleScraped] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     const stored = getStoredComments(id);
     queueMicrotask(() => setUserComments(stored));
   }, [id]);
+
+  useEffect(() => {
+    if (!userId || !Number.isFinite(numericId)) {
+      setArticleScraped(false);
+      return;
+    }
+    isArticleScrapedDB(numericId, userId).then(setArticleScraped);
+  }, [userId, numericId]);
 
   useEffect(() => {
     if (!userId) {
@@ -269,6 +280,12 @@ export const useDetail = (userId?: string) => {
 
   const isLikedDiscussion = (targetId: string) => likedTargetIds.has(targetId);
 
+  const toggleArticleScrap = useCallback(async () => {
+    if (!userId || !Number.isFinite(numericId)) return;
+    const result = await toggleArticleScrapDB(numericId, userId, '국민토론');
+    setArticleScraped(result.scraped);
+  }, [userId, numericId]);
+
   return {
     id,
     numericId,
@@ -295,6 +312,8 @@ export const useDetail = (userId?: string) => {
     deleteComment,
     toggleLikeDiscussion,
     isLikedDiscussion,
+    articleScraped,
+    toggleArticleScrap,
   };
 };
 

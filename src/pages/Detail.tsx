@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CommentItem } from '../components/detail/CommentItem';
 import { DiscussionInput } from '../components/detail/DiscussionInput';
 import { Card } from '../components/ui/Card';
@@ -7,10 +7,16 @@ import { Button } from '../components/ui/Button';
 import { theme } from '../design/theme';
 import { useDetail } from '../features/detail/useDetail';
 import { useAuth } from '../features/auth';
+import { useReport } from '../features/user/hooks/useReport';
+import { ReportModal } from '../components/report/ReportModal';
 import '../components/detail/discussionCivil.css';
 
 export const Detail: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated, openLoginModal } = useAuth();
+  const { submitReport } = useReport();
+  const [isArticleLiked, setIsArticleLiked] = useState(false);
+  const [articleLikeCount, setArticleLikeCount] = useState(0);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const {
     id,
     numericId,
@@ -23,7 +29,6 @@ export const Detail: React.FC = () => {
     proArgumentSummaries,
     conArgumentSummaries,
     aiLoading,
-    sortBy,
     comments: visibleComments,
     hasComments,
     hasMoreComments,
@@ -35,6 +40,8 @@ export const Detail: React.FC = () => {
     deleteComment,
     toggleLikeDiscussion,
     isLikedDiscussion,
+    articleScraped,
+    toggleArticleScrap,
   } = useDetail(user?.id);
 
   const articleTitle = article?.title ?? debateTopic ?? '';
@@ -43,7 +50,7 @@ export const Detail: React.FC = () => {
         <div className={theme.section.page}>
             <div className={`${theme.section.container} py-xl`}>
                 {/* Header / Hero */}
-                <header className="max-w-[900px] mx-auto text-center mb-xl">
+                <header className="max-w-[900px] mx-auto text-center mb-xxl">
                     <div className="flex justify-center mb-md">
                         <div className="inline-flex items-center gap-xs px-sm py-[4px] rounded-full bg-surface border border-border shadow-sm">
                             <span className="w-[6px] h-[6px] rounded-full bg-success animate-pulse" />
@@ -57,7 +64,54 @@ export const Detail: React.FC = () => {
                         {debateTopic ?? '토론 주제를 불러오는 중입니다.'}
                     </h1>
 
-                    <div className="mt-lg">
+                    {/* Interactions — 공감 / 스크랩 / 신고 (우측 정렬) */}
+                    <div className="flex items-center justify-end gap-md mt-sm border-border pt-md">
+                        <button
+                            type="button"
+                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold ${isArticleLiked ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}
+                            onClick={() => {
+                                if (!isAuthenticated || !user) {
+                                    openLoginModal();
+                                    return;
+                                }
+                                setIsArticleLiked((prev) => !prev);
+                                setArticleLikeCount((prev) => (isArticleLiked ? prev - 1 : prev + 1));
+                            }}
+                        >
+                            <span className="material-icons-round text-[15px]! transition-all">
+                                {isArticleLiked ? 'thumb_up' : 'thumb_up_off_alt'}
+                            </span>
+                            공감 {articleLikeCount}
+                        </button>
+                        <button
+                            type="button"
+                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold ${articleScraped ? 'text-amber-500' : 'text-text-secondary hover:text-amber-500'}`}
+                            onClick={() => {
+                                if (!isAuthenticated || !user) {
+                                    openLoginModal();
+                                    return;
+                                }
+                                toggleArticleScrap();
+                            }}
+                        >
+                            <span className="material-icons-round text-[15px]! transition-all">
+                                {articleScraped ? 'bookmark' : 'bookmark_border'}
+                            </span>
+                            스크랩
+                        </button>
+                        {isAuthenticated && user && (
+                            <button
+                                type="button"
+                                className="flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold text-text-secondary hover:text-danger"
+                                onClick={() => setIsReportOpen(true)}
+                            >
+                                <span className="material-icons-round text-[15px]!">flag</span>
+                                신고
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="mt-md">
                         <Card variant="glass" padding="xl" className="relative pb-lg">
                             <div className="flex items-center justify-center gap-xs mb-sm text-primary text-[11px] font-bold tracking-[0.16em] uppercase">
                                 <span className="material-icons-round text-base">auto_awesome</span>
@@ -84,7 +138,7 @@ export const Detail: React.FC = () => {
                 </header>
 
                 {/* Main grid: 찬성 / 여론 / 반대 */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start mb-xxl">
                     {/* 찬성 의견 */}
                     <section className="lg:col-span-5 flex flex-col gap-md">
                         <div className="flex items-center justify-between mb-xs">
@@ -292,6 +346,22 @@ export const Detail: React.FC = () => {
                     )}
                 </section>
             </div>
+
+            <ReportModal
+                isOpen={isReportOpen}
+                onClose={() => setIsReportOpen(false)}
+                onSubmit={async (reason, detail) => {
+                    if (!user || !id) return;
+                    await submitReport({
+                        reporterId: user.id,
+                        targetType: 'article',
+                        targetId: id,
+                        reason,
+                        detail,
+                    });
+                }}
+                targetLabel="기사"
+            />
         </div>
     );
 };

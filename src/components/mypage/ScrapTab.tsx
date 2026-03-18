@@ -5,11 +5,12 @@
  * with category filter (전체 | 국민제안 | 국민토론 | 일대일토론).
  */
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../ui/Card';
 import { EmptyState } from '../ui/EmptyState';
 import { ProposalCard } from '../proposal/ProposalCard';
+import { NewsCard, type NewsCardArticle } from '../community/NewsCard';
 import type { Proposal } from '../../services/db/proposalDB';
 import type { ArticleScrap } from '../../services/db/gamificationDB';
 
@@ -21,12 +22,15 @@ interface ScrapTabProps {
     scrapedProposals: Proposal[];
     scrapedArticles: ArticleScrap[];
     articleTitleMap: Map<number, { title: string; topic: string }>;
+    /** 전체 뉴스 목록 (국민토론 섹션에서 NewsCard로 표시용) */
+    newsItems?: NewsCardArticle[];
 }
 
 export const ScrapTab: React.FC<ScrapTabProps> = ({
     scrapedProposals,
     scrapedArticles,
     articleTitleMap,
+    newsItems = [],
 }) => {
     const navigate = useNavigate();
     const [activeCategory, setActiveCategory] = useState<ScrapCategory>('전체');
@@ -34,13 +38,21 @@ export const ScrapTab: React.FC<ScrapTabProps> = ({
     const communityArticles = scrapedArticles.filter((a) => a.source === '국민토론');
     const discussionArticles = scrapedArticles.filter((a) => a.source === '일대일토론');
 
+    /** 스크랩 순서대로 국민토론 기사를 NewsCard용 article 형태로 정렬 */
+    const communityNewsCards = useMemo(() => {
+        const byId = new Map(newsItems.map((n) => [n.id, n]));
+        return communityArticles
+            .map((a) => byId.get(a.articleId))
+            .filter((n): n is NewsCardArticle => n != null);
+    }, [communityArticles, newsItems]);
+
     const showProposals = activeCategory === '전체' || activeCategory === '국민제안';
     const showCommunity = activeCategory === '전체' || activeCategory === '국민토론';
     const showDiscussion = activeCategory === '전체' || activeCategory === '일대일토론';
 
     const totalCount =
         (showProposals ? scrapedProposals.length : 0) +
-        (showCommunity ? communityArticles.length : 0) +
+        (showCommunity ? communityNewsCards.length : 0) +
         (showDiscussion ? discussionArticles.length : 0);
 
     return (
@@ -96,8 +108,8 @@ export const ScrapTab: React.FC<ScrapTabProps> = ({
                         </div>
                     )}
 
-                    {/* 국민토론 기사 */}
-                    {showCommunity && communityArticles.length > 0 && (
+                    {/* 국민토론 기사 — Community와 동일한 NewsCard 사용 */}
+                    {showCommunity && communityNewsCards.length > 0 && (
                         <div>
                             {activeCategory === '전체' && (
                                 <h3 className="text-sm font-bold text-text-secondary mb-md flex items-center gap-xs">
@@ -105,24 +117,15 @@ export const ScrapTab: React.FC<ScrapTabProps> = ({
                                     국민토론
                                 </h3>
                             )}
-                            <div className="flex flex-col gap-sm">
-                                {communityArticles.map((a) => {
-                                    const info = articleTitleMap.get(a.articleId);
-                                    return (
-                                        <Card
-                                            key={a.id}
-                                            className="p-md cursor-pointer hover:-translate-y-[1px] hover:shadow-md transition-all"
-                                            onClick={() => navigate(`/detail/${a.articleId}`)}
-                                        >
-                                            <p className="text-sm font-bold text-text-primary m-0 line-clamp-1">
-                                                {info?.title ?? `기사 #${a.articleId}`}
-                                            </p>
-                                            <p className="text-xs text-text-secondary mt-xs m-0">
-                                                {info?.topic ?? '국민토론'}
-                                            </p>
-                                        </Card>
-                                    );
-                                })}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+                                {communityNewsCards.map((article) => (
+                                    <NewsCard
+                                        key={article.id}
+                                        article={article}
+                                        showAI={false}
+                                        onClick={() => navigate(`/detail/${article.id}`)}
+                                    />
+                                ))}
                             </div>
                         </div>
                     )}

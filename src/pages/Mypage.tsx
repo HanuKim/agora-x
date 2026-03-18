@@ -12,6 +12,7 @@ import { useAuth } from '../features/auth';
 import { useUserPrefs } from '../features/user';
 import { useProposals } from '../features/proposal/useProposals';
 import { useGamification } from '../features/user/hooks/useGamification';
+import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 import { getScrapedArticles, type ArticleScrap } from '../services/db/gamificationDB';
 import { getAllOpinions, type Proposal } from '../services/db/proposalDB';
 import { getProposals } from '../services/db/proposalDB';
@@ -22,6 +23,7 @@ import { ProfileSidebar, type MyPageTab } from '../components/mypage/ProfileSide
 import { MyInfoTab } from '../components/mypage/MyInfoTab';
 import { MyPostsTab, type MyOpinionItem } from '../components/mypage/MyPostsTab';
 import { ScrapTab } from '../components/mypage/ScrapTab';
+import type { NewsCardArticle } from '../components/community/NewsCard';
 import { LikedOpinionsTab, type LikedOpinionItem } from '../components/mypage/LikedOpinionsTab';
 import { GlobalDialog } from '../components/common/GlobalDialog';
 
@@ -43,6 +45,7 @@ export const Mypage: React.FC = () => {
     const { knowledgePrefs, setKnowledgeLevel } = useUserPrefs();
     const { fetchUserInteractions, fetchLikedOpinions } = useProposals();
     const { userLevel, fetchUserLevel, getProgressToNextLevel, initLevel } = useGamification();
+    const { items: newsItems } = useNewsWithAISummary();
 
     const [activeTab, setActiveTab] = useState<MyPageTab>('info');
     const [scrapedProposals, setScrapedProposals] = useState<Proposal[]>([]);
@@ -176,6 +179,7 @@ export const Mypage: React.FC = () => {
                             scrapedProposals={scrapedProposals}
                             scrapedArticles={scrapedArticles}
                             articleTitleMap={articleTitleMap}
+                            newsItems={newsItems.map((i) => ({ ...i, url: i.articleUrl }))}
                         />
                     )}
                     {activeTab === 'liked' && (
