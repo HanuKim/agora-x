@@ -18,6 +18,7 @@ import { getActiveCategoryColorClass } from '../design/categoryColors';
 import { ReportModal } from '../components/report/ReportModal';
 import { LevelUpToast } from '../components/notification/LevelUpToast';
 import { GlobalDialog } from '../components/common/GlobalDialog';
+import type { ContentCategory } from '../features/common/types';
 
 // Real mock data
 import rawNewsData from '../data/selectedNews.json';
@@ -37,7 +38,7 @@ function parseArticles(data: Record<string, unknown>[]): NewsCardArticle[] {
             title: (article?.title as string) ?? '',
             summary: summary?.summary ?? '',
             topic: (item.topic as string) ?? '',
-            category: categories?.[0]?.middle_code_nm ?? '기타',
+            category: (categories?.[0]?.middle_code_nm as ContentCategory) ?? '기타',
             imageUrl: images?.[0]?.image_url ?? null,
             commentCount: comments?.length ?? 0,
             regDt: (article?.reg_dt as string) ?? '',
@@ -112,7 +113,7 @@ export const ProposalDetail: React.FC = () => {
                 title: ta.title || '',
                 summary: ta.summary || '',
                 topic: proposal.topic || '', // Fallback to proposal topic
-                category: proposal.category || '사회',
+                category: (proposal.category as ContentCategory) || '기타',
                 imageUrl: ta.image_url || null,
                 commentCount: 0,
                 regDt: ta.pub_date || new Date().toISOString(),
