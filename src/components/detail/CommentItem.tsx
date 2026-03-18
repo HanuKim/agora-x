@@ -43,6 +43,8 @@ export interface ReplyItemProps {
   currentUserId?: string;
   commentId?: string;
   issueId?: string;
+  /** reply 리스트에서 마지막 요소인지 (thread-line 렌더 제어용) */
+  isLast?: boolean;
   onEditReply?: (replyId: string, updates: Partial<Pick<CivilReply, 'body' | 'stance'>>) => void;
   onDeleteReply?: (replyId: string) => void;
   onLike?: (payload: LikeDiscussionPayload) => void;
@@ -89,7 +91,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   const closeDialog = () => setDialogConfig((prev) => ({ ...prev, isOpen: false }));
 
   if (props.variant === 'reply') {
-    const { reply, currentUserId: replyCurrentUserId, commentId, issueId, onEditReply, onDeleteReply, onLike, isLiked } = props;
+    const { reply, currentUserId: replyCurrentUserId, commentId, issueId, isLast = false, onEditReply, onDeleteReply, onLike, isLiked } = props;
     const badgeClass = stanceBadgeClass[reply.stance] ?? stanceBadgeClass.neutral;
     const label = stanceLabels[reply.stance] ?? '중립';
     const dateStr = formatCivilDate(reply.createdAt) ?? reply.timeAgo;
@@ -125,88 +127,98 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
 
     return (
       <>
-        <div className="relative pl-10">
-          <div className="thread-curve" style={{ height: reply.curveHeight ?? 25 }} />
-          <div className="flex flex-col gap-sm p-lg rounded-xl bg-surface/50 border border-border">
-            <div className="flex items-center gap-sm">
-              <span className="flex items-center font-bold text-sm text-text-primary">{reply.authorName}</span>
-              <span className={badgeClass}>{label}</span>
-              <span className="text-xs text-text-secondary">· {dateStr}</span>
-            </div>
-            <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep my-xs">
-              {reply.body}
-            </p>
-            <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
-              <button
-                type="button"
-                onClick={onLike ? handleLike : undefined}
-                className={`flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 ${liked ? 'text-primary' : 'hover:text-primary'}`}
-                aria-label="공감"
-              >
-                <span className="material-icons-round text-[16px]">{liked ? 'thumb_up' : 'thumb_up_off_alt'}</span>
-                공감
-              </button>
-              {showReport && (
+        <div className="flex gap-0 m-0">
+          {/* Left: thread line/curve rail */}
+          <div className="relative w-10 shrink-0">
+            {/* thread-line */}
+            {!isLast && <div className="absolute left-[-10px] top-0 bottom-0 w-[2px] bg-border" />}
+            {/* thread-curve */}
+            <div className="thread-curve" style={{ height: reply.curveHeight ?? 70 }} />
+          </div>
+
+          {/* Right: reply container */}
+          <div className="flex-1 min-w-0 mt-4">
+            <div className="flex flex-col gap-sm p-lg rounded-xl bg-surface/50 border border-border">
+              <div className="flex items-center gap-sm">
+                <span className="flex items-center font-bold text-sm text-text-primary">{reply.authorName}</span>
+                <span className={badgeClass}>{label}</span>
+                <span className="text-xs text-text-secondary">· {dateStr}</span>
+              </div>
+              <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep my-xs">
+                {reply.body}
+              </p>
+              <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
                 <button
                   type="button"
-                  className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
-                  onClick={() => setIsReportOpen(true)}
-                  aria-label="신고"
+                  onClick={onLike ? handleLike : undefined}
+                  className={`flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 ${liked ? 'text-primary' : 'hover:text-primary'}`}
+                  aria-label="공감"
                 >
-                  <span className="material-icons-round text-[16px]">flag</span>
-                  신고
+                  <span className="material-icons-round text-[16px]">{liked ? 'thumb_up' : 'thumb_up_off_alt'}</span>
+                  공감
                 </button>
-              )}
-              {isOwnReply && commentId && onEditReply && onDeleteReply && (
-                <div className="flex gap-md ml-auto">
-                  <button
-                    type="button"
-                    className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
-                    onClick={() =>
-                      setDialogConfig({
-                        isOpen: true,
-                        type: 'prompt',
-                        title: '답글 수정',
-                        message: '답글 내용을 수정합니다.',
-                        defaultValue: reply.body,
-                        placeholder: '답글을 입력하세요',
-                        onConfirm: (val) => {
-                          if (val != null && val.trim()) onEditReply(reply.id, { body: val.trim() });
-                          closeDialog();
-                        },
-                      })
-                    }
-                    aria-label="수정"
-                    title="수정"
-                  >
-                    <span className="material-icons-round text-[16px]">edit</span>
-                    수정
-                  </button>
+                {showReport && (
                   <button
                     type="button"
                     className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
-                    onClick={() =>
-                      setDialogConfig({
-                        isOpen: true,
-                        type: 'confirm',
-                        title: '답글 삭제',
-                        message: '정말로 이 답글을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.',
-                        confirmText: '삭제',
-                        isDestructive: true,
-                        onConfirm: () => {
-                          onDeleteReply(reply.id);
-                          closeDialog();
-                        },
-                      })
-                    }
-                    aria-label="삭제"
-                    title="삭제"
+                    onClick={() => setIsReportOpen(true)}
+                    aria-label="신고"
                   >
-                    <span className="material-icons-round text-[16px]">delete</span>
-                    삭제
+                    <span className="material-icons-round text-[16px]">flag</span>
+                    신고
                   </button>
-                </div>
-              )}
+                )}
+                {isOwnReply && commentId && onEditReply && onDeleteReply && (
+                  <div className="flex gap-md ml-auto">
+                    <button
+                      type="button"
+                      className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+                      onClick={() =>
+                        setDialogConfig({
+                          isOpen: true,
+                          type: 'prompt',
+                          title: '답글 수정',
+                          message: '답글 내용을 수정합니다.',
+                          defaultValue: reply.body,
+                          placeholder: '답글을 입력하세요',
+                          onConfirm: (val) => {
+                            if (val != null && val.trim()) onEditReply(reply.id, { body: val.trim() });
+                            closeDialog();
+                          },
+                        })
+                      }
+                      aria-label="수정"
+                      title="수정"
+                    >
+                      <span className="material-icons-round text-[16px]">edit</span>
+                      수정
+                    </button>
+                    <button
+                      type="button"
+                      className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
+                      onClick={() =>
+                        setDialogConfig({
+                          isOpen: true,
+                          type: 'confirm',
+                          title: '답글 삭제',
+                          message: '정말로 이 답글을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.',
+                          confirmText: '삭제',
+                          isDestructive: true,
+                          onConfirm: () => {
+                            onDeleteReply(reply.id);
+                            closeDialog();
+                          },
+                        })
+                      }
+                      aria-label="삭제"
+                      title="삭제"
+                    >
+                      <span className="material-icons-round text-[16px]">delete</span>
+                      삭제
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -286,7 +298,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   };
 
   return (
-    <div className={`comment-group relative ${showThreadLine && hasReplies ? '' : ''}`}>
+    <div className={`comment-group relative pb-0 ${showThreadLine && hasReplies ? '' : ''}`}>
       {showThreadLine && hasReplies && <div className="thread-line" />}
 
       <div className="group relative z-10">
@@ -396,11 +408,12 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
 
       {hasReplies && (
         <div className="ml-10 mt-4 space-y-4 relative">
-          {visibleReplies.map((reply) => (
+          {visibleReplies.map((reply, idx) => (
             <CivilDiscussionItem
               key={reply.id}
               variant="reply"
               reply={reply}
+              isLast={idx === visibleReplies.length - 1 && !showMoreRepliesButton}
               currentUserId={currentUserId}
               commentId={commentData.id}
               issueId={issueId}
@@ -424,8 +437,8 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
       )}
 
       {hasReplies && showMoreRepliesButton && (
-        <div className="ml-10 pl-10 relative mt-4">
-          <div className="thread-curve" style={{ height: 15 }} />
+        <div className="ml-10 pl-10 relative mt-4">{/* thread-curve */}
+        <div className="thread-curve" style={{ height: 15 }} />
           <button
             type="button"
             onClick={loadMoreReplies}

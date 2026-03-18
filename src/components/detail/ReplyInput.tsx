@@ -100,8 +100,9 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, curr
   };
 
   return (
+    // 이 아래 mt-4
     <div className="ml-10 relative pl-10 mt-4 mb-6 reply-input-enter">
-      <div className="thread-curve" style={{ height: 25 }} />
+      <div className="thread-curve" style={{ height: 120 }} />
       <div className="flex flex-col gap-xs p-lg pt-4 rounded-xl bg-surface/50 border border-border text-text-primary">
       <div className="flex items-center gap-xs flex-wrap">
           <span className="font-bold text-sm text-text-primary pl-2">{replyAuthorName}</span>
