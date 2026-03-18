@@ -84,6 +84,10 @@ export class ClaudeService {
         }
 
         try {
+            const controller = new AbortController();
+            const timeoutMs = 12_000;
+            const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+
             const body = {
                 model: this.model,
                 max_tokens: request.maxTokens ?? 512,
@@ -100,7 +104,8 @@ export class ClaudeService {
                     'anthropic-dangerous-direct-browser-access': 'true',
                 },
                 body: JSON.stringify(body),
-            });
+                signal: controller.signal,
+            }).finally(() => window.clearTimeout(timeoutId));
 
             if (!response.ok) {
                 const errText = await response.text();

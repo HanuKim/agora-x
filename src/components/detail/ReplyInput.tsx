@@ -149,7 +149,7 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, curr
               className="cursor-pointer flex items-center gap-1 text-sm font-medium text-primary hover:opacity-90 transition-colors disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-base">send</span>
-              {isSubmitting ? '안전성 검토 중...' : '답글 등록'}
+              {isSubmitting ? '안전성 검토 중...' : '등록하기'}
             </button>
           </div>
         </div>
