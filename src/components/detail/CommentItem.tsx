@@ -309,15 +309,17 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
               <span className="material-icons-round text-[16px]">{commentLiked ? 'thumb_up' : 'thumb_up_off_alt'}</span>
               공감 {commentDisplayScore > 0 ? commentDisplayScore : ''}
             </button>
-            <button
-              type="button"
-              onClick={() => setShowReplyInput((prev) => !prev)}
-              className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
-              aria-label="답글 달기"
-            >
-              <span className="material-icons-round text-[16px]">chat_bubble</span>
-              답글 달기
-            </button>
+            {currentUserId && (
+              <button
+                type="button"
+                onClick={() => setShowReplyInput((prev) => !prev)}
+                className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+                aria-label="답글 달기"
+              >
+                <span className="material-icons-round text-[16px]">chat_bubble</span>
+                답글 달기
+              </button>
+            )}
             {currentUserId && commentData.authorId !== currentUserId && (
               <button
                 type="button"

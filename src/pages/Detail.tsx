@@ -267,8 +267,16 @@ export const Detail: React.FC = () => {
 
                         <section className="mb-xl">
                             <DiscussionInput
-                              onSubmit={(stance, body) => handleSubmitOpinion(stance, body, user?.id)}
+                              onSubmit={(stance, body) => {
+                                if (!isAuthenticated || !user) {
+                                  openLoginModal();
+                                  return;
+                                }
+                                handleSubmitOpinion(stance, body, user.id);
+                              }}
                               issueId={id}
+                              isAuthenticated={isAuthenticated}
+                              openLoginModal={openLoginModal}
                             />
                         </section>
 

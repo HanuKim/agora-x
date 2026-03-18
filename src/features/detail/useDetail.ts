@@ -203,9 +203,10 @@ export const useDetail = (userId?: string) => {
   const handleSubmitOpinion = (stance: CivilStance, body: string, authorId?: string) => {
     if (!id) return;
     const now = new Date();
+    const authorKey = authorId ?? CURRENT_USER_ID;
     const newComment: CivilComment = {
       id: `user-${id}-${Date.now()}`,
-      authorName: generateNickname(CURRENT_USER_ID, id),
+      authorName: generateNickname(authorKey, id),
       authorId,
       stance,
       body,
