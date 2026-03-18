@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { ReplyInput } from './ReplyInput';
-import { getStoredReplies } from '../../services/db/detailDB';
+import { getStoredReplies, updateStoredReply, removeStoredReply, getLikeCountDelta } from '../../services/db/detailDB';
 import type { CivilComment, CivilReply } from '../../features/detail/useCivilStance';
+import type { LikeDiscussionPayload } from '../../features/detail/useDetail';
 import { theme } from '../../design/theme';
 import { formatCivilDate } from '../../utils/commentDate';
+import { ReportModal } from '../report/ReportModal';
+import { useReport } from '../../features/user/hooks/useReport';
+import { GlobalDialog, type DialogType } from '../common/GlobalDialog';
 
 const REPLIES_PAGE_SIZE = 5;
 
@@ -25,13 +29,24 @@ export interface CommentItemProps {
   comment: CivilComment;
   showThreadLine?: boolean;
   onReplyAdded?: () => void;
-  /** 기사 issueId — 답글 작성 시 동일 기사 내 익명 닉네임 생성용 */
   issueId?: string;
+  currentUserId?: string;
+  onEdit?: (commentId: string, updates: Partial<Pick<CivilComment, 'body' | 'stance'>>) => void;
+  onDelete?: (commentId: string) => void;
+  onLike?: (payload: LikeDiscussionPayload) => void;
+  isLiked?: (targetId: string) => boolean;
 }
 
 // --- Reply props (variant: 'reply')
 export interface ReplyItemProps {
   reply: CivilReply;
+  currentUserId?: string;
+  commentId?: string;
+  issueId?: string;
+  onEditReply?: (replyId: string, updates: Partial<Pick<CivilReply, 'body' | 'stance'>>) => void;
+  onDeleteReply?: (replyId: string) => void;
+  onLike?: (payload: LikeDiscussionPayload) => void;
+  isLiked?: (targetId: string) => boolean;
 }
 
 type CivilDiscussionItemProps =
@@ -45,49 +60,204 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
   const [storedReplies, setStoredReplies] = useState<CivilReply[]>(() =>
     commentForHook ? getStoredReplies(commentForHook.id) : []
   );
-  const [visibleReplyCount, setVisibleReplyCount] = useState(0);
+  const [visibleReplyCount, setVisibleReplyCount] = useState(() => {
+    if (!commentForHook) return 0;
+    const initial = (commentForHook.replies ?? []).length;
+    const stored = getStoredReplies(commentForHook.id).length;
+    return Math.min(REPLIES_PAGE_SIZE, initial + stored);
+  });
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const { submitReport } = useReport();
+  const [dialogConfig, setDialogConfig] = useState<{
+    isOpen: boolean;
+    type: DialogType;
+    title: string;
+    message: string;
+    confirmText?: string;
+    isDestructive?: boolean;
+    placeholder?: string;
+    defaultValue?: string;
+    onConfirm: (val?: string) => void;
+  }>({
+    isOpen: false,
+    type: 'confirm',
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+  const closeDialog = () => setDialogConfig((prev) => ({ ...prev, isOpen: false }));
 
   if (props.variant === 'reply') {
-    const { reply } = props;
+    const { reply, currentUserId: replyCurrentUserId, commentId, issueId, onEditReply, onDeleteReply, onLike, isLiked } = props;
     const badgeClass = stanceBadgeClass[reply.stance] ?? stanceBadgeClass.neutral;
     const label = stanceLabels[reply.stance] ?? '중립';
     const dateStr = formatCivilDate(reply.createdAt) ?? reply.timeAgo;
+    const isOwnReply = replyCurrentUserId && reply.authorId === replyCurrentUserId;
+    const showReport = replyCurrentUserId && !isOwnReply;
+    const liked = isLiked?.(reply.id);
+
+    const handleReplyReport = async (reason: string, detail: string) => {
+      if (!replyCurrentUserId) return;
+      await submitReport({
+        reporterId: replyCurrentUserId,
+        targetType: 'opinion',
+        targetId: reply.id,
+        reason,
+        detail,
+      });
+    };
+
+    const handleLike = () => {
+      if (issueId && onLike) {
+        onLike({
+          targetId: reply.id,
+          type: 'reply',
+          issueId,
+          authorName: reply.authorName,
+          body: reply.body,
+          stance: reply.stance,
+          createdAt: reply.createdAt,
+          scoreAtLike: 0,
+        });
+      }
+    };
 
     return (
-      <div className="relative pl-10">
-        <div className="thread-curve" style={{ height: reply.curveHeight ?? 25 }} />
-        <div className="flex flex-col gap-sm p-lg rounded-xl bg-surface/50 border border-border">
-          <div className="flex items-center gap-sm">
-            <span className="flex items-center font-bold text-sm text-text-primary">{reply.authorName}</span>
-            <span className={badgeClass}>{label}</span>
-            <span className="text-xs text-text-secondary">· {dateStr}</span>
-          </div>
-          <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep my-xs">
-            {reply.body}
-          </p>
-          <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
-            <button
-              type="button"
-              className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
-              aria-label="공감"
-            >
-              <span className="material-icons-round text-[16px]">thumb_up_off_alt</span>
-              공감
-            </button>
+      <>
+        <div className="relative pl-10">
+          <div className="thread-curve" style={{ height: reply.curveHeight ?? 25 }} />
+          <div className="flex flex-col gap-sm p-lg rounded-xl bg-surface/50 border border-border">
+            <div className="flex items-center gap-sm">
+              <span className="flex items-center font-bold text-sm text-text-primary">{reply.authorName}</span>
+              <span className={badgeClass}>{label}</span>
+              <span className="text-xs text-text-secondary">· {dateStr}</span>
+            </div>
+            <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep my-xs">
+              {reply.body}
+            </p>
+            <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
+              <button
+                type="button"
+                onClick={onLike ? handleLike : undefined}
+                className={`flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 ${liked ? 'text-primary' : 'hover:text-primary'}`}
+                aria-label="공감"
+              >
+                <span className="material-icons-round text-[16px]">{liked ? 'thumb_up' : 'thumb_up_off_alt'}</span>
+                공감
+              </button>
+              {showReport && (
+                <button
+                  type="button"
+                  className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
+                  onClick={() => setIsReportOpen(true)}
+                  aria-label="신고"
+                >
+                  <span className="material-icons-round text-[16px]">flag</span>
+                  신고
+                </button>
+              )}
+              {isOwnReply && commentId && onEditReply && onDeleteReply && (
+                <div className="flex gap-md ml-auto">
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+                    onClick={() =>
+                      setDialogConfig({
+                        isOpen: true,
+                        type: 'prompt',
+                        title: '답글 수정',
+                        message: '답글 내용을 수정합니다.',
+                        defaultValue: reply.body,
+                        placeholder: '답글을 입력하세요',
+                        onConfirm: (val) => {
+                          if (val != null && val.trim()) onEditReply(reply.id, { body: val.trim() });
+                          closeDialog();
+                        },
+                      })
+                    }
+                    aria-label="수정"
+                    title="수정"
+                  >
+                    <span className="material-icons-round text-[16px]">edit</span>
+                    수정
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
+                    onClick={() =>
+                      setDialogConfig({
+                        isOpen: true,
+                        type: 'confirm',
+                        title: '답글 삭제',
+                        message: '정말로 이 답글을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.',
+                        confirmText: '삭제',
+                        isDestructive: true,
+                        onConfirm: () => {
+                          onDeleteReply(reply.id);
+                          closeDialog();
+                        },
+                      })
+                    }
+                    aria-label="삭제"
+                    title="삭제"
+                  >
+                    <span className="material-icons-round text-[16px]">delete</span>
+                    삭제
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+        <GlobalDialog {...dialogConfig} onCancel={closeDialog} />
+        <ReportModal
+          isOpen={isReportOpen}
+          onClose={() => setIsReportOpen(false)}
+          onSubmit={handleReplyReport}
+          targetLabel="답글"
+        />
+      </>
     );
   }
 
-  const { comment: commentData, showThreadLine = true, onReplyAdded, issueId } = props;
+  const { comment: commentData, showThreadLine = true, onReplyAdded, issueId, currentUserId, onEdit, onDelete, onLike, isLiked } = props;
   const badgeClass = stanceBadgeClass[commentData.stance] ?? stanceBadgeClass.neutral;
   const label = stanceLabels[commentData.stance] ?? '중립';
   const dateStr = formatCivilDate(commentData.createdAt) ?? commentData.timeAgo;
   const initialReplies = commentData.replies ?? [];
   const repliesList = [...initialReplies, ...storedReplies];
   const hasReplies = repliesList.length > 0;
+  const isOwnComment = currentUserId && commentData.authorId === currentUserId;
+  const commentLiked = isLiked?.(commentData.id);
+
+  const handleCommentLike = () => {
+    if (issueId && onLike) {
+      onLike({
+        targetId: commentData.id,
+        type: 'comment',
+        issueId,
+        authorName: commentData.authorName,
+        body: commentData.body,
+        stance: commentData.stance,
+        createdAt: commentData.createdAt,
+        scoreAtLike: commentData.score,
+      });
+    }
+  };
+
+  const commentDisplayScore = commentData.score + getLikeCountDelta(commentData.id);
+
+  const handleReport = async (reason: string, detail: string) => {
+    if (!currentUserId) return;
+    await submitReport({
+      reporterId: currentUserId,
+      targetType: 'opinion',
+      targetId: commentData.id,
+      reason,
+      detail,
+    });
+  };
 
   const loadMoreReplies = () => {
     setVisibleReplyCount((prev) => Math.min(prev + REPLIES_PAGE_SIZE, repliesList.length));
@@ -101,6 +271,18 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
     setVisibleReplyCount((prev) => Math.min(prev + 1, repliesList.length + 1));
     setShowReplyInput(false);
     onReplyAdded?.();
+  };
+
+  const handleEditReply = (replyId: string, updates: Partial<Pick<CivilReply, 'body' | 'stance'>>) => {
+    if (!commentData.id) return;
+    updateStoredReply(commentData.id, replyId, updates);
+    setStoredReplies((prev) => prev.map((r) => (r.id === replyId ? { ...r, ...updates } : r)));
+  };
+
+  const handleDeleteReply = (replyId: string) => {
+    if (!commentData.id) return;
+    removeStoredReply(commentData.id, replyId);
+    setStoredReplies((prev) => prev.filter((r) => r.id !== replyId));
   };
 
   return (
@@ -120,29 +302,113 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
           <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
             <button
               type="button"
-              className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+              onClick={onLike ? handleCommentLike : undefined}
+              className={`flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 ${commentLiked ? 'text-primary' : 'hover:text-primary'}`}
               aria-label="공감"
             >
-              <span className="material-icons-round text-[16px]">thumb_up_off_alt</span>
-              공감 {commentData.score > 0 ? commentData.score : ''}
+              <span className="material-icons-round text-[16px]">{commentLiked ? 'thumb_up' : 'thumb_up_off_alt'}</span>
+              공감 {commentDisplayScore > 0 ? commentDisplayScore : ''}
             </button>
-            <button
-              type="button"
-              onClick={() => setShowReplyInput((prev) => !prev)}
-              className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
-              aria-label="답글 달기"
-            >
-              <span className="material-icons-round text-[16px]">chat_bubble</span>
-              답글 달기
-            </button>
+            {currentUserId && (
+              <button
+                type="button"
+                onClick={() => setShowReplyInput((prev) => !prev)}
+                className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+                aria-label="답글 달기"
+              >
+                <span className="material-icons-round text-[16px]">chat_bubble</span>
+                답글 달기
+              </button>
+            )}
+            {currentUserId && commentData.authorId !== currentUserId && (
+              <button
+                type="button"
+                className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
+                onClick={() => setIsReportOpen(true)}
+                aria-label="신고"
+              >
+                <span className="material-icons-round text-[16px]">flag</span>
+                신고
+              </button>
+            )}
+            {isOwnComment && (
+              <div className="flex gap-md ml-auto">
+                <button
+                  type="button"
+                  className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-primary"
+                  onClick={() =>
+                    setDialogConfig({
+                      isOpen: true,
+                      type: 'prompt',
+                      title: '댓글 수정',
+                      message: '댓글 내용을 수정합니다.',
+                      defaultValue: commentData.body,
+                      placeholder: '댓글을 입력하세요',
+                      onConfirm: (val) => {
+                        if (val != null && val.trim()) onEdit?.(commentData.id, { body: val.trim() });
+                        closeDialog();
+                      },
+                    })
+                  }
+                  aria-label="수정"
+                  title="수정"
+                >
+                  <span className="material-icons-round text-[16px]">edit</span>
+                  수정
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 hover:text-danger"
+                  onClick={() =>
+                    setDialogConfig({
+                      isOpen: true,
+                      type: 'confirm',
+                      title: '댓글 삭제',
+                      message: '정말로 이 댓글을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.',
+                      confirmText: '삭제',
+                      isDestructive: true,
+                      onConfirm: () => {
+                        onDelete?.(commentData.id);
+                        closeDialog();
+                      },
+                    })
+                  }
+                  aria-label="삭제"
+                  title="삭제"
+                >
+                  <span className="material-icons-round text-[16px]">delete</span>
+                  삭제
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
+      <GlobalDialog {...dialogConfig} onCancel={closeDialog} />
+
+      <ReportModal
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        onSubmit={handleReport}
+        targetLabel="댓글"
+      />
+
       {hasReplies && (
         <div className="ml-10 mt-4 space-y-4 relative">
           {visibleReplies.map((reply) => (
-            <CivilDiscussionItem key={reply.id} variant="reply" reply={reply} />
+            <CivilDiscussionItem
+              key={reply.id}
+              variant="reply"
+              reply={reply}
+              currentUserId={currentUserId}
+              commentId={commentData.id}
+              issueId={issueId}
+              onEditReply={handleEditReply}
+              onDeleteReply={handleDeleteReply}
+              onLike={onLike}
+              isLiked={isLiked}
+            />
           ))}
         </div>
       )}
@@ -151,6 +417,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
         <ReplyInput
           commentId={commentData.id}
           issueId={issueId}
+          currentUserId={currentUserId}
           onCancel={() => setShowReplyInput(false)}
           onSubmit={handleReplySubmit}
         />
@@ -165,7 +432,7 @@ function CivilDiscussionItem(props: CivilDiscussionItemProps) {
             className="flex items-center gap-2 text-primary font-bold text-sm hover:underline py-1 transition-colors"
           >
             <span className="w-6 h-[2px] bg-primary/30" />
-            답글 {visibleReplyCount === 0 ? repliesList.length : remainingCount}개 더 보기...
+            답글 {remainingCount}개 더보기
           </button>
         </div>
       )}

@@ -12,22 +12,24 @@ import { useAuth } from '../features/auth';
 import { useUserPrefs } from '../features/user';
 import { useProposals } from '../features/proposal/useProposals';
 import { useGamification } from '../features/user/hooks/useGamification';
+import { useNewsWithAISummary } from '../features/news/useNewsWithAISummary';
 import { getScrapedArticles, type ArticleScrap } from '../services/db/gamificationDB';
 import { getAllOpinions, type Proposal } from '../services/db/proposalDB';
 import { getProposals } from '../services/db/proposalDB';
+import { getLikedDiscussions } from '../services/db/detailDB';
 
 // MyPage components
 import { ProfileSidebar, type MyPageTab } from '../components/mypage/ProfileSidebar';
 import { MyInfoTab } from '../components/mypage/MyInfoTab';
 import { MyPostsTab, type MyOpinionItem } from '../components/mypage/MyPostsTab';
 import { ScrapTab } from '../components/mypage/ScrapTab';
+import type { NewsCardArticle } from '../components/community/NewsCard';
 import { LikedOpinionsTab, type LikedOpinionItem } from '../components/mypage/LikedOpinionsTab';
 import { GlobalDialog } from '../components/common/GlobalDialog';
 
-// For article title lookup
+// For article title lookup (scrap display)
 import rawNewsData from '../data/selectedNews.json';
 
-// Build article title map for scrap display
 const allRawArticles = (rawNewsData as { selectedNews: Record<string, unknown>[] }).selectedNews;
 const articleTitleMap = new Map<number, { title: string; topic: string }>();
 allRawArticles.forEach((item, idx) => {
@@ -43,6 +45,7 @@ export const Mypage: React.FC = () => {
     const { knowledgePrefs, setKnowledgeLevel } = useUserPrefs();
     const { fetchUserInteractions, fetchLikedOpinions } = useProposals();
     const { userLevel, fetchUserLevel, getProgressToNextLevel, initLevel } = useGamification();
+    const { items: newsItems } = useNewsWithAISummary();
 
     const [activeTab, setActiveTab] = useState<MyPageTab>('info');
     const [scrapedProposals, setScrapedProposals] = useState<Proposal[]>([]);
@@ -63,6 +66,28 @@ export const Mypage: React.FC = () => {
     const loadData = useCallback(async () => {
         if (!user) return;
 
+        // 공감한 의견은 다른 로직과 분리해 먼저 로드해 항상 탭에 반영
+        const loadLikedOpinions = async () => {
+            try {
+                const [likedFromProposals, likedDiscussions] = await Promise.all([
+                    fetchLikedOpinions(user.id),
+                    Promise.resolve(getLikedDiscussions(user.id)),
+                ]);
+                setLikedOpinions([
+                    ...likedFromProposals,
+                    ...likedDiscussions.map((d) => ({ opinion: null, proposal: null, discussion: d })),
+                ]);
+            } catch (err) {
+                console.error('[Mypage] Liked opinions load failed:', err);
+                try {
+                    setLikedOpinions(await fetchLikedOpinions(user.id));
+                } catch {
+                    setLikedOpinions([]);
+                }
+            }
+        };
+        void loadLikedOpinions();
+
         // Init level if first visit
         await initLevel(user.id);
         await fetchUserLevel(user.id);
@@ -74,11 +99,7 @@ export const Mypage: React.FC = () => {
         const artScraps = await getScrapedArticles(user.id);
         setScrapedArticles(artScraps);
 
-        // Liked opinions
-        const liked = await fetchLikedOpinions(user.id);
-        setLikedOpinions(liked);
-
-        // My posts & opinions
+        // My posts & opinions (국민 제안 / 국민제안 의견 / 국민토론 의견 — 각각 별도 배열로 동일 패턴)
         const allProposals = await getProposals();
         const mine = allProposals.filter((p) => p.authorId === user.id);
         setMyProposals(mine);
@@ -150,6 +171,7 @@ export const Mypage: React.FC = () => {
                         <MyPostsTab
                             myProposals={myProposals}
                             myOpinions={myOpinions}
+                            userId={user?.id}
                         />
                     )}
                     {activeTab === 'scraps' && (
@@ -157,6 +179,7 @@ export const Mypage: React.FC = () => {
                             scrapedProposals={scrapedProposals}
                             scrapedArticles={scrapedArticles}
                             articleTitleMap={articleTitleMap}
+                            newsItems={newsItems.map((i) => ({ ...i, url: i.articleUrl }))}
                         />
                     )}
                     {activeTab === 'liked' && (

@@ -10,18 +10,20 @@ const FALLBACK_REPLY_NAME = '익명';
 
 interface ReplyInputProps {
   commentId: string;
-  /** 기사 issueId — 동일 기사 내 익명 닉네임 생성 (없으면 FALLBACK_REPLY_NAME) */
   issueId?: string;
+  currentUserId?: string;
   onCancel?: () => void;
   onSubmit?: (reply: CivilReply) => void;
 }
 
-export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, onCancel, onSubmit }) => {
+export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, currentUserId, onCancel, onSubmit }) => {
   const [body, setBody] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyError, setReplyError] = useState('');
 
-  const replyAuthorName = issueId ? generateNickname(CURRENT_USER_ID, issueId) : FALLBACK_REPLY_NAME;
+  const replyAuthorName = issueId
+    ? generateNickname(currentUserId ?? CURRENT_USER_ID, issueId)
+    : FALLBACK_REPLY_NAME;
 
   const handleSubmit = async () => {
     const trimmed = body.trim();
@@ -41,6 +43,7 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, onCa
       const reply: CivilReply = {
         id: `reply-${commentId}-${Date.now()}`,
         authorName: replyAuthorName,
+        authorId: currentUserId,
         stance: 'neutral',
         body: trimmed,
         timeAgo: '방금 전',

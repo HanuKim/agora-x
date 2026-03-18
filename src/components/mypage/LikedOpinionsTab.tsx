@@ -10,10 +10,12 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../ui/Card';
 import { EmptyState } from '../ui/EmptyState';
 import type { Opinion, Proposal } from '../../services/db/proposalDB';
+import { getLikeCountDelta, type Discussion } from '../../services/db/detailDB';
 
 export interface LikedOpinionItem {
-    opinion: Opinion;
+    opinion: Opinion | null;
     proposal: Proposal | null;
+    discussion?: Discussion | null;
 }
 
 interface LikedOpinionsTabProps {
@@ -38,51 +40,59 @@ export const LikedOpinionsTab: React.FC<LikedOpinionsTabProps> = ({ items }) => 
                 />
             ) : (
                 <div className="flex flex-col gap-md">
-                    {items.map(({ opinion, proposal }) => (
-                        <Card
-                            key={opinion.id}
-                            className="p-lg cursor-pointer hover:-translate-y-[1px] hover:shadow-md transition-all"
-                            onClick={() => {
-                                if (proposal) navigate(`/proposals/${proposal.id}`);
-                            }}
-                        >
-                            {/* Source proposal */}
-                            {proposal && (
-                                <div className="flex items-center gap-xs mb-sm">
-                                    <span className="material-icons-round text-[14px] text-primary">
-                                        description
-                                    </span>
-                                    <span className="text-xs font-bold text-primary line-clamp-1">
-                                        {proposal.title}
-                                    </span>
-                                </div>
-                            )}
+                    {items.map((item) => {
+                        const { opinion, proposal, discussion } = item;
+                        const isDiscussion = discussion != null;
+                        const key = isDiscussion ? discussion.id : (opinion?.id ?? '');
+                        const onClick = isDiscussion
+                            ? () => navigate(`/detail/${discussion.issueId}`)
+                            : () => { if (proposal) navigate(`/proposals/${proposal.id}`); };
 
-                            {/* Opinion content */}
-                            <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep m-0 line-clamp-3">
-                                {opinion.content}
-                            </p>
+                        return (
+                            <Card
+                                key={key}
+                                className="p-lg cursor-pointer hover:-translate-y-[1px] hover:shadow-md transition-all"
+                                onClick={onClick}
+                            >
+                                {/* Source: proposal title or article title */}
+                                {(proposal ?? discussion?.articleTitle) && (
+                                    <div className="flex items-center gap-xs mb-sm">
+                                        <span className="material-icons-round text-[14px] text-primary">
+                                            description
+                                        </span>
+                                        <span className="text-xs font-bold text-primary line-clamp-1">
+                                            {isDiscussion ? (discussion.articleTitle ?? `기사 #${discussion.issueId}`) : proposal!.title}
+                                        </span>
+                                    </div>
+                                )}
 
-                            <div className="flex items-center justify-between mt-sm">
-                                <span className="text-xs text-text-secondary">
-                                    {opinion.authorNickname}
-                                </span>
-                                <div className="flex items-center gap-xs text-xs text-text-secondary">
-                                    <span className="material-icons-round text-[14px] text-primary">
-                                        thumb_up
+                                {/* Content */}
+                                <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep m-0 line-clamp-3">
+                                    {isDiscussion ? discussion.body : (opinion?.content ?? '')}
+                                </p>
+
+                                <div className="flex items-center justify-between mt-sm">
+                                    <span className="text-xs text-text-secondary">
+                                        {isDiscussion ? discussion.authorName : (opinion?.authorNickname ?? '')}
                                     </span>
-                                    {opinion.likes || 0}
-                                    <span className="ml-sm flex items-center gap-xs">
-                                        <span className="material-icons-round text-[14px]">schedule</span>
-                                        {new Date(opinion.createdAt).toLocaleDateString('ko-KR', {
-                                            month: 'short',
-                                            day: 'numeric',
-                                        })}
-                                    </span>
+                                    <div className="flex items-center gap-xs text-xs text-text-secondary">
+                                        <span className="material-icons-round text-[14px] text-primary">
+                                            thumb_up
+                                        </span>
+                                        {isDiscussion
+                                            ? (discussion.scoreAtLike ?? 0) + getLikeCountDelta(discussion.targetId)
+                                            : (opinion?.likes ?? 0)}
+                                        <span className="ml-sm flex items-center gap-xs">
+                                            <span className="material-icons-round text-[14px]">schedule</span>
+                                            {isDiscussion
+                                                ? new Date(discussion.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+                                                : (opinion ? new Date(opinion.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) : '')}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </Card>
-                    ))}
+                            </Card>
+                        );
+                    })}
                 </div>
             )}
         </div>

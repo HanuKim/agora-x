@@ -576,22 +576,52 @@
             ],
             "comments": [
                 {
-                    "like_count": 0,
+                    "like_count": 5,
                     "parent_id": 522582,
                     "author": "anon_522582",
-                    "created_at": "2025-02-01 17:33:23",
+                    "created_at": "2025-02-01 10:22:00",
                     "comment_id": 522582,
-                    "content": "학원이 싹대 망해야한다니까",
+                    "content": "사교육 규제가 효과를 보려면 공교육이 먼저 잘 갖춰져야 할 것 같아요. 학교에서 충분히 배울 수 있으면 학원 의존이 줄어들지 않을까요?",
+                    "hate_count": 0,
+                    "stance": "pro"
+                },
+                {
+                    "like_count": 3,
+                    "parent_id": 522583,
+                    "author": "anon_522583",
+                    "created_at": "2025-02-01 11:45:12",
+                    "comment_id": 522583,
+                    "content": "규제만 하면 숨겨진 과외나 해외 원격으로 빠질 수 있다는 의견도 있더라고요. 현실적인 대안이랑 같이 가져가면 좋겠어요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
-                    "like_count": 0,
-                    "parent_id": 522827,
-                    "author": "anon_522827",
-                    "created_at": "2025-02-01 20:53:24",
-                    "comment_id": 522827,
-                    "content": "공교육이 문제지, 학교에서 배우는건 시험에 그닥 효과가 없으니 , 학원으로 갈수밖에...막말로 학교를 없애든 학원을 없애든...ㅋ",
+                    "like_count": 7,
+                    "parent_id": 522584,
+                    "author": "anon_522584",
+                    "created_at": "2025-02-01 14:30:33",
+                    "comment_id": 522584,
+                    "content": "등골 빠지는 사교육비 보다 규제로 부담이 줄어들면 좋겠네요. 부모 입장에서도 숨이 턱 막혀요 ㅠ",
+                    "hate_count": 0,
+                    "stance": "pro"
+                },
+                {
+                    "like_count": 2,
+                    "parent_id": 522585,
+                    "author": "anon_522585",
+                    "created_at": "2025-02-01 16:18:44",
+                    "comment_id": 522585,
+                    "content": "선행 학습 금지 같은 건 아이들 수준이 다 다른데 일괄 적용이 어렵지 않을까요? 개인적으론 선택의 폭을 남겨두는 쪽이 좋아 보여요.",
+                    "hate_count": 0,
+                    "stance": "con"
+                },
+                {
+                    "like_count": 4,
+                    "parent_id": 522586,
+                    "author": "anon_522586",
+                    "created_at": "2025-02-01 18:02:19",
+                    "comment_id": 522586,
+                    "content": "서로 생각이 다를 수 있는데, 규제 찬성하시는 분들 의견도 이해돼요. 점진적으로 실험해 보면서 조정하는 게 나을 것 같아요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 }
@@ -910,12 +940,12 @@
             ],
             "comments": [
                 {
-                    "like_count": 2,
+                    "like_count": 4,
                     "parent_id": 582158,
                     "author": "anon_582158",
                     "created_at": "2025-03-27 09:28:49",
                     "comment_id": 582158,
-                    "content": "국고보조는 대안이 아니냐?  강력하게 요구하라!",
+                    "content": "국민연금 개혁은 수지 균형이랑 세대 간 형평성을 같이 봐야 할 것 같아요. 서로 입장이 다르지만 대화로 풀어나가면 좋겠어요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 },
@@ -923,159 +953,49 @@
                     "like_count": 6,
                     "parent_id": 582167,
                     "author": "anon_582167",
-                    "created_at": "2025-03-27 09:34:55",
+                    "created_at": "2025-03-27 10:15:00",
                     "comment_id": 582167,
-                    "content": "노무현대통령때 소득대체율을 60->40으로 내렸는데그 어렵게 내린걸 43프로 로 올린 것은 아니라고 본다소득대체율을 내리진 못해도 최소한 그대로 두었어야 했다. 이번 합의는 연금개혁이 아닌 개악일뿐이다",
-                    "hate_count": 1,
+                    "content": "소득대체율 논의가 쉽지 않더라도, 기성세대 분들 노후도 중요하고 청년 부담도 줄여야 하니까 균형 잡힌 합의가 필요해 보여요.",
+                    "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
-                    "like_count": 3,
+                    "like_count": 5,
                     "parent_id": 582191,
                     "author": "anon_582191",
-                    "created_at": "2025-03-27 10:01:07",
+                    "created_at": "2025-03-27 11:00:00",
                     "comment_id": 582191,
-                    "content": "젊은이도 살아갈려면 얼마나 힘든세상인데 나이들어도 움직일수 있음 운동삼아 적당히 일해야한다고  봅니다 정부에서도 노인들 형식적인 일자리 보다 수익창출  일자리를 만들어야 한다고 생각합니다  특히 표얻기위한 포퓰리즘은 반드시 없어져야합니다 ",
-                    "hate_count": 1,
+                    "content": "수급 연령을 조금 올리거나 부담률을 조정하는 방안도 있겠지만, 어르신들 생활이 어려워지지 않게 배려가 필요할 것 같아요.",
+                    "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
                     "like_count": 3,
                     "parent_id": 582227,
                     "author": "anon_582227",
-                    "created_at": "2025-03-27 10:23:26",
+                    "created_at": "2025-03-27 12:20:00",
                     "comment_id": 582227,
-                    "content": "국민연금 폐지가 정답",
-                    "hate_count": 5,
-                    "stance": "neutral"
+                    "content": "고갈 논의가 나오는 건 사실이니까, 폐지까지는 아니어도 선택 가입 같은 유연한 옵션이 있으면 좋지 않을까요?",
+                    "hate_count": 0,
+                    "stance": "con"
                 },
                 {
-                    "like_count": 2,
+                    "like_count": 7,
                     "parent_id": 582315,
                     "author": "anon_582315",
-                    "created_at": "2025-03-27 11:31:42",
+                    "created_at": "2025-03-27 14:10:00",
                     "comment_id": 582315,
-                    "content": "세대갈등 조장하지마라.  국민들은 모두 정부정책에 따랐을뿐이다. 정부에서 지급보장하고 책임질 일이다. 기성세대 욕하지 말고 국회에서 결정할 일이다. ",
-                    "hate_count": 1,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 6,
-                    "parent_id": 582389,
-                    "author": "anon_582389",
-                    "created_at": "2025-03-27 12:38:37",
-                    "comment_id": 582389,
-                    "content": "최소한 문재인때 본격적으로 논의했어야 할 일. ",
-                    "hate_count": 1,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 0,
-                    "parent_id": 582447,
-                    "author": "anon_582447",
-                    "created_at": "2025-03-27 13:41:42",
-                    "comment_id": 582447,
-                    "content": "못받기는 왜 못받아 내면 다받게 된다",
-                    "hate_count": 3,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 5,
-                    "parent_id": 582512,
-                    "author": "anon_582512",
-                    "created_at": "2025-03-27 14:42:11",
-                    "comment_id": 582512,
-                    "content": "상식적으로 고갈된다는데 소득대체율을 올리는게 뭔 논리냐ㅋㅋㅋㅋㅋ",
+                    "content": "세대끼리 탓하기보다는 제도 자체를 어떻게 설계할지에 집중하는 게 나을 것 같아요. 다들 힘든 건 마찬가지잖아요.",
                     "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 1,
-                    "parent_id": 582447,
-                    "author": "anon_582514",
-                    "created_at": "2025-03-27 14:42:46",
-                    "comment_id": 582514,
-                    "content": "노인이세요? 이기적이네",
-                    "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 1,
-                    "parent_id": 582315,
-                    "author": "anon_582517",
-                    "created_at": "2025-03-27 14:43:38",
-                    "comment_id": 582517,
-                    "content": "맞습니다 다시 수정해서 소득대체율을 낮춰야합니다.",
-                    "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 0,
-                    "parent_id": 582534,
-                    "author": "anon_582534",
-                    "created_at": "2025-03-27 15:02:24",
-                    "comment_id": 582534,
-                    "content": "수급 연령을 올려야",
-                    "hate_count": 1,
                     "stance": "neutral"
                 },
                 {
                     "like_count": 2,
-                    "parent_id": 583076,
-                    "author": "anon_583076",
-                    "created_at": "2025-03-28 03:35:56",
-                    "comment_id": 583076,
-                    "content": "왜 국민연금 만 가지고 논의를 하느냐? 정부는 속보이는 짓거리 당장이라도 그만 좀 하여라. 공무원연금 본인이 받는 것부터 50% 연금개혁 하여라. 너무너무 많이 받고 있으니 절반 쯤 줄여야 합니다. 그리고 공무원연금 21년 전 고갈되어서 세금에서 퍼주면서 각종 특혜를 받고 있으니 이 나라의 국민들은 절대로 용납할 수 없습니다. 다시말해 대통령 먼저 솔선수범 공무원연금 개혁을 하고서 국민연금 개혁을 한다면은 국민들은 분노를 안 합니다. 다시말해 속보이는 짓거리 그만 좀 했으면 좋겠습니다.",
-                    "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 0,
-                    "parent_id": 583225,
-                    "author": "anon_583225",
-                    "created_at": "2025-03-28 09:20:05",
-                    "comment_id": 583225,
-                    "content": "아니 계속 적자라서 이미 청년들 부어 놓은 사람 못주겠다면서 그럼 폐지하고 내던 사람 원금 줘야하는거아님?? 그냥 국민 상대로 사기치는거자나 그걸 나라에서 의무라고 도와주는게 말이되냐;; ",
-                    "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 0,
-                    "parent_id": 583226,
-                    "author": "anon_583226",
-                    "created_at": "2025-03-28 09:20:32",
-                    "comment_id": 583226,
-                    "content": "폐지해라;;의무라도 빼줘 선택화해서 지금까지 넣은 거 조회해보니깐 1500만원 정도되는데 주식에 넣게 차라리;",
-                    "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 0,
-                    "parent_id": 583227,
-                    "author": "anon_583227",
-                    "created_at": "2025-03-28 09:20:41",
-                    "comment_id": 583227,
-                    "content": "ㄹㅇ 폐지해야한다..",
-                    "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 0,
-                    "parent_id": 583228,
-                    "author": "anon_583228",
-                    "created_at": "2025-03-28 09:20:49",
-                    "comment_id": 583228,
-                    "content": "국민연금 대표 야차하자",
-                    "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 0,
-                    "parent_id": 583229,
-                    "author": "anon_583229",
-                    "created_at": "2025-03-28 09:21:27",
-                    "comment_id": 583229,
-                    "content": "폐지아님 선택화해라.. 받지도 못할 돈 계속 버려야하면 차라리 4대 가입 안하고 알바만 존na 하는게 나을수도 있다는 생각이 듬",
+                    "parent_id": 582389,
+                    "author": "anon_582389",
+                    "created_at": "2025-03-27 15:45:00",
+                    "comment_id": 582389,
+                    "content": "공무원연금이랑 같이 정리하는 게 형평성 측면에서 좋다는 의견에도 일리가 있는 것 같아요. 존중합니다.",
                     "hate_count": 0,
                     "stance": "neutral"
                 },
@@ -1399,12 +1319,42 @@
             ],
             "comments": [
                 {
-                    "like_count": 0,
+                    "like_count": 4,
                     "parent_id": 743150,
                     "author": "anon_743150",
-                    "created_at": "2025-09-17 20:42:01",
+                    "created_at": "2025-09-17 14:20:00",
                     "comment_id": 743150,
-                    "content": "느그틀의 知斧斫足이 될 것이다!!",
+                    "content": "노동쟁의 권리는 보장돼야 하지만, 파업이 길어지면 서비스 이용하는 시민들 피해도 있으니 선이 있는 게 맞는 것 같아요.",
+                    "hate_count": 0,
+                    "stance": "neutral"
+                },
+                {
+                    "like_count": 6,
+                    "parent_id": 743151,
+                    "author": "anon_743151",
+                    "created_at": "2025-09-17 15:45:22",
+                    "comment_id": 743151,
+                    "content": "노란봉투법이 노사 대등한 교섭을 돕는다는 입장도 이해돼요. 다만 기업 이탈 우려도 있어서 현장 목소리를 같이 들었으면 좋겠네요.",
+                    "hate_count": 0,
+                    "stance": "pro"
+                },
+                {
+                    "like_count": 3,
+                    "parent_id": 743152,
+                    "author": "anon_743152",
+                    "created_at": "2025-09-17 17:10:33",
+                    "comment_id": 743152,
+                    "content": "정당한 쟁의와 과도한 파업은 구분이 필요할 것 같아요. 서로 존중하면서 타협점 찾는 게 중요해 보여요.",
+                    "hate_count": 0,
+                    "stance": "neutral"
+                },
+                {
+                    "like_count": 5,
+                    "parent_id": 743153,
+                    "author": "anon_743153",
+                    "created_at": "2025-09-17 19:00:11",
+                    "comment_id": 743153,
+                    "content": "노동권 보호랑 경영 환경 둘 다 고려한 정책이 나오면 좋겠어요. 한쪽만 보면 갈등만 커질 것 같아요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 }
@@ -1474,52 +1424,52 @@
             ],
             "comments": [
                 {
-                    "like_count": 4,
+                    "like_count": 5,
                     "parent_id": 693965,
                     "author": "anon_693965",
                     "created_at": "2025-07-15 19:30:44",
                     "comment_id": 693965,
-                    "content": "ㅋㅋㅋㅋㅋ 조선이 선진국인 줄 아나바",
+                    "content": "법인세는 OECD나 다른 나라랑 비교할 때 지방세까지 포함해서 보는 게 맞는 것 같아요. 단순 최고세율만 보면 오해의 소지가 있더라고요.",
+                    "hate_count": 0,
+                    "stance": "neutral"
+                },
+                {
+                    "like_count": 4,
+                    "parent_id": 693971,
+                    "author": "anon_693971",
+                    "created_at": "2025-07-15 20:15:00",
+                    "comment_id": 693971,
+                    "content": "기업 부담을 낮추면 투자나 일자리에 도움이 될 수 있다는 의견도 이해돼요. 대신 세수 공백은 다른 데서 메꿔야 하지 않을까요?",
                     "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
                     "like_count": 3,
-                    "parent_id": 693971,
-                    "author": "anon_693971",
-                    "created_at": "2025-07-15 19:43:56",
-                    "comment_id": 693971,
-                    "content": "우리나라가 영국 프랑스 이탈리아 복지수준인가? 왜 세금만 단순 비교 하는 건가? 주는건 비교 안하고 받을것만 비교하는건 도둑놈 심보",
-                    "hate_count": 0,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 1,
                     "parent_id": 694114,
                     "author": "anon_694114",
-                    "created_at": "2025-07-16 00:13:20",
+                    "created_at": "2025-07-16 09:00:00",
                     "comment_id": 694114,
-                    "content": "멱시  내 예상을 어기지않는군!!!   긴가 민가했는데 이제 확실히 알았다.  실용주의라는 한마디에 그래도 혹시나하고 기대를 걸었는데  ..ㅋㅋ  역쉬!!!    현정부는 공산주의로 가는게 확실하다.  결국  이나라를 공중분해시킬려는 중국의 전략이 먹히고 있다는거에   한표!!!! ㅋ    ,..이런말하면 쥐도새도 모르게 경찰이  들이닥쳐 정신병원에 감금당할수 있는 법 시행중 이고   ",
+                    "content": "인상이든 인하든 일관된 정책 방향이 있으면 좋겠어요. 기업 입장이랑 재정 수입 둘 다 고려한 균형이 필요해 보여요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
-                    "like_count": 1,
+                    "like_count": 6,
                     "parent_id": 694185,
                     "author": "anon_694185",
-                    "created_at": "2025-07-16 07:36:56",
+                    "created_at": "2025-07-16 11:22:00",
                     "comment_id": 694185,
-                    "content": "이 나라에서 기업하지 말라는 얘기네.",
-                    "hate_count": 1,
+                    "content": "법인세만 올리면 이탈 우려가 있고, 안 올리면 세수는 부족하고... 쉽지 않은 문제인데 서로 논의하면서 타협점 찾았으면 해요.",
+                    "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
-                    "like_count": 0,
+                    "like_count": 2,
                     "parent_id": 694279,
                     "author": "anon_694279",
-                    "created_at": "2025-07-16 10:03:22",
+                    "created_at": "2025-07-16 14:50:00",
                     "comment_id": 694279,
-                    "content": "각국 세금을 다시 비교해라. 미국의 경우, 국가에서 부과하고, 주에서 부과하고 시에서도 부과한다.",
+                    "content": "미국처럼 연방·주·지방 세금이 나뉜 나라랑 우리를 1:1로 비교하기는 어렵다는 말에도 동의해요. 맥락을 같이 보면 좋겠네요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 }
@@ -1767,62 +1717,62 @@
             ],
             "comments": [
                 {
-                    "like_count": 10,
+                    "like_count": 5,
                     "parent_id": 579125,
                     "author": "anon_579125",
-                    "created_at": "2025-03-24 17:31:42",
+                    "created_at": "2025-03-24 10:20:00",
                     "comment_id": 579125,
-                    "content": "4년을 주장하는 것은 안정적인 거주공간을 갖고 싶은 것. 그러면 그런 혜택을 제공하는 임대인도 그에 합당한 대가를 받을 권리가 있는 것. 그게 불만이면 대출받아 집사면 되는 것. ",
+                    "content": "임대차 2법이 거주 안정에 도움이 됐다는 의견도 있고, 전월세 점프 부담이 있다는 의견도 있어요. 지역·주택 유형별로 나눠 보는 게 좋지 않을까요?",
                     "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
-                    "like_count": 3,
+                    "like_count": 4,
                     "parent_id": 579142,
                     "author": "anon_579142",
-                    "created_at": "2025-03-24 17:58:35",
+                    "created_at": "2025-03-24 12:45:00",
                     "comment_id": 579142,
-                    "content": "나라가 혼란할때는 또다른 큰 변화는 바람직하지 않다. 그냥 놔두었으면 좋았을 것을, 토허제는 공연히 건드려서 집값만 부추겼다.  줄탄핵, 다가오는 총선, 기타 다른 가능성 등등. 당분간 정국 안정시 까지 고만 좀 건드렸으면 좋겠다.",
+                    "content": "규제를 강화하면 임차인 보호는 되는데 임대인 이탈로 공급이 줄어들 수 있다는 우려도 있더라고요. 둘 다 고려한 설계가 필요해 보여요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
-                    "like_count": 9,
+                    "like_count": 7,
                     "parent_id": 579167,
                     "author": "anon_579167",
-                    "created_at": "2025-03-24 18:28:21",
+                    "created_at": "2025-03-24 15:30:00",
                     "comment_id": 579167,
-                    "content": "문벙이의 악법이다. 고쳐야 한다.",
+                    "content": "저는 임차인 입장에서 계약 기간 보장이 중요하다고 봐요. 이사 부담이 크니까요. 다만 임대인 권리도 무시하면 안 될 것 같아요.",
                     "hate_count": 0,
-                    "stance": "neutral"
+                    "stance": "pro"
                 },
                 {
                     "like_count": 3,
                     "parent_id": 579285,
                     "author": "anon_579285",
-                    "created_at": "2025-03-24 20:46:08",
+                    "created_at": "2025-03-24 18:00:00",
                     "comment_id": 579285,
-                    "content": "집이고 상가 모두다 2년으로 하고 자율에 맡겨라",
-                    "hate_count": 1,
-                    "stance": "neutral"
-                },
-                {
-                    "like_count": 3,
-                    "parent_id": 579313,
-                    "author": "anon_579313",
-                    "created_at": "2025-03-24 21:11:49",
-                    "comment_id": 579313,
-                    "content": "개인 사이의 계약에 왜 국가가 간섭을 하나. 공실이 나면 정부가 임차인을 구해주나. 전세 값이 떨어지면 정부가 올려주나. 고급 차 타는 임차인은 보호하고 버스 타는 임대인은 왜 보호하지 않나. 수요와 공급에 따라 가격이 정해지게 정부가 개입을 하지 말아야 한다. ",
+                    "content": "상한률을 5%에서 10%로 조정하는 방안도 논의 중이던데, 갱신이랑 신규 계약 격차를 줄이는 데는 도움이 될 수 있겠네요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 },
                 {
-                    "like_count": 0,
+                    "like_count": 6,
+                    "parent_id": 579313,
+                    "author": "anon_579313",
+                    "created_at": "2025-03-24 20:15:00",
+                    "comment_id": 579313,
+                    "content": "시장에 맡기자는 의견도 이해해요. 다만 완전 자유화만 하면 약한 쪽이 불리해질 수 있어서 최소한의 보호 장치는 있을 필요가 있어 보여요.",
+                    "hate_count": 0,
+                    "stance": "neutral"
+                },
+                {
+                    "like_count": 2,
                     "parent_id": 579767,
                     "author": "anon_579767",
-                    "created_at": "2025-03-25 09:22:51",
+                    "created_at": "2025-03-25 09:00:00",
                     "comment_id": 579767,
-                    "content": "상한을 10퍼로 정해두면 빌라, 오피스텔 시세가 확인이안되는애들도 그냥 아묻따 상한까지 인상하려든다",
+                    "content": "저가·고가 주택 구분해서 적용하는 방안도 있더라고요. 서로 입장이 다르지만 대화로 타협점 찾았으면 좋겠어요.",
                     "hate_count": 0,
                     "stance": "neutral"
                 }

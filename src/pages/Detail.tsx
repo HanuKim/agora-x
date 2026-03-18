@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CommentItem } from '../components/detail/CommentItem';
 import { DiscussionInput } from '../components/detail/DiscussionInput';
 import { Card } from '../components/ui/Card';
@@ -6,12 +6,23 @@ import { PollSection } from '../components/detail/PollSection';
 import { Button } from '../components/ui/Button';
 import { theme } from '../design/theme';
 import { useDetail } from '../features/detail/useDetail';
+import { useAuth } from '../features/auth';
+import { useReport } from '../features/user/hooks/useReport';
+import { ReportModal } from '../components/report/ReportModal';
+import { AssistantModal } from '../components/detail/AssistantModal';
+import { sendAssistantUserMessage } from '../features/detail/useAssistant';
 import '../components/detail/discussionCivil.css';
 
 export const Detail: React.FC = () => {
+  const { user, isAuthenticated, openLoginModal } = useAuth();
+  const { submitReport } = useReport();
+  const [isArticleLiked, setIsArticleLiked] = useState(false);
+  const [articleLikeCount, setArticleLikeCount] = useState(0);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const {
     id,
     numericId,
+    article,
     articleUrl,
     debateTopic,
     overview,
@@ -20,7 +31,6 @@ export const Detail: React.FC = () => {
     proArgumentSummaries,
     conArgumentSummaries,
     aiLoading,
-    sortBy,
     comments: visibleComments,
     hasComments,
     hasMoreComments,
@@ -28,13 +38,22 @@ export const Detail: React.FC = () => {
     handleSubmitOpinion,
     loadMoreComments,
     handleReplyAdded,
-  } = useDetail();
+    editComment,
+    deleteComment,
+    toggleLikeDiscussion,
+    isLikedDiscussion,
+    articleScraped,
+    toggleArticleScrap,
+  } = useDetail(user?.id);
+
+  const articleTitle = article?.title ?? debateTopic ?? '';
+  const assistantTopic = debateTopic ?? article?.topic ?? '토론 주제';
 
     return (
         <div className={theme.section.page}>
             <div className={`${theme.section.container} py-xl`}>
                 {/* Header / Hero */}
-                <header className="max-w-[900px] mx-auto text-center mb-xl">
+                <header className="max-w-[900px] mx-auto text-center mb-xxl">
                     <div className="flex justify-center mb-md">
                         <div className="inline-flex items-center gap-xs px-sm py-[4px] rounded-full bg-surface border border-border shadow-sm">
                             <span className="w-[6px] h-[6px] rounded-full bg-success animate-pulse" />
@@ -48,7 +67,54 @@ export const Detail: React.FC = () => {
                         {debateTopic ?? '토론 주제를 불러오는 중입니다.'}
                     </h1>
 
-                    <div className="mt-lg">
+                    {/* Interactions — 공감 / 스크랩 / 신고 (우측 정렬) */}
+                    <div className="flex items-center justify-end gap-md mt-sm border-border pt-md">
+                        <button
+                            type="button"
+                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold ${isArticleLiked ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}
+                            onClick={() => {
+                                if (!isAuthenticated || !user) {
+                                    openLoginModal();
+                                    return;
+                                }
+                                setIsArticleLiked((prev) => !prev);
+                                setArticleLikeCount((prev) => (isArticleLiked ? prev - 1 : prev + 1));
+                            }}
+                        >
+                            <span className="material-icons-round text-[15px]! transition-all">
+                                {isArticleLiked ? 'thumb_up' : 'thumb_up_off_alt'}
+                            </span>
+                            공감 {articleLikeCount}
+                        </button>
+                        <button
+                            type="button"
+                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold ${articleScraped ? 'text-amber-500' : 'text-text-secondary hover:text-amber-500'}`}
+                            onClick={() => {
+                                if (!isAuthenticated || !user) {
+                                    openLoginModal();
+                                    return;
+                                }
+                                toggleArticleScrap();
+                            }}
+                        >
+                            <span className="material-icons-round text-[15px]! transition-all">
+                                {articleScraped ? 'bookmark' : 'bookmark_border'}
+                            </span>
+                            스크랩
+                        </button>
+                        {isAuthenticated && user && (
+                            <button
+                                type="button"
+                                className="flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold text-text-secondary hover:text-danger"
+                                onClick={() => setIsReportOpen(true)}
+                            >
+                                <span className="material-icons-round text-[15px]!">flag</span>
+                                신고
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="mt-md">
                         <Card variant="glass" padding="xl" className="relative pb-lg">
                             <div className="flex items-center justify-center gap-xs mb-sm text-primary text-[11px] font-bold tracking-[0.16em] uppercase">
                                 <span className="material-icons-round text-base">auto_awesome</span>
@@ -75,7 +141,7 @@ export const Detail: React.FC = () => {
                 </header>
 
                 {/* Main grid: 찬성 / 여론 / 반대 */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start mb-xxl">
                     {/* 찬성 의견 */}
                     <section className="lg:col-span-5 flex flex-col gap-md">
                         <div className="flex items-center justify-between mb-xs">
@@ -114,15 +180,6 @@ export const Detail: React.FC = () => {
                                         {proArgumentSummaries[i] || `찬성 논거 ${i + 1}`}
                                     </h3>
                                     <p className="text-sm text-text-secondary mb-sm break-keep">{arg}</p>
-                                    <div className="flex items-center gap-md text-xs text-text-secondary">
-                                        <button
-                                            type="button"
-                                            className="inline-flex items-center gap-[2px] text-text-secondary hover:text-success transition-colors"
-                                        >
-                                            <span className="material-icons-round text-[14px]">arrow_upward</span>
-                                            추천
-                                        </button>
-                                    </div>
                                 </Card>
                             ))
                         )}
@@ -183,15 +240,6 @@ export const Detail: React.FC = () => {
                                         {conArgumentSummaries[i] || `반대 논거 ${i + 1}`}
                                     </h3>
                                     <p className="text-sm text-text-secondary mb-sm break-keep">{arg}</p>
-                                    <div className="flex items-center gap-md text-xs text-text-secondary justify-end">
-                                        <button
-                                            type="button"
-                                            className="inline-flex items-center gap-[2px] text-text-secondary hover:text-danger transition-colors"
-                                        >
-                                            <span className="material-icons-round text-[14px]">arrow_upward</span>
-                                            추천
-                                        </button>
-                                    </div>
                                 </Card>
                             ))
                         )}
@@ -218,24 +266,22 @@ export const Detail: React.FC = () => {
                                 <span className="material-icons-round text-primary">forum</span>
                                 시민 토론장 <span className="text-text-muted font-normal">{totalDisplayCount.toLocaleString()}</span>
                             </h2>
-                            <div className="flex gap-md text-sm font-medium">
-                                <button
-                                    type="button"
-                                    className={sortBy === 'popular' ? 'text-primary border-b-2 border-primary pb-1' : 'text-text-secondary pb-1 transition-colors'}
-                                >
-                                    인기순
-                                </button>
-                                <button
-                                    type="button"
-                                    className={sortBy === 'latest' ? 'text-primary border-b-2 border-primary pb-1' : 'text-text-secondary pb-1 transition-colors'}
-                                >
-                                    최신순
-                                </button>
-                            </div>
                         </div>
 
                         <section className="mb-xl">
-                            <DiscussionInput onSubmit={handleSubmitOpinion} issueId={id} />
+                            <DiscussionInput
+                              onSubmit={(stance, body) => {
+                                if (!isAuthenticated || !user) {
+                                  openLoginModal();
+                                  return;
+                                }
+                                sendAssistantUserMessage(assistantTopic, `[${stance === 'pro' ? '찬성' : stance === 'con' ? '반대' : '중립'}] ${body}`);
+                                handleSubmitOpinion(stance, body, user.id);
+                              }}
+                              issueId={id}
+                              isAuthenticated={isAuthenticated}
+                              openLoginModal={openLoginModal}
+                            />
                         </section>
 
                         {hasComments ? (
@@ -247,6 +293,22 @@ export const Detail: React.FC = () => {
                                         showThreadLine={Boolean(comment.replies?.length)}
                                         onReplyAdded={handleReplyAdded}
                                         issueId={id}
+                                        currentUserId={user?.id}
+                                        onEdit={
+                                          id
+                                            ? (commentId, updates) => editComment(id, commentId, updates)
+                                            : undefined
+                                        }
+                                        onDelete={
+                                          id ? (commentId) => deleteComment(id, commentId) : undefined
+                                        }
+                                        onLike={
+                                          user?.id && id
+                                            ? (payload) =>
+                                                toggleLikeDiscussion(user.id, payload, articleTitle)
+                                            : undefined
+                                        }
+                                        isLiked={isLikedDiscussion}
                                     />
                                 ))}
                             </div>
@@ -296,6 +358,25 @@ export const Detail: React.FC = () => {
                     )}
                 </section>
             </div>
+
+            {/* Floating AI assistant (always bottom-right on scroll) */}
+            <AssistantModal issueTopic={assistantTopic} />
+
+            <ReportModal
+                isOpen={isReportOpen}
+                onClose={() => setIsReportOpen(false)}
+                onSubmit={async (reason, detail) => {
+                    if (!user || !id) return;
+                    await submitReport({
+                        reporterId: user.id,
+                        targetType: 'article',
+                        targetId: id,
+                        reason,
+                        detail,
+                    });
+                }}
+                targetLabel="기사"
+            />
         </div>
     );
 };
