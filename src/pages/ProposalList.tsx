@@ -52,24 +52,35 @@ export const ProposalList: React.FC = () => {
     return (
         <div className="px-xl py-xl w-full max-w-[1200px] mx-auto">
             {/* Header Section */}
-            <div className="mb-xl flex flex-col gap-lg">
-                <div className="flex-1">
-                    <h1 className="text-[2.25rem] font-extrabold mb-sm">
-                        국민 제안
-                    </h1>
-                    <p className="text-text-secondary">
-                        우리 사회의 문제점을 짚어보고 함께 해결책을 모색하는 시민들의 공론장입니다.
-                    </p>
+            <div className='flex justify-between'>
+                <div className="flex-2 mb-xl flex flex-col gap-lg">
+                    <div>
+                        <h1 className="text-[2.25rem] font-extrabold mb-sm">
+                            국민 제안
+                        </h1>
+                        <p className="text-text-secondary">
+                            우리 사회의 문제점을 짚어보고 함께 해결책을 모색하는 시민들의 공론장입니다.
+                        </p>
+                    </div>
+                    {/* Search and Filters */}
+                    <SearchFilter
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
+                        tabs={tabs}
+                    />
+                </div>
+                <div className='p-md'>
+                    <Button
+                        size="md"
+                        onClick={() => navigate('/proposals/new')}
+                        className="flex gap-1"
+                    >
+                        <span className="material-icons-round text-sm!">edit</span> 제안하기
+                    </Button>
                 </div>
 
-                {/* Search and Filters */}
-                <SearchFilter
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    activeTab={activeTab}
-                    onTabChange={setActiveTab}
-                    tabs={tabs}
-                />
             </div>
 
             <div>
@@ -113,17 +124,6 @@ export const ProposalList: React.FC = () => {
                         ))}
                     </div>
                 )}
-            </div>
-
-            {/* Floating Action Button */}
-            <div className="fixed bottom-8 right-8 z-100">
-                <Button
-                    size="md"
-                    onClick={() => navigate('/proposals/new')}
-                    className="rounded-full! shadow-lg! flex items-center gap-2 px-4! py-3! hover:-translate-y-1 transition-transform"
-                >
-                    <span className="material-icons-round text-sm!">edit</span>
-                </Button>
             </div>
 
             <GlobalDialog

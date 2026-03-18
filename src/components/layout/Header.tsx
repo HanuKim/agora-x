@@ -23,9 +23,9 @@ export const Header: React.FC = () => {
                 <nav className="flex gap-xl">
                     {[
                         { to: '/', label: '홈' },
-                        { to: '/proposals', label: '국민 제안' },
                         { to: '/community', label: '국민 토론' },
-                        { to: '/ai-discussion', label: '일대일 토론' },
+                        { to: '/proposals', label: '국민 제안' },
+                        { to: '/ai-discussion', label: '토론 연습' },
                         { to: '/guide', label: '이용 가이드' },
                     ].map(({ to, label }) => (
                         <NavLink
@@ -34,8 +34,8 @@ export const Header: React.FC = () => {
                             end={to === '/'}
                             className={({ isActive }) =>
                                 isActive
-                                    ? 'text-sm font-bold text-primary no-underline'
-                                    : 'text-sm font-bold text-text-white no-underline hover:text-primary transition-colors duration-200'
+                                    ? 'text-md font-bold text-primary no-underline'
+                                    : 'text-md font-bold text-text-white no-underline hover:text-primary transition-colors duration-200'
                             }
                         >
                             {label}
@@ -44,15 +44,17 @@ export const Header: React.FC = () => {
                 </nav>
 
                 {/* Right: Auth + Notification + Dark mode toggle */}
-                <div className="flex items-center gap-sm">
+                <div className="flex items-center gap-md">
                     {/* Auth */}
                     {isAuthenticated && user ? (
                         <NavLink to="/mypage" className="flex items-center gap-sm no-underline">
-                            <span className="text-sm font-medium text-text-primary">{user.name}</span>
+                            <span className="text-md font-medium text-text-primary">{user.name}</span>
                             {user.picture ? (
-                                <img src={localStorage.getItem(`agora-x-profile-img-${user.id}`) ?? user.picture} alt={user.name} className="w-8 h-8 rounded-full" />
+                                <div className="w-10 h-10 rounded-full border border-border overflow-hidden">
+                                    <img src={localStorage.getItem(`agora-x-profile-img-${user.id}`) ?? user.picture} alt={user.name} className="w-10 h-10 rounded-full" />
+                                </div>
                             ) : (
-                                <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-primary">
+                                <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-primary">
                                     <span className="material-icons-round text-xl">person</span>
                                 </div>
                             )}
@@ -60,7 +62,7 @@ export const Header: React.FC = () => {
                     ) : (
                         <button
                             onClick={openLoginModal}
-                            className="bg-primary text-white border-0 px-md py-xs rounded-md cursor-pointer font-sans text-sm font-medium hover:bg-primary-hover transition-colors duration-200"
+                            className="bg-primary text-white border-0 px-md py-xs rounded-md cursor-pointer font-sans text-md font-medium hover:bg-primary-hover transition-colors duration-200"
                         >
                             로그인
                         </button>
@@ -71,7 +73,7 @@ export const Header: React.FC = () => {
                         <button
                             onClick={openModal}
                             aria-label="알림"
-                            className="relative flex items-center justify-center w-9 h-9 rounded-full border border-border bg-surface hover:bg-border transition-all duration-200 text-text-secondary hover:text-text-primary"
+                            className="relative flex items-center justify-center w-10 h-10 rounded-full border border-border bg-surface hover:bg-border transition-all duration-200 text-text-secondary hover:text-text-primary"
                         >
                             <span className="material-icons-round text-xl">notifications</span>
                             {unreadCount > 0 && (
@@ -87,7 +89,7 @@ export const Header: React.FC = () => {
                         onClick={toggleTheme}
                         aria-label={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
                         title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
-                        className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-surface hover:bg-border transition-all duration-200 text-text-secondary hover:text-text-primary"
+                        className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-surface hover:bg-border transition-all duration-200 text-text-secondary hover:text-text-primary"
                     >
                         {isDark ? (
                             /* 🌞 Sun icon (switch to light) */

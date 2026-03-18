@@ -63,7 +63,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, on
 
     return (
         <div className="fixed inset-0 z-50" onClick={handleBackdropClick}>
-            <div className="absolute right-[40px] top-[66px] w-[380px] max-h-[480px] flex flex-col bg-bg border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="absolute right-[40px] top-[76px] w-[380px] max-h-[480px] flex flex-col bg-bg border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                 {/* Header */}
                 <div className="flex items-center justify-between px-lg py-md border-b border-border">
                     <h3 className="text-base font-bold text-text-primary m-0">

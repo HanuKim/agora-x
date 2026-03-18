@@ -59,7 +59,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             <Card className="w-full max-w-[480px] mx-md p-xl animate-in fade-in zoom-in-95 duration-200">
                 {submitted ? (
                     <div className="text-center py-xl">
-                        <span className="material-icons-round text-4xl mb-md block text-green-500">check_circle</span>
+                        <span className="material-icons-round text-3xl! mb-md block text-green-500">check_circle</span>
                         <p className="text-lg font-bold text-text-primary">신고가 접수되었습니다</p>
                         <p className="text-sm text-text-secondary mt-xs">검토 후 조치하겠습니다.</p>
                     </div>
@@ -86,11 +86,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                             {REPORT_REASONS.map((reason) => (
                                 <label
                                     key={reason}
-                                    className={`flex items-center gap-sm p-md rounded-lg border cursor-pointer transition-all ${
-                                        selectedReason === reason
-                                            ? 'border-primary bg-primary/5'
-                                            : 'border-border hover:border-primary/50'
-                                    }`}
+                                    className={`flex items-center gap-sm p-md rounded-lg border cursor-pointer transition-all ${selectedReason === reason
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-border hover:border-primary/50'
+                                        }`}
                                 >
                                     <input
                                         type="radio"

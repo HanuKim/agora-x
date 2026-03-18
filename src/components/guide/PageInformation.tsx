@@ -235,13 +235,13 @@ export const PageInformation: React.FC<PageInformationProps> = ({
               <span className="inline-block px-3 py-1 rounded-full bg-purple-100 text-purple-600 text-xs font-bold mb-4 uppercase tracking-wider dark:bg-purple-900/30 dark:text-purple-300">
                 AI Debate
               </span>
-              <h2 className="text-2xl font-bold text-text-primary">일대일 토론</h2>
+              <h2 className="text-2xl font-bold text-text-primary">토론 연습</h2>
             </div>
             {expandedId === 'ai-chat' && (
               <div className="guide-preview mb-4 shrink-0">
                 <img
                   src={guideAiDebateImg}
-                  alt="일대일 토론 미리보기"
+                  alt="토론 연습 미리보기"
                   className="rounded-lg shadow-xl w-full min-w-0 object-contain bg-surface"
                 />
               </div>
@@ -255,7 +255,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
                 <div className="mb-6 p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
                   <h3 className="text-sm font-bold text-purple-600 dark:text-purple-400 mb-2">상세 설명</h3>
                   <p className="text-text-secondary text-sm leading-relaxed">
-                    일대일 토론에서는 선택한 이슈에 대해 AI가 반대 입장을 맡아 대화합니다.
+                    토론 연습에서는 선택한 이슈에 대해 AI가 반대 입장을 맡아 대화합니다.
                     토론 주제와 AI 페르소나를 설정한 뒤 대화를 시작하면, 실시간으로 논리적 일관성 수치를
                     확인할 수 있습니다. 세션 종료 후에는 요약 리포트로 자신의 주장을 점검하고 보완할 수 있습니다.
                   </p>

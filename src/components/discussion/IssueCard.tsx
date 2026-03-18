@@ -2,7 +2,7 @@
  * IssueCard — AI 토론 주제 카드
  *
  * 사용처:
- *  - Home.tsx        (가로 스크롤 "일대일 토론하기" 섹션, compact 모드)
+ *  - Home.tsx        (가로 스크롤 "토론 연습하기" 섹션, compact 모드)
  *  - DiscussionAI.tsx (토픽 그리드 전체 목록)
  *
  * Props:

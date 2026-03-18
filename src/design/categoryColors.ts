@@ -2,7 +2,7 @@ import type { ContentCategory } from '../features/common/types';
 
 /**
  * categoryColors.ts — 카테고리 색상
- * 국민 제안, 일대일 토론 등 앱 전반에서 사용되는 카테고리 색상 및 뱃지 스타일.
+ * 국민 제안, 토론 연습 등 앱 전반에서 사용되는 카테고리 색상 및 뱃지 스타일.
  */
 
 export const getCategoryColorClass = (category: ContentCategory | string) => {
