@@ -28,13 +28,17 @@ export const AssistantModal: React.FC<AssistantModalProps> = ({ issueTopic, floa
 
   return (
     <div className={containerClass} aria-live="polite">
-      {/* Chat Modal — DiscussionAIDetail Chat Interface와 동일 */}
-      {isOpen && (
-        <div
-          className="w-full max-w-[380px] h-[550px] bg-bg rounded-3xl shadow-2xl border border-border flex flex-col mb-4 overflow-hidden"
-          role="dialog"
-          aria-label="AI 토론 어시스턴트"
-        >
+      {/* Chat Modal — 부드러운 open/close 모션 */}
+      <div
+        className={[
+          'w-full max-w-[380px] h-[550px] bg-bg rounded-3xl shadow-2xl border border-border flex flex-col overflow-hidden',
+          'transform-gpu transition-all duration-200 ease-out origin-bottom-right',
+          isOpen ? 'opacity-100 scale-100 translate-y-0 mb-4' : 'opacity-0 scale-95 translate-y-2 pointer-events-none mb-0',
+        ].join(' ')}
+        role="dialog"
+        aria-label="AI 토론 어시스턴트"
+        aria-hidden={!isOpen}
+      >
           {/* Header */}
           <header className="p-4 border-b border-border flex items-center justify-between bg-bg shrink-0">
             <div className="flex items-center gap-2 min-w-0">
@@ -159,8 +163,7 @@ export const AssistantModal: React.FC<AssistantModalProps> = ({ issueTopic, floa
               </form>
             </div>
           </footer>
-        </div>
-      )}
+      </div>
 
       {/* Toggle Button */}
       <button
