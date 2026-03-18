@@ -1,21 +1,50 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useIssueWithAI } from '../features/discussion/useIssueWithAI';
 import { claudeService, type UserArgumentAnalysis } from '../services/ai/claudeService';
 import { getChatSession, setChatSession, clearChatSession } from '../services/ai/aiCacheDB';
 import { useUserPrefs } from '../features/user/hooks/useUserPrefs';
 import { GlobalDialog } from '../components/common/GlobalDialog';
 
+/* ── AI Help Types ────────────────────── */
+type HelpType = 'organize' | 'argument' | 'counter' | 'free';
+
+const HELP_BUTTONS: { type: HelpType; label: string; icon: string }[] = [
+    { type: 'organize', label: '의견 정리', icon: 'sort' },
+    { type: 'argument', label: '논거 추천', icon: 'tips_and_updates' },
+    { type: 'counter', label: '반론 예상', icon: 'shield' },
+];
+
 export const DiscussionAIDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
     const { issues, analysisMap, loadingMap, fetchIssueAnalysis } = useIssueWithAI();
     const { getLevelForCategory } = useUserPrefs();
 
-    const issueId = Number(id);
-    const issue = issues.find((i) => i.id === issueId);
-    const analysis = analysisMap[issueId];
-    const isLoading = loadingMap[issueId] ?? true;
+    const isCustom = location.pathname === '/ai-discussion/custom';
+    const issueId = isCustom ? NaN : Number(id);
+
+    // Custom issue from navigation state
+    const customIssue = (location.state as any)?.customIssue as {
+        id: number;
+        topic: string;
+        category: string;
+        pro: string[];
+        con: string[];
+        background: string;
+        keyPoints: string[];
+    } | undefined;
+
+    const issue = isCustom && customIssue
+        ? { id: customIssue.id, topic: customIssue.topic, category: customIssue.category, pro: customIssue.pro, con: customIssue.con }
+        : issues.find((i) => i.id === issueId);
+
+    const analysis = isCustom && customIssue
+        ? { background: customIssue.background, keyPoints: customIssue.keyPoints, proArguments: customIssue.pro, conArguments: customIssue.con }
+        : analysisMap[issueId];
+
+    const isLoading = isCustom ? false : (loadingMap[issueId] ?? true);
 
     // Chat State
     const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
@@ -31,28 +60,32 @@ export const DiscussionAIDetail: React.FC = () => {
     });
 
     const [isRecording, setIsRecording] = useState(false);
-
-    // Recognition instance reference
     const recognitionRef = useRef<any>(null);
-
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-
     const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+
+    // ── AI Help State ──────────────────────
+    const [isHelpOpen, setIsHelpOpen] = useState(false);
+    const [helpRemaining, setHelpRemaining] = useState(10);
+    const [helpLoading, setHelpLoading] = useState(false);
+    const [helpResponse, setHelpResponse] = useState('');
+    const [freeHelpInput, setFreeHelpInput] = useState('');
 
     // Initial setup & Restore Chat History
     useEffect(() => {
         const loadSession = async () => {
             if (!issue) return;
 
-            fetchIssueAnalysis(issue);
+            if (!isCustom) {
+                fetchIssueAnalysis(issue);
+            }
 
             const savedSession = await getChatSession(issue.id);
             if (savedSession && savedSession.messages.length > 0) {
                 setMessages(savedSession.messages);
                 setOpinionAnalysis(savedSession.opinionAnalysis);
             } else {
-                // Initialize default chat with AI greeting if no saved history
                 setMessages([{
                     role: 'assistant',
                     content: `안녕하세요! **'${issue.topic}'** 주제에 대해 토론할 준비가 되었습니다.\n\n저는 객관적인 관점에서 사용자의 논리를 분석하고 반대편의 입장을 제시하겠습니다.\n\n어느 입장에 서서 발제하시겠습니까?`
@@ -63,9 +96,10 @@ export const DiscussionAIDetail: React.FC = () => {
         if (issue) {
             loadSession();
         } else if (!isLoading && !issue) {
+            // Redirect if: normal route with no issue found, or custom route without state data
             navigate('/ai-discussion', { replace: true });
         }
-    }, [issue, fetchIssueAnalysis, isLoading, navigate]);
+    }, [issue, fetchIssueAnalysis, isLoading, navigate, isCustom]);
 
     // Auto-scroll to bottom of chat
     useEffect(() => {
@@ -86,7 +120,6 @@ export const DiscussionAIDetail: React.FC = () => {
         setIsChatLoading(true);
 
         try {
-            // 병렬로 AI 응답과 사용자 주장 분석을 요청합니다.
             const knowledgeLevel = getLevelForCategory(issue.category as any);
             const [replyResponse, analysisResponse] = await Promise.all([
                 claudeService.generateChatReply(issue.topic, newHistory, knowledgeLevel),
@@ -102,7 +135,6 @@ export const DiscussionAIDetail: React.FC = () => {
                 messages: finalMessages,
                 opinionAnalysis: analysisResponse
             });
-
         } catch (error) {
             console.error("Chat Error:", error);
         } finally {
@@ -128,13 +160,12 @@ export const DiscussionAIDetail: React.FC = () => {
 
         const recognition = new SpeechRecognition();
         recognition.lang = 'ko-KR';
-        recognition.interimResults = true; // Show results while recording
+        recognition.interimResults = true;
         recognition.continuous = true;
 
         recognition.onresult = (event: any) => {
             let newlyFinalized = '';
             let interimTranscript = '';
-
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
                     newlyFinalized += event.results[i][0].transcript + ' ';
@@ -142,10 +173,7 @@ export const DiscussionAIDetail: React.FC = () => {
                     interimTranscript += event.results[i][0].transcript;
                 }
             }
-            // Temporarily replace/append to inputMessage (in a real app, might want to handle existing text carefully)
             setInputMessage((prev) => {
-                // To avoid clearing previous manual text, we ideally only append. 
-                // For simplicity here, we assume user is purely dictating or we append to end.
                 const basePath = prev.replace(/\[음성 입력 중\.\.\.\].*$/g, '').trim();
                 return basePath + (basePath && newlyFinalized ? ' ' : '') + newlyFinalized + (interimTranscript ? ` [음성 입력 중...] ${interimTranscript}` : '');
             });
@@ -174,13 +202,10 @@ export const DiscussionAIDetail: React.FC = () => {
                 role: 'assistant',
                 content: `대화가 초기화되었습니다. 다시 **'${issue.topic}'** 주제에 대해 이야기해볼까요?\n\n어느 입장에 서서 발제하시겠습니까?`
             }]);
-            setOpinionAnalysis({
-                clarity: 0,
-                relevance: 0,
-                logicValid: 0,
-                feedback: "대기 중"
-            });
+            setOpinionAnalysis({ clarity: 0, relevance: 0, logicValid: 0, feedback: "대기 중" });
             setIsResetDialogOpen(false);
+            setHelpRemaining(10);
+            setHelpResponse('');
         } catch (error) {
             console.error("Reset Error:", error);
         }
@@ -188,29 +213,54 @@ export const DiscussionAIDetail: React.FC = () => {
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter') {
-            // "엔터 말고 해당 버튼으로만 보내지도록 해주세요" 요청 반영
-            // 아무 기능도 안 함. 브라우저 기본 동작으로 줄바꿈만 일어남.
-            return;
+            return; // 엔터 말고 해당 버튼으로만 보내지도록
         }
     };
 
     const insertFormatting = (prefix: string, suffix: string = '') => {
         const textarea = textareaRef.current;
         if (!textarea) return;
-
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const currentText = inputMessage;
-
         const selectedText = currentText.substring(start, end);
         const newText = currentText.substring(0, start) + prefix + selectedText + suffix + currentText.substring(end);
-
         setInputMessage(newText);
-
         setTimeout(() => {
             textarea.focus();
             textarea.setSelectionRange(start + prefix.length, end + prefix.length);
         }, 0);
+    };
+
+    // ── AI Help Handler ──────────────────
+    const handleAIHelp = async (helpType: HelpType) => {
+        if (helpRemaining <= 0 || helpLoading || !issue) return;
+        setHelpLoading(true);
+        setHelpResponse('');
+        try {
+            const response = await claudeService.generateDebateHelp(
+                issue.topic,
+                messages,
+                helpType,
+                helpType === 'free' ? freeHelpInput : undefined
+            );
+            setHelpResponse(response);
+            setHelpRemaining(prev => prev - 1);
+            setFreeHelpInput('');
+        } catch (err) {
+            console.error('AI Help error:', err);
+            setHelpResponse('도움 생성에 실패했습니다.');
+        } finally {
+            setHelpLoading(false);
+        }
+    };
+
+    const insertHelpToInput = () => {
+        if (helpResponse) {
+            setInputMessage(prev => prev + (prev ? '\n' : '') + helpResponse);
+            setHelpResponse('');
+            setIsHelpOpen(false);
+        }
     };
 
     if (!issue) return null;
@@ -229,6 +279,9 @@ export const DiscussionAIDetail: React.FC = () => {
                         <div className="flex items-center gap-2 mb-3">
                             <span className="material-icons-round text-primary text-sm">public</span>
                             <span className="text-xs font-bold uppercase tracking-widest text-text-secondary">토론 주제</span>
+                            {isCustom && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">사용자 생성</span>
+                            )}
                         </div>
                         <h1 className="font-display text-2xl md:text-3xl font-bold leading-tight text-text-primary mb-4 break-keep">
                             {issue.topic}
@@ -276,7 +329,6 @@ export const DiscussionAIDetail: React.FC = () => {
                                 <div key={i} className="h-20 bg-bg rounded-xl border border-border animate-pulse mb-3"></div>
                             ))
                         ) : (
-                            // Render key points OR fallback to pro/con if keyPoints array is empty
                             (analysis?.keyPoints?.length ? analysis.keyPoints : [...(analysis?.proArguments || []), ...(analysis?.conArguments || [])].slice(0, 3)).map((kp, idx) => {
                                 const palettes = [
                                     { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' },
@@ -300,7 +352,7 @@ export const DiscussionAIDetail: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Analysis Dashboard Placeholder (from prototype) */}
+                    {/* Analysis Dashboard */}
                     <div className="hidden md:block mt-auto pt-6 border-t border-border">
                         <div className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-[#25282e] dark:to-[#1a1c20] rounded-xl p-5 text-white shadow-lg relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-primary blur-[50px] opacity-10 rounded-full pointer-events-none"></div>
@@ -413,10 +465,102 @@ export const DiscussionAIDetail: React.FC = () => {
                     <div ref={messagesEndRef} />
                 </div>
 
+                {/* ── AI Help Panel ──────────────────────── */}
+                {isHelpOpen && (
+                    <div className="border-t border-border bg-surface/90 backdrop-blur-sm p-4 md:p-6 shrink-0 z-10 space-y-3 animate-[slideDown_200ms_ease-out]">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-sm">
+                                <span className="text-lg">🐻</span>
+                                <h4 className="text-sm font-bold text-text-primary">AI에게 도움받기</h4>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${helpRemaining > 3 ? 'bg-emerald-500/10 text-emerald-500' : helpRemaining > 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'}`}>
+                                    {helpRemaining}/10회 남음
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => setIsHelpOpen(false)}
+                                className="text-text-secondary hover:text-text-primary bg-transparent border-none cursor-pointer p-1"
+                            >
+                                <span className="material-icons-round text-base">close</span>
+                            </button>
+                        </div>
+
+                        {/* Help type buttons */}
+                        <div className="flex gap-sm flex-wrap">
+                            {HELP_BUTTONS.map((btn) => (
+                                <button
+                                    key={btn.type}
+                                    onClick={() => handleAIHelp(btn.type)}
+                                    disabled={helpLoading || helpRemaining <= 0}
+                                    className="flex items-center gap-1 px-3 py-2 rounded-xl bg-bg border border-border text-sm font-bold text-text-primary hover:border-primary hover:text-primary transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <span className="material-icons-round text-sm">{btn.icon}</span>
+                                    {btn.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Free-form help input */}
+                        <div className="flex gap-sm">
+                            <input
+                                type="text"
+                                value={freeHelpInput}
+                                onChange={(e) => setFreeHelpInput(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && freeHelpInput.trim() && handleAIHelp('free')}
+                                placeholder="자유 질문: 예) 이 주장의 약점은?"
+                                disabled={helpLoading || helpRemaining <= 0}
+                                className="flex-1 bg-bg border border-border rounded-xl px-3 py-2 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:border-primary disabled:opacity-40"
+                            />
+                            <button
+                                onClick={() => freeHelpInput.trim() && handleAIHelp('free')}
+                                disabled={!freeHelpInput.trim() || helpLoading || helpRemaining <= 0}
+                                className="px-3 py-2 bg-primary text-white rounded-xl text-sm font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border-none hover:bg-primary-hover transition-colors"
+                            >
+                                질문
+                            </button>
+                        </div>
+
+                        {/* Help response */}
+                        {helpLoading && (
+                            <div className="flex items-center gap-sm text-sm text-text-secondary">
+                                <span className="animate-spin text-base">🐻</span>
+                                도움을 생성하고 있습니다...
+                            </div>
+                        )}
+                        {helpResponse && (
+                            <div className="bg-bg border border-primary/20 rounded-xl p-4 space-y-2">
+                                <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap break-keep">{helpResponse}</p>
+                                <button
+                                    onClick={insertHelpToInput}
+                                    className="flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-hover transition-colors bg-transparent border-none cursor-pointer"
+                                >
+                                    <span className="material-icons-round text-sm">content_paste</span>
+                                    채팅에 붙여넣기
+                                </button>
+                            </div>
+                        )}
+
+                        {helpRemaining <= 0 && (
+                            <p className="text-xs text-red-500 font-medium">이번 대화에서 도움 횟수를 모두 사용했습니다.</p>
+                        )}
+                    </div>
+                )}
+
                 {/* Chat Input */}
                 <div className="p-4 md:p-6 bg-surface border-t border-border shrink-0 z-10">
                     <div className="max-w-4xl mx-auto relative">
                         <div className="flex items-center gap-4 px-2 mb-2">
+                            {/* AI Help toggle button */}
+                            <button
+                                onClick={() => setIsHelpOpen(!isHelpOpen)}
+                                className={`flex items-center gap-1 text-xs font-bold transition-colors ${isHelpOpen ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}
+                            >
+                                <span className="material-icons-round text-sm">psychology</span>
+                                AI 도움받기
+                                {helpRemaining < 10 && (
+                                    <span className="text-[10px] text-text-secondary">({helpRemaining})</span>
+                                )}
+                            </button>
+                            <span className="text-border">|</span>
                             <button
                                 onClick={() => insertFormatting('[', '](url)')}
                                 className="text-text-secondary hover:text-text-primary transition-colors text-xs font-medium flex items-center gap-1"

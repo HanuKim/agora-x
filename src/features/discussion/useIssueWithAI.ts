@@ -51,8 +51,8 @@ export function useIssueWithAI() {
             const level = getLevelForCategory(contentCategory);
             const key = cacheKey.issue(issue.id, contentCategory, level);
 
-            // 이미 로드됨 → 스킵
-            if (analysisMap[issue.id] !== undefined) return;
+            // 이미 성공적으로 로드됨 → 스킵 (null은 실패이므로 재시도 허용)
+            if (analysisMap[issue.id] !== undefined && analysisMap[issue.id] !== null) return;
 
             setLoadingMap((prev) => ({ ...prev, [issue.id]: true }));
 
