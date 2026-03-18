@@ -7,6 +7,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { LEVEL_THRESHOLDS } from '../../services/db/gamificationDB';
+import { triggerConfetti } from '../../utils/confetti';
 
 interface LevelUpToastProps {
     level: number;
@@ -20,6 +21,9 @@ export const LevelUpToast: React.FC<LevelUpToastProps> = ({ level, onClose }) =>
     useEffect(() => {
         // Enter animation
         requestAnimationFrame(() => setIsVisible(true));
+
+        // Fire confetti 🎉
+        setTimeout(() => triggerConfetti(), 200);
 
         // Auto dismiss
         const timer = setTimeout(() => {
