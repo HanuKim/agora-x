@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useProposals } from '../proposal/useProposals';
 import { useNewsWithAISummary } from '../news/useNewsWithAISummary';
 
@@ -17,7 +17,13 @@ export const useHome = () => {
     const activeProposals = proposals.slice(0, 5);
     const currentProposal = activeProposals[activeProposalIndex];
 
-    const { items: newsItems } = useNewsWithAISummary(6);
+    const { items: newsItems } = useNewsWithAISummary(9);
+
+    // ── 국민토론 캐러셀 상태 ──────────────
+    const [activeDebateIndex, setActiveDebateIndex] = useState(0);
+    const featuredDebates = newsItems.slice(0, 3);
+    const remainingDebates = newsItems.slice(3);
+    const currentDebate = featuredDebates[activeDebateIndex];
 
     // Fetch proposals
     useEffect(() => {
@@ -113,6 +119,22 @@ export const useHome = () => {
         }
     };
 
+    // ── 국민토론 캐러셀 Logic ──────────────
+    useEffect(() => {
+        if (featuredDebates.length <= 1) return;
+        const autoRotate = setInterval(() => {
+            setActiveDebateIndex(prev => (prev + 1) % featuredDebates.length);
+        }, 10000);
+        return () => clearInterval(autoRotate);
+    }, [featuredDebates.length]);
+
+    const scrollDebates = useCallback((dir: 'left' | 'right') => {
+        setActiveDebateIndex(prev => {
+            if (dir === 'left') return (prev - 1 + featuredDebates.length) % featuredDebates.length;
+            return (prev + 1) % featuredDebates.length;
+        });
+    }, [featuredDebates.length]);
+
     return {
         issueScrollRef,
         isPaused,
@@ -128,5 +150,13 @@ export const useHome = () => {
         handleProposalClick,
 
         newsItems,
+
+        // 국민토론 캐러셀
+        activeDebateIndex,
+        setActiveDebateIndex,
+        featuredDebates,
+        remainingDebates,
+        currentDebate,
+        scrollDebates,
     };
 };

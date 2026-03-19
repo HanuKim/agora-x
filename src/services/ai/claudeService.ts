@@ -468,6 +468,147 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
             return fallback;
         }
     }
+
+    /**
+     * 사용자 프롬프트로부터 커스텀 토론 주제를 생성합니다.
+     */
+    async generateCustomIssueSummary(prompt: string): Promise<{
+        topic: string;
+        category: string;
+        pro: string[];
+        con: string[];
+        background: string;
+        keyPoints: string[];
+    }> {
+        const fallback = {
+            topic: prompt,
+            category: '사회',
+            pro: ['찬성 의견을 생성할 수 없습니다.'],
+            con: ['반대 의견을 생성할 수 없습니다.'],
+            background: `"${prompt}"에 관한 토론 주제입니다.`,
+            keyPoints: [prompt],
+        };
+
+        if (!this.apiKey) return fallback;
+
+        try {
+            const { reply } = await this.sendMessage({
+                messages: [{
+                    role: 'user',
+                    content: `사용자가 다음 주제로 토론하고 싶어합니다: "${prompt}"
+
+이 주제를 한국 사회 맥락에서 토론 가능한 형태로 구조화해주세요.
+
+반드시 아래 JSON 형식으로만 응답하세요:
+{
+  "topic": "토론 주제 (명확한 질문 형태, 50자 이내)",
+  "category": "정치|경제|사회|국제|문화|기술|기타 중 하나",
+  "pro": ["찬성 논거 1", "찬성 논거 2", "찬성 논거 3"],
+  "con": ["반대 논거 1", "반대 논거 2", "반대 논거 3"],
+  "background": "이슈 배경 설명 (200자 이내)",
+  "keyPoints": ["핵심 쟁점 1", "핵심 쟁점 2", "핵심 쟁점 3"]
+}`
+                }],
+                systemPrompt: '당신은 한국 사회 이슈를 구조화하는 AI입니다. 유효한 JSON만 반환하세요.',
+                maxTokens: 768,
+            });
+
+            const cleaned = reply.replace(/```json?/g, '').replace(/```/g, '').trim();
+            const parsed = JSON.parse(cleaned);
+
+            return {
+                topic: parsed.topic || prompt,
+                category: parsed.category || '사회',
+                pro: Array.isArray(parsed.pro) ? parsed.pro : fallback.pro,
+                con: Array.isArray(parsed.con) ? parsed.con : fallback.con,
+                background: parsed.background || fallback.background,
+                keyPoints: Array.isArray(parsed.keyPoints) ? parsed.keyPoints : fallback.keyPoints,
+            };
+        } catch (e) {
+            console.warn('[ClaudeService] generateCustomIssueSummary fallback:', e);
+            return fallback;
+        }
+    }
+
+    /**
+     * 토론 연습 중 사용자에게 도움을 제공합니다.
+     */
+    async generateDebateHelp(
+        topic: string,
+        chatHistory: { role: 'user' | 'assistant'; content: string }[],
+        helpType: 'organize' | 'argument' | 'counter' | 'free',
+        freeInput?: string
+    ): Promise<string> {
+        if (!this.apiKey) return 'AI 도움 기능을 사용할 수 없습니다. API 키를 확인해주세요.';
+
+        const helpInstructions: Record<string, string> = {
+            organize: '사용자가 지금까지 한 발언들을 정리하여 핵심 주장을 명확하게 요약해주세요. 구조화된 형태로 제시하세요.',
+            argument: '이 토론 주제에 대해 사용자가 사용할 수 있는 강력한 논거 3개를 제시해주세요. 근거와 함께 설명하세요.',
+            counter: '상대방(AI)이 제시할 수 있는 예상 반론을 3개 분석하고, 각 반론에 대한 대응 전략을 제안해주세요.',
+            free: freeInput ? `사용자의 요청: "${freeInput}"` : '사용자의 토론 능력 향상을 위한 조언을 제공하세요.',
+        };
+
+        try {
+            const recentContext = chatHistory.slice(-6).map(m => `[${m.role}] ${m.content}`).join('\n');
+
+            const { reply } = await this.sendMessage({
+                messages: [{
+                    role: 'user',
+                    content: `토론 주제: "${topic}"
+
+최근 대화 맥락:
+${recentContext}
+
+도움 요청: ${helpInstructions[helpType]}
+
+300자 이내로 간결하고 실용적인 도움을 제공하세요.`
+                }],
+                systemPrompt: '당신은 토론 코치입니다. 사용자의 토론 역량을 높이기 위한 실질적 도움을 제공하세요. 자연스러운 한국어로 답변하세요.',
+                maxTokens: 500,
+            });
+
+            return reply.trim();
+        } catch (e) {
+            console.error('[ClaudeService] generateDebateHelp failed:', e);
+            return '도움을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.';
+        }
+    }
+
+    /**
+     * 사이트 이용 안내 AI 챗봇
+     */
+    async siteAssistantChat(
+        userMessage: string,
+        chatHistory: { role: 'user' | 'assistant'; content: string }[]
+    ): Promise<string> {
+        if (!this.apiKey) return 'AI 어시스턴트를 사용할 수 없습니다.';
+
+        try {
+            const { reply } = await this.sendMessage({
+                messages: [...chatHistory, { role: 'user', content: userMessage }],
+                systemPrompt: `당신은 "Agora-X" 시민 토론 플랫폼의 안내 AI "아곰이"입니다.
+
+플랫폼 구조:
+- 홈(/) : 메인 페이지, 인기 토론/제안 미리보기
+- 국민 토론(/community) : 뉴스 기반 시민 토론. 찬/반/중립 투표 및 의견 등록. 상세페이지(/detail/:id)
+- 국민 제안(/proposals) : 시민이 직접 사회 문제 제안. 새 제안(/proposals/new). 상세페이지(/proposals/:id)
+- 토론 연습(/ai-discussion) : AI "아곰이"와 1:1 토론 연습. 상세페이지(/ai-discussion/:id)
+- 마이페이지(/mypage) : 내 활동, 레벨, 스크랩, 알림, 지식수준 설정
+
+규칙:
+- 200자 이내로 간결하게 답변
+- 관련 페이지 경로를 [페이지명](경로) 형태로 안내
+- 게시물 검색 요청 시 키워드를 파악하여 관련 섹션 안내
+- 플랫폼 외 질문은 정중히 거절`,
+                maxTokens: 300,
+            });
+
+            return reply.trim();
+        } catch (e) {
+            console.error('[ClaudeService] siteAssistantChat failed:', e);
+            return '죄송합니다. 일시적인 오류가 발생했습니다.';
+        }
+    }
 }
 
 /** Singleton instance for app-wide use */

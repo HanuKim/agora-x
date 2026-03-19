@@ -1,7 +1,7 @@
 /**
  * DiscussionAI Page
  *
- * 토론 주제 목록 페이지
+ * 토론 주제 목록 페이지 + 사용자 커스텀 주제 생성
  */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,12 +10,17 @@ import { useIssueWithAI } from '../features/discussion/useIssueWithAI';
 import { SearchFilter } from '../components/common/SearchFilter';
 import { CONTENT_CATEGORIES } from '../features/common/types';
 import { EmptyState } from '../components/ui/EmptyState';
+import { claudeService } from '../services/ai/claudeService';
 
 export const DiscussionAI: React.FC = () => {
     const { issues } = useIssueWithAI();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState('전체');
+
+    // Custom prompt state
+    const [customPrompt, setCustomPrompt] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const tabs = ['전체', ...CONTENT_CATEGORIES];
 
@@ -25,13 +30,81 @@ export const DiscussionAI: React.FC = () => {
         return matchesSearch && matchesCategory;
     });
 
+    const handleCustomGenerate = async () => {
+        if (!customPrompt.trim() || isGenerating) return;
+        setIsGenerating(true);
+        try {
+            const result = await claudeService.generateCustomIssueSummary(customPrompt.trim());
+            // Navigate to detail page with custom issue data via state
+            navigate('/ai-discussion/custom', {
+                state: {
+                    customIssue: {
+                        id: Date.now(),
+                        topic: result.topic,
+                        category: result.category,
+                        pro: result.pro,
+                        con: result.con,
+                        background: result.background,
+                        keyPoints: result.keyPoints,
+                    }
+                }
+            });
+        } catch (err) {
+            console.error('Custom issue generation failed:', err);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     return (
         <div className="px-xl py-xl max-w-[1200px] mx-auto w-full">
             <div className="mb-xl">
-                <h1 className="text-[2.25rem] font-extrabold mb-sm">일대일 토론</h1>
+                <h1 className="text-[2.25rem] font-extrabold mb-sm">토론 연습</h1>
                 <p className="text-text-secondary mb-lg">
                     Agora-X의 AI, 아곰이와 함께 한국 사회의 주요 쟁점들을 깊게 파헤쳐 봅니다.
                 </p>
+
+                {/* ── Custom Topic Prompt ────────────── */}
+                <div className="mb-xl bg-gradient-to-r from-primary/5 to-amber-500/5 border border-primary/20 rounded-2xl p-lg">
+                    <div className="flex items-center gap-sm mb-md">
+                        <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="material-icons-round text-primary text-base">add_circle</span>
+                        </span>
+                        <div>
+                            <h3 className="text-base font-bold text-text-primary">나만의 토론 주제 만들기</h3>
+                            <p className="text-xs text-text-secondary">원하는 주제를 입력하면 AI가 토론 쟁점을 구조화합니다.</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-sm">
+                        <input
+                            type="text"
+                            value={customPrompt}
+                            onChange={(e) => setCustomPrompt(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleCustomGenerate()}
+                            placeholder="예: 주 4일제 도입에 대해 토론하고 싶어요"
+                            className="flex-1 bg-bg border border-border rounded-xl px-md py-sm text-text-primary placeholder-text-secondary focus:outline-none focus:border-primary transition-colors"
+                            disabled={isGenerating}
+                        />
+                        <button
+                            onClick={handleCustomGenerate}
+                            disabled={!customPrompt.trim() || isGenerating}
+                            className="px-lg py-sm bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-xs border-none"
+                        >
+                            {isGenerating ? (
+                                <>
+                                    <span className="text-base animate-spin">🐻</span>
+                                    생성 중...
+                                </>
+                            ) : (
+                                <>
+                                    <span className="material-icons-round text-base">auto_awesome</span>
+                                    AI 주제 생성
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+
                 <SearchFilter
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}

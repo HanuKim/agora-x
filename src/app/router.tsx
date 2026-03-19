@@ -32,6 +32,7 @@ export const router = createBrowserRouter([
             { path: '/detail/:id', element: <Detail /> },
             { path: '/community', element: <Community /> },
             { path: '/ai-discussion', element: <DiscussionAI /> },
+            { path: '/ai-discussion/custom', element: <DiscussionAIDetail /> },
             { path: '/ai-discussion/:id', element: <DiscussionAIDetail /> },
             { path: '/proposals', element: <ProposalList /> },
             { path: '/proposals/new', element: <ProposalCreate /> },
