@@ -1,12 +1,43 @@
 import React, { useState } from 'react';
-import type { CivilReply } from '../../features/detail/useCivilStance';
+import type { CivilReply, CivilStance } from '../../features/detail/useCivilStance';
 import { appendStoredReply } from '../../services/db/detailDB';
 import { generateNickname } from '../../utils/nicknameGenerator';
 import { claudeService } from '../../services/ai/claudeService';
+import { useCivilStancePreference } from '../../features/detail/useCivilStance';
 import './discussionCivil.css';
 
 const CURRENT_USER_ID = 'current-user';
 const FALLBACK_REPLY_NAME = '익명';
+
+/* DiscussionInput과 동일한 스탠스 뱃지 스타일 */
+const STANCE_BADGE_BASE =
+  'whitespace-nowrap px-3 py-1 mb-1 rounded-full text-[9pt] font-bold transition-all border cursor-pointer';
+const stanceOptionConfig: {
+  value: CivilStance;
+  label: string;
+  inactiveClass: string;
+  activeClass: string;
+}[] = [
+  {
+    value: 'pro',
+    label: '찬성',
+    inactiveClass: 'bg-success/10 text-success border-success/30 hover:border-success',
+    activeClass: 'bg-success text-white border-success',
+  },
+  {
+    value: 'con',
+    label: '반대',
+    inactiveClass: 'bg-danger/10 text-danger border-danger/30 hover:border-danger',
+    activeClass: 'bg-danger text-white border-danger',
+  },
+  {
+    value: 'neutral',
+    label: '중립',
+    inactiveClass: 'bg-surface text-text-secondary border-border hover:border-text-secondary',
+    activeClass: 'bg-text-primary text-bg border-text-primary',
+  },
+];
+
 
 interface ReplyInputProps {
   commentId: string;
@@ -17,6 +48,11 @@ interface ReplyInputProps {
 }
 
 export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, currentUserId, onCancel, onSubmit }) => {
+  const { stance, setStance } = useCivilStancePreference({
+    issueId,
+    userId: currentUserId,
+    defaultStance: 'neutral',
+  });
   const [body, setBody] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyError, setReplyError] = useState('');
@@ -44,7 +80,7 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, curr
         id: `reply-${commentId}-${Date.now()}`,
         authorName: replyAuthorName,
         authorId: currentUserId,
-        stance: 'neutral',
+        stance,
         body: trimmed,
         timeAgo: '방금 전',
         createdAt: new Date().toISOString(),
@@ -64,14 +100,27 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, curr
   };
 
   return (
+    // 이 아래 mt-4
     <div className="ml-10 relative pl-10 mt-4 mb-6 reply-input-enter">
-      <div className="thread-curve" style={{ height: 25 }} />
-      <div className="flex flex-col gap-sm p-lg rounded-xl bg-surface/50 border border-border text-text-primary">
-        <div className="flex items-center gap-sm">
-          <span className="font-bold text-sm text-text-primary">{replyAuthorName}</span>
-          <span className="flex items-center gap-1 text-[10px] bg-bg py-[2px] px-sm rounded text-text-secondary">
-            <span className="material-icons">warning</span> AI가 부적절한 발언을 검사 중입니다.
-          </span>
+      <div className="thread-curve" style={{ height: 120 }} />
+      <div className="flex flex-col gap-xs p-lg pt-4 rounded-xl bg-surface/50 border border-border text-text-primary">
+      <div className="flex items-center gap-xs flex-wrap">
+          <span className="font-bold text-sm text-text-primary pl-2">{replyAuthorName}</span>
+          <div className="flex flex-wrap gap-1 pl-2">
+            {stanceOptionConfig.map((opt) => {
+              const isActive = stance === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setStance(opt.value)}
+                  className={`${STANCE_BADGE_BASE} ${isActive ? opt.activeClass : opt.inactiveClass}`}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <textarea
           value={body}
@@ -84,7 +133,7 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, curr
             {replyError}
           </div>
         )}
-        <div className="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-border">
+        <div className="flex flex-wrap justify-between items-center gap-2 pt-2">
           <p className="text-[11px] text-text-muted flex items-center gap-1">
             <span className="material-symbols-outlined text-xs inline-block align-middle">info</span>
             AI가 부적절한 발언을 검사중입니다.
@@ -105,7 +154,7 @@ export const ReplyInput: React.FC<ReplyInputProps> = ({ commentId, issueId, curr
               className="cursor-pointer flex items-center gap-1 text-sm font-medium text-primary hover:opacity-90 transition-colors disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-base">send</span>
-              {isSubmitting ? '안전성 검토 중...' : '답글 등록'}
+              {isSubmitting ? '안전성 검토 중...' : '등록하기'}
             </button>
           </div>
         </div>

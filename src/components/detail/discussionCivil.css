@@ -15,25 +15,17 @@
   z-index: 0;
 }
 
-.comment-group:hover .thread-line {
-  background: var(--color-primary);
-}
-
 /* Thread curve: horizontal bend from vertical line to reply */
 .thread-curve {
   position: absolute;
-  left: -20px;
+  left: -10px;
   top: 0;
-  width: 20px;
-  height: 25px;
+  width: 50px;
+  height: 70px;
   border-left: 2px solid var(--color-border);
   border-bottom: 2px solid var(--color-border);
-  border-bottom-left-radius: 12px;
+  border-bottom-left-radius: 45px;
   transition: border-color 0.2s;
-}
-
-.comment-group:hover .thread-curve {
-  border-color: var(--color-primary);
 }
 
 /* Reply input entrance */
