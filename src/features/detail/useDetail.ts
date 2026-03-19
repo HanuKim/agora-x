@@ -137,7 +137,10 @@ export const useDetail = (userId?: string) => {
   const category: ContentCategory = article?.category ?? '기타';
 
   // ---------- 시민 토론장 ----------
-  const [sortBy] = useState<'popular' | 'latest'>('popular');
+  /** 오래된순(기본) | 최신순 | 인기순 */
+  const [sortOrder, setSortOrder] = useState<'oldest' | 'newest' | 'popular'>('oldest');
+  /** 전체 | 찬성 | 반대 | 중립 — comment만 필터, reply는 부모 comment에 따라 유지 */
+  const [stanceFilter, setStanceFilter] = useState<'all' | CivilStance>('all');
   const [visibleCommentCount, setVisibleCommentCount] = useState(5);
   const [, setRepliesVersion] = useState(0);
   /** 로컬 저장 댓글(issueId 기준) — 페이지 로드 시 getStoredComments와 merge */
@@ -186,8 +189,30 @@ export const useDetail = (userId?: string) => {
     [commentsFromData, userComments]
   );
 
-  const visibleComments = allComments.slice(0, visibleCommentCount);
-  const hasMoreComments = allComments.length > 0 && visibleCommentCount < allComments.length;
+  const processedComments = useMemo(() => {
+    const filtered =
+      stanceFilter === 'all'
+        ? allComments
+        : allComments.filter((c) => c.stance === stanceFilter);
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortOrder === 'oldest') {
+        const ta = a.createdAt ?? a.id;
+        const tb = b.createdAt ?? b.id;
+        return String(ta).localeCompare(String(tb));
+      }
+      if (sortOrder === 'newest') {
+        const ta = a.createdAt ?? a.id;
+        const tb = b.createdAt ?? b.id;
+        return String(tb).localeCompare(String(ta));
+      }
+      return (b.score ?? 0) - (a.score ?? 0);
+    });
+    return sorted;
+  }, [allComments, stanceFilter, sortOrder]);
+
+  const visibleComments = processedComments.slice(0, visibleCommentCount);
+  const hasMoreComments =
+    processedComments.length > 0 && visibleCommentCount < processedComments.length;
   const hasComments = allComments.length > 0;
 
   /**
@@ -301,7 +326,10 @@ export const useDetail = (userId?: string) => {
     conArgumentSummaries,
     aiLoading,
     // 시민 토론장
-    sortBy,
+    sortOrder,
+    setSortOrder,
+    stanceFilter,
+    setStanceFilter,
     comments: visibleComments,
     hasComments,
     hasMoreComments,

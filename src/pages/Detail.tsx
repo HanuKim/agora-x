@@ -4,6 +4,7 @@ import { DiscussionInput } from '../components/detail/DiscussionInput';
 import { Card } from '../components/ui/Card';
 import { PollSection } from '../components/detail/PollSection';
 import { Button } from '../components/ui/Button';
+import { Select } from '../components/ui/Select';
 import { theme } from '../design/theme';
 import { useDetail } from '../features/detail/useDetail';
 import { useAuth } from '../features/auth';
@@ -31,6 +32,10 @@ export const Detail: React.FC = () => {
     proArgumentSummaries,
     conArgumentSummaries,
     aiLoading,
+    sortOrder,
+    setSortOrder,
+    stanceFilter,
+    setStanceFilter,
     comments: visibleComments,
     hasComments,
     hasMoreComments,
@@ -261,11 +266,34 @@ export const Detail: React.FC = () => {
                 {/* 시민 토론장 — index.css 디자인 토큰 사용 */}
                 <section className="mt-xl pt-lg border-border">
                     <section className="space-y-lg">
-                        <div className="flex items-center justify-between border-b border-border pb-md">
+                        <div className="flex flex-wrap items-center justify-between gap-md border-b border-border pb-md">
                             <h2 className="text-2xl font-bold flex items-center gap-sm text-text-primary">
                                 <span className="material-icons-round text-primary">forum</span>
                                 시민 토론장 <span className="text-text-muted font-normal">{totalDisplayCount.toLocaleString()}</span>
                             </h2>
+                            <div className="flex items-center gap-sm ml-auto">
+                                <Select<'oldest' | 'newest' | 'popular'>
+                                    value={sortOrder}
+                                    options={[
+                                        { value: 'oldest', label: '오래된순' },
+                                        { value: 'newest', label: '최신순' },
+                                        { value: 'popular', label: '인기순' },
+                                    ]}
+                                    onChange={(v) => setSortOrder(v)}
+                                    aria-label="정렬"
+                                />
+                                <Select<'all' | 'pro' | 'con' | 'neutral'>
+                                    value={stanceFilter}
+                                    options={[
+                                        { value: 'all', label: '전체 의견' },
+                                        { value: 'pro', label: '찬성 의견' },
+                                        { value: 'con', label: '반대 의견' },
+                                        { value: 'neutral', label: '중립 의견' },
+                                    ]}
+                                    onChange={(v) => setStanceFilter(v)}
+                                    aria-label="의견 필터"
+                                />
+                            </div>
                         </div>
 
                         <section className="mb-xl">
