@@ -201,17 +201,20 @@ export class ClaudeService {
 
 응답 지침: ${levelInstruction}
 
-논거 추출 규칙:
-- 찬성 논거 2개, 반대 논거 2개만 추출하세요.
-- 각 논거는 150자 내외, 2~3문장으로 작성하세요.
-- 각 논거마다 핵심 요약을 15자 내외 한 문장으로 작성하세요 (proArgumentSummaries, conArgumentSummaries).
+작성 규칙:
+1. overview는 반드시 두 부분으로 구성하세요 (합계 500~700자 이상):
+   - [기사 내용 설명] 기사의 핵심 사건, 배경, 주요 내용을 3~4문장(200~300자)으로 설명
+   - [쟁점 분석] 이 기사에서 도출되는 핵심 사회적 쟁점과 찬반 대립 구도를 2~3문장(200~300자)으로 분석
+   두 부분을 자연스러운 문단으로 연결해 작성하세요.
+2. 찬성/반대 논거 각 2개, 각 논거는 200~300자, 3~4문장으로 충분히 작성하세요.
+3. 각 논거마다 핵심 요약을 15자 내외 한 문장으로 작성하세요 (proArgumentSummaries, conArgumentSummaries).
 
 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {
-  "overview": "기사 핵심 내용을 한 문장으로 요약 (60~70자 이내, 지식 수준에 맞는 표현)",
+  "overview": "[기사 내용 설명 200~300자] [쟁점 분석 200~300자] (합계 500~700자 이상)",
   "debateTopic": "이 기사를 바탕으로 시민이 토론할 수 있는 구체적인 질문 (50자 이내)",
-  "proArguments": ["찬성 논거 1 (150자 내외)", "찬성 논거 2 (150자 내외)"],
-  "conArguments": ["반대 논거 1 (150자 내외)", "반대 논거 2 (150자 내외)"],
+  "proArguments": ["찬성 논거 1 (200~300자)", "찬성 논거 2 (200~300자)"],
+  "conArguments": ["반대 논거 1 (200~300자)", "반대 논거 2 (200~300자)"],
   "proArgumentSummaries": ["찬성 논거 1 핵심 요약 (15자 내외)", "찬성 논거 2 핵심 요약 (15자 내외)"],
   "conArgumentSummaries": ["반대 논거 1 핵심 요약 (15자 내외)", "반대 논거 2 핵심 요약 (15자 내외)"]
 }`;
@@ -220,7 +223,7 @@ export class ClaudeService {
                 messages: [{ role: 'user', content: userPrompt }],
                 systemPrompt:
                     '당신은 한국 사회 이슈를 분석하는 AI입니다. 반드시 유효한 JSON만 반환하세요. 다른 설명 없이 JSON 객체만 출력하세요.',
-                maxTokens: 1024,
+                maxTokens: 2048,
             });
 
             const parsed = this.parseNewsSummaryJson(reply, fallback);
@@ -317,17 +320,17 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
 
 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {
-  "background": "이 이슈의 배경과 사회적 맥락 설명 (500자 이내, 지식 수준에 맞게)",
+  "background": "이 이슈의 역사적 배경, 현황, 사회적 맥락, 주요 이해관계자, 국내외 비교 등을 지식 수준에 맞게 상세히 설명 (1000~1500자 이상, 여러 문단으로)",
   "keyPoints": ["핵심 쟁점 1", "핵심 쟁점 2", "핵심 쟁점 3"],
-"proArguments": ["찬성 논거 1 (40자 이내)", "찬성 논거 2 (40자 이내)", "찬성 논거 3 (40자 이내)"],
-  "conArguments": ["반대 논거 1 (40자 이내)", "반대 논거 2 (40자 이내)", "반대 논거 3 (40자 이내)"]
+  "proArguments": ["찬성 논거 1 (60자 이내)", "찬성 논거 2 (60자 이내)", "찬성 논거 3 (60자 이내)"],
+  "conArguments": ["반대 논거 1 (60자 이내)", "반대 논거 2 (60자 이내)", "반대 논거 3 (60자 이내)"]
 }`;
 
             const { reply } = await this.sendMessage({
                 messages: [{ role: 'user', content: userPrompt }],
                 systemPrompt:
                     '당신은 한국 사회 이슈를 균형 있게 분석하는 AI입니다. 반드시 유효한 JSON만 반환하세요.',
-                maxTokens: 768,
+                maxTokens: 1800,
             });
 
             const cleaned = reply.replace(/```json?/g, '').replace(/```/g, '').trim();

@@ -9,13 +9,15 @@ export const MainLayout: React.FC = () => {
     const location = useLocation();
     const isLogin = location.pathname === '/login';
     const isAIPractice = location.pathname.startsWith('/ai-discussion/');
+    const isArena = /^\/detail\/\d+\/arena$/.test(location.pathname);
+    const isFullScreen = isLogin || isAIPractice || isArena;
 
     // 페이지 이동 시 스크롤을 항상 최상단으로 초기화
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'instant' });
     }, [location.pathname]);
 
-    const wrapperClass = (isLogin || isAIPractice)
+    const wrapperClass = isFullScreen
         ? "h-screen flex flex-col bg-bg font-sans overflow-hidden"
         : "min-h-screen flex flex-col bg-bg font-sans";
 
@@ -25,12 +27,12 @@ export const MainLayout: React.FC = () => {
 
             <main className={[
                 'flex-1 flex flex-col min-h-0',
-                (isLogin || isAIPractice) ? '' : 'pb-[60px]'
+                isFullScreen ? '' : 'pb-[60px]'
             ].join(' ')}>
                 <Outlet />
             </main>
 
-            {!isLogin && !isAIPractice && <Footer />}
+            {!isLogin && !isFullScreen && <Footer />}
             <LoginModal />
             {!isLogin && <GlobalFloatingButton />}
         </div>

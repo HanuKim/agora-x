@@ -22,8 +22,9 @@ import { getLikedDiscussions } from '../services/db/detailDB';
 import { ProfileSidebar, type MyPageTab } from '../components/mypage/ProfileSidebar';
 import { MyInfoTab } from '../components/mypage/MyInfoTab';
 import { MyPostsTab, type MyOpinionItem } from '../components/mypage/MyPostsTab';
+import { getChatHistories, type ChatHistoryEntry } from '../services/db/historyDB';
 import { ScrapTab } from '../components/mypage/ScrapTab';
-import type { NewsCardArticle } from '../components/community/NewsCard';
+
 import { LikedOpinionsTab, type LikedOpinionItem } from '../components/mypage/LikedOpinionsTab';
 import { GlobalDialog } from '../components/common/GlobalDialog';
 
@@ -53,6 +54,7 @@ export const Mypage: React.FC = () => {
     const [likedOpinions, setLikedOpinions] = useState<LikedOpinionItem[]>([]);
     const [myProposals, setMyProposals] = useState<Proposal[]>([]);
     const [myOpinions, setMyOpinions] = useState<MyOpinionItem[]>([]);
+    const [myHistories, setMyHistories] = useState<ChatHistoryEntry[]>([]);
 
     // Profile image from localStorage
     const [profileImage, setProfileImage] = useState<string | undefined>(() => {
@@ -113,6 +115,9 @@ export const Mypage: React.FC = () => {
                 proposal: proposalMap.get(op.proposalId) ?? null,
             }));
         setMyOpinions(myOps);
+
+        // Fetch AI Discussions & Arena histories
+        setMyHistories(getChatHistories().filter(h => h.messages && h.messages.length > 0));
     }, [user, initLevel, fetchUserLevel, fetchUserInteractions, fetchLikedOpinions]);
 
     useEffect(() => {
@@ -171,6 +176,7 @@ export const Mypage: React.FC = () => {
                         <MyPostsTab
                             myProposals={myProposals}
                             myOpinions={myOpinions}
+                            myHistories={myHistories}
                             userId={user?.id}
                         />
                     )}

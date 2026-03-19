@@ -22,7 +22,7 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
     deadlineText = '투표 마감까지 3일 남음',
 }) => {
     return (
-        <aside className="lg:col-span-2 flex justify-center lg:pt-xl mb-lg lg:mb-0">
+        <aside className="flex justify-center lg:pt-xl mb-lg lg:mb-0">
             <Card
                 variant="glass"
                 padding="lg"
@@ -36,33 +36,30 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
                     <button
                         type="button"
                         onClick={() => onSelect('pro')}
-                        className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${
-                            selectedVote === 'pro'
+                        className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${selectedVote === 'pro'
                                 ? 'border-success bg-success/20 text-success ring-2 ring-success/40'
                                 : 'border-success/30 bg-success/5 text-success hover:bg-success/10'
-                        }`}
+                            }`}
                     >
                         찬성
                     </button>
                     <button
                         type="button"
                         onClick={() => onSelect('con')}
-                        className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${
-                            selectedVote === 'con'
+                        className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${selectedVote === 'con'
                                 ? 'border-danger bg-danger/20 text-danger ring-2 ring-danger/40'
                                 : 'border-danger/30 bg-danger/5 text-danger hover:bg-danger/10'
-                        }`}
+                            }`}
                     >
                         반대
                     </button>
                     <button
                         type="button"
                         onClick={() => onSelect('neutral')}
-                        className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${
-                            selectedVote === 'neutral'
+                        className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${selectedVote === 'neutral'
                                 ? 'border-border bg-surface text-text-primary ring-2 ring-border'
                                 : 'border-border bg-stone-100/5 text-text-secondary hover:bg-stone-100/10'
-                        }`}
+                            }`}
                     >
                         보류
                     </button>
