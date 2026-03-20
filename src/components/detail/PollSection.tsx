@@ -54,9 +54,11 @@ function loadPoll(articleId: number): StoredPoll {
 export interface PollSectionProps {
     /** 기사 ID (투표 저장 키로 사용) */
     articleId: number;
+    /** 투표 완료 후 콜백 (토론장 안내 모달 등) */
+    onVoteComplete?: () => void;
 }
 
-export const PollSection: React.FC<PollSectionProps> = ({ articleId }) => {
+export const PollSection: React.FC<PollSectionProps> = ({ articleId, onVoteComplete }) => {
     const [poll, setPoll] = useState<StoredPoll>(() => loadPoll(articleId));
     const [selectedVote, setSelectedVote] = useState<PollVote | null>(null);
 
@@ -78,7 +80,8 @@ export const PollSection: React.FC<PollSectionProps> = ({ articleId }) => {
             conCount: poll.conCount + (selectedVote === 'con' ? 1 : 0),
         });
         setSelectedVote(null);
-    }, [selectedVote, poll.proCount, poll.neutralCount, poll.conCount, savePoll]);
+        onVoteComplete?.();
+    }, [selectedVote, poll.proCount, poll.neutralCount, poll.conCount, savePoll, onVoteComplete]);
 
     const handleEditPoll = useCallback(() => {
         savePoll({

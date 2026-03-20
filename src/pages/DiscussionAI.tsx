@@ -11,6 +11,7 @@ import { SearchFilter } from '../components/common/SearchFilter';
 import { CONTENT_CATEGORIES } from '../features/common/types';
 import { EmptyState } from '../components/ui/EmptyState';
 import { claudeService } from '../services/ai/claudeService';
+import { getChatHistories, saveChatHistory } from '../services/db/historyDB';
 
 export const DiscussionAI: React.FC = () => {
     const { issues } = useIssueWithAI();
@@ -21,6 +22,9 @@ export const DiscussionAI: React.FC = () => {
     // Custom prompt state
     const [customPrompt, setCustomPrompt] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    
+    // Custom history state
+    const [customHistories, setCustomHistories] = useState(getChatHistories().filter(h => h.type === 'ai_discussion'));
 
     const tabs = ['전체', ...CONTENT_CATEGORIES];
 
@@ -35,19 +39,32 @@ export const DiscussionAI: React.FC = () => {
         setIsGenerating(true);
         try {
             const result = await claudeService.generateCustomIssueSummary(customPrompt.trim());
+            const newId = Date.now();
+            const newCustomIssue = {
+                id: newId,
+                topic: result.topic,
+                category: result.category,
+                pro: result.pro,
+                con: result.con,
+                background: result.background,
+                keyPoints: result.keyPoints,
+            };
+            
+            // Save to history so it appears in the list
+            saveChatHistory({
+                id: `ai-discussion-custom-${newId}`,
+                type: 'ai_discussion',
+                title: result.topic,
+                topic: result.topic,
+                category: result.category,
+                lastMessageAt: Date.now(),
+                customIssueData: newCustomIssue,
+                messages: []
+            });
+            
             // Navigate to detail page with custom issue data via state
-            navigate('/ai-discussion/custom', {
-                state: {
-                    customIssue: {
-                        id: Date.now(),
-                        topic: result.topic,
-                        category: result.category,
-                        pro: result.pro,
-                        con: result.con,
-                        background: result.background,
-                        keyPoints: result.keyPoints,
-                    }
-                }
+            navigate(`/ai-discussion/custom/${newId}`, {
+                state: { customIssue: newCustomIssue }
             });
         } catch (err) {
             console.error('Custom issue generation failed:', err);
@@ -104,6 +121,32 @@ export const DiscussionAI: React.FC = () => {
                         </button>
                     </div>
                 </div>
+
+                {customHistories.length > 0 && (
+                    <div className="mb-xl">
+                        <h3 className="text-xl font-bold text-text-primary mb-md flex items-center gap-xs">
+                            <span className="material-icons-round text-primary">history</span>
+                            내가 생성한 토론 주제
+                        </h3>
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-md">
+                            {customHistories.map((history) => (
+                                <IssueCard
+                                    key={history.id}
+                                    issue={{
+                                        id: history.customIssueData?.id || 0,
+                                        topic: history.topic,
+                                        category: (history.category || '기타') as any,
+                                        pro: history.customIssueData?.pro || [],
+                                        con: history.customIssueData?.con || []
+                                    }}
+                                    onClick={() => navigate(`/ai-discussion/custom/${history.customIssueData?.id}`, {
+                                        state: { customIssue: history.customIssueData }
+                                    })}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <SearchFilter
                     searchQuery={searchQuery}

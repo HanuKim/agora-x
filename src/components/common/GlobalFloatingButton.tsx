@@ -94,7 +94,7 @@ export const GlobalFloatingButton: React.FC = () => {
 
     // Hide on AI discussion detail pages & detail pages (they have their own assistant)
     const isAIDetail = location.pathname.startsWith('/ai-discussion/');
-    const isDetailPage = /^\/detail\/\d+$/.test(location.pathname);
+    const isArenaDetail = location.pathname.endsWith('/arena');
 
     // Auto-rotate trending
     useEffect(() => {
@@ -172,16 +172,16 @@ ${dataContext}
     };
 
     // Don't render on detail pages or AI practice detail pages (they have AssistantModal)
-    if (isAIDetail || isDetailPage) return null;
+    if (isAIDetail || isArenaDetail) return null;
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end" aria-live="polite">
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none" aria-live="polite">
             {/* Panel */}
             <div
                 className={[
                     'w-full max-w-[380px] h-[680px] bg-bg rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden',
                     'transform-gpu transition-all duration-200 ease-out origin-bottom-right',
-                    isOpen ? 'opacity-100 scale-100 translate-y-0 mb-4' : 'opacity-0 scale-95 translate-y-2 pointer-events-none mb-0',
+                    isOpen ? 'opacity-100 scale-100 translate-y-0 mb-4 pointer-events-auto' : 'opacity-0 scale-95 translate-y-2 pointer-events-none mb-0',
                 ].join(' ')}
             >
                 {/* Tab Header */}
@@ -304,7 +304,7 @@ ${dataContext}
 
             {/* Onboarding Tooltip */}
             {showGuide && !isOpen && (
-                <div className="absolute bottom-[70px] right-0 w-[260px] bg-[#2B2E34] text-white rounded-2xl p-4 shadow-2xl animate-[fadeSlideUp_300ms_ease-out]"
+                <div className="absolute bottom-[70px] right-0 w-[260px] bg-[#2B2E34] text-white rounded-2xl p-4 shadow-2xl animate-[fadeSlideUp_300ms_ease-out] pointer-events-auto"
                     style={{ animation: 'fadeSlideUp 300ms ease-out' }}
                 >
                     <button onClick={dismissGuide} className="absolute top-2 right-2 text-white/50 hover:text-white bg-transparent border-none cursor-pointer">
@@ -320,7 +320,7 @@ ${dataContext}
             {/* FAB */}
             <button
                 onClick={() => { setIsOpen(!isOpen); if (showGuide) dismissGuide(); }}
-                className="relative w-14 h-14 bg-primary rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-105 transition-transform border-none cursor-pointer"
+                className="relative w-14 h-14 bg-primary rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-105 transition-transform border-none cursor-pointer pointer-events-auto mt-2"
                 aria-label={isOpen ? '패널 닫기' : '패널 열기'}
             >
                 {!isOpen && !showGuide && (

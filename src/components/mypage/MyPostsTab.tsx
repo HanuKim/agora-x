@@ -16,10 +16,10 @@ import { useProposals } from '../../features/proposal/useProposals';
 import { useMyDiscussions } from '../../features/detail/useDetail';
 import type { Proposal, Opinion } from '../../services/db/proposalDB';
 
-type PostCategory = '전체' | '국민제안' | '국민제안 의견' | '국민토론 의견';
+type PostCategory = '전체' | '국민제안' | '국민제안 의견' | '국민토론 의견' | 'AI 토론 기록';
 type SortOption = 'newest' | 'oldest' | 'likes';
 
-const CATEGORIES: PostCategory[] = ['전체', '국민제안', '국민제안 의견', '국민토론 의견'];
+const CATEGORIES: PostCategory[] = ['전체', '국민제안', '국민제안 의견', '국민토론 의견', 'AI 토론 기록'];
 const SORT_OPTIONS: { key: SortOption; label: string }[] = [
     { key: 'newest', label: '최신순' },
     { key: 'oldest', label: '과거순' },
@@ -43,9 +43,12 @@ export interface MyOpinionItem {
     proposal: Proposal | null;
 }
 
+import type { ChatHistoryEntry } from '../../services/db/historyDB';
+
 interface MyPostsTabProps {
     myProposals: Proposal[];
     myOpinions: MyOpinionItem[];
+    myHistories?: ChatHistoryEntry[];
     /** 내 게시물/의견 로드와 동일하게 훅에서 사용하기 위한 userId (useMyDiscussions용) */
     userId?: string;
 }
@@ -53,6 +56,7 @@ interface MyPostsTabProps {
 export const MyPostsTab: React.FC<MyPostsTabProps> = ({
     myProposals,
     myOpinions,
+    myHistories = [],
     userId,
 }) => {
     const navigate = useNavigate();
@@ -99,6 +103,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
     const showProposals = activeCategory === '전체' || activeCategory === '국민제안';
     const showProposalOpinions = activeCategory === '전체' || activeCategory === '국민제안 의견';
     const showDiscussionOpinions = activeCategory === '전체' || activeCategory === '국민토론 의견';
+    const showHistories = activeCategory === '전체' || activeCategory === 'AI 토론 기록';
 
     const sortedProposals = sortItems(myProposals);
     const sortedProposalOpinions = sortItems(
@@ -107,11 +112,15 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
     const sortedDiscussionOpinions = sortItems(
         discussionList.map((d) => ({ ...d, createdAt: d.createdAt, likes: d.likes ?? 0 }))
     );
+    const sortedHistories = sortItems(
+        myHistories.map(h => ({ ...h, createdAt: h.lastMessageAt, likes: 0 }))
+    );
 
     const totalCount =
         (showProposals ? sortedProposals.length : 0) +
         (showProposalOpinions ? sortedProposalOpinions.length : 0) +
-        (showDiscussionOpinions ? sortedDiscussionOpinions.length : 0);
+        (showDiscussionOpinions ? sortedDiscussionOpinions.length : 0) +
+        (showHistories ? sortedHistories.length : 0);
 
     // Category ratio calculation
     const categoryStats = useMemo(() => {
@@ -130,6 +139,11 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
         });
         myDiscussions.forEach((d) => {
             const cat = d.category ?? '기타';
+            counts[cat] = (counts[cat] ?? 0) + 1;
+            total++;
+        });
+        myHistories.forEach((h) => {
+            const cat = h.category || '기타';
             counts[cat] = (counts[cat] ?? 0) + 1;
             total++;
         });
@@ -466,6 +480,68 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                                                 <span className="material-icons-round text-lg">delete</span>
                                             </button>
                                         </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* AI 토론 기록 */}
+                    {showHistories && sortedHistories.length > 0 && (
+                        <div>
+                            {activeCategory === '전체' && (
+                                <h3 className="text-sm font-bold text-text-secondary mb-md flex items-center gap-xs">
+                                    <span className="material-icons-round text-[16px]">smart_toy</span>
+                                    AI 토론 기록 ({sortedHistories.length})
+                                </h3>
+                            )}
+                            <div className="flex flex-col gap-md">
+                                {sortedHistories.map((history) => (
+                                    <div key={history.id} className="relative group">
+                                        <Card
+                                            className="p-lg cursor-pointer hover:-translate-y-[1px] hover:shadow-md transition-all"
+                                            onClick={() => {
+                                                if (history.type === 'ai_discussion') {
+                                                    if (history.customIssueData) {
+                                                        navigate(`/ai-discussion/custom/${history.customIssueData.id}`, {
+                                                            state: { customIssue: history.customIssueData }
+                                                        });
+                                                    } else if (history.articleId) {
+                                                        navigate(`/ai-discussion/${history.articleId}`);
+                                                    }
+                                                } else if (history.type === 'arena' && history.articleId) {
+                                                    navigate(`/detail/${history.articleId}/arena`);
+                                                }
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-xs mb-sm">
+                                                <span className={`material-icons-round text-[14px] ${history.type === 'arena' ? 'text-danger' : 'text-primary'}`}>
+                                                    {history.type === 'arena' ? 'sports_kabaddi' : 'auto_awesome'}
+                                                </span>
+                                                <span className={`text-xs font-bold ${history.type === 'arena' ? 'text-danger' : 'text-primary'} line-clamp-1`}>
+                                                    {history.type === 'arena' ? '토론장 참여' : 'AI 토론 연습'}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm font-bold text-text-primary mb-xs">
+                                                주제: {history.title}
+                                            </p>
+                                            {history.messages && history.messages.length > 0 && (
+                                                <p className="text-sm text-text-secondary line-clamp-2">
+                                                    최근 대화: {history.messages[history.messages.length - 1].content}
+                                                </p>
+                                            )}
+                                            <div className="flex items-center justify-between mt-sm">
+                                                <span className="text-xs text-text-secondary flex items-center gap-xs">
+                                                    <span className="material-icons-round text-[14px]">schedule</span>
+                                                    {new Date(history.lastMessageAt).toLocaleDateString('ko-KR', {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </span>
+                                            </div>
+                                        </Card>
                                     </div>
                                 ))}
                             </div>

@@ -32,21 +32,21 @@ export const PollCardAfter: React.FC<PollCardAfterProps> = ({
         proPercent >= neutralPercent && proPercent >= conPercent
             ? { label: '찬성', percent: proPercent }
             : neutralPercent >= conPercent
-              ? { label: '보류', percent: neutralPercent }
-              : { label: '반대', percent: conPercent };
+                ? { label: '보류', percent: neutralPercent }
+                : { label: '반대', percent: conPercent };
 
     // total=0이면 회색 빈 차트, 그 외 conic-gradient: green(찬성) → gray(보류) → red(반대)
     const gradientStops =
         total === 0
             ? '#e5e5e5 0% 100%'
             : [
-                  `#10b981 0% ${proPercent}%`,
-                  `#9ca3af ${proPercent}% ${proPercent + neutralPercent}%`,
-                  `#ef4444 ${proPercent + neutralPercent}% 100%`,
-              ].join(', ');
+                `#10b981 0% ${proPercent}%`,
+                `#9ca3af ${proPercent}% ${proPercent + neutralPercent}%`,
+                `#ef4444 ${proPercent + neutralPercent}% 100%`,
+            ].join(', ');
 
     return (
-        <aside className="lg:col-span-2 flex justify-center lg:pt-xl mb-lg lg:mb-0">
+        <aside className="flex justify-center lg:pt-xl mb-lg lg:mb-0">
             <Card
                 variant="glass"
                 padding="lg"

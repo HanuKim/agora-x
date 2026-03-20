@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useIssueWithAI } from '../features/discussion/useIssueWithAI';
 import { claudeService, type UserArgumentAnalysis } from '../services/ai/claudeService';
 import { getChatSession, setChatSession, clearChatSession } from '../services/ai/aiCacheDB';
+import { getChatHistory, saveChatHistory } from '../services/db/historyDB';
 import { useUserPrefs } from '../features/user/hooks/useUserPrefs';
 import { GlobalDialog } from '../components/common/GlobalDialog';
 
@@ -22,11 +23,17 @@ export const DiscussionAIDetail: React.FC = () => {
     const { issues, analysisMap, loadingMap, fetchIssueAnalysis } = useIssueWithAI();
     const { getLevelForCategory } = useUserPrefs();
 
-    const isCustom = location.pathname === '/ai-discussion/custom';
-    const issueId = isCustom ? NaN : Number(id);
+    const isCustom = location.pathname.startsWith('/ai-discussion/custom');
+    // Extract ID (either the param ID or grab the customID part)
+    const urlParts = location.pathname.split('/');
+    const customIdParam = isCustom ? Number(urlParts[urlParts.length - 1]) : NaN;
+    const issueId = isCustom ? customIdParam : Number(id);
 
-    // Custom issue from navigation state
-    const customIssue = (location.state as any)?.customIssue as {
+    // Custom issue from navigation state or DB fallback
+    const customIssueFromState = (location.state as any)?.customIssue;
+    const historyEntry = isCustom ? getChatHistory(`ai-discussion-custom-${issueId}`) : undefined;
+    
+    const customIssue = customIssueFromState || historyEntry?.customIssueData as {
         id: number;
         topic: string;
         category: string;
@@ -37,7 +44,7 @@ export const DiscussionAIDetail: React.FC = () => {
     } | undefined;
 
     const issue = isCustom && customIssue
-        ? { id: customIssue.id, topic: customIssue.topic, category: customIssue.category, pro: customIssue.pro, con: customIssue.con }
+        ? { id: customIssue.id, topic: customIssue.topic, category: customIssue.category as any, pro: customIssue.pro, con: customIssue.con }
         : issues.find((i) => i.id === issueId);
 
     const analysis = isCustom && customIssue
@@ -134,6 +141,19 @@ export const DiscussionAIDetail: React.FC = () => {
             await setChatSession(issue.id, {
                 messages: finalMessages,
                 opinionAnalysis: analysisResponse
+            });
+            
+            // Save to MyPage history
+            saveChatHistory({
+                id: isCustom ? `ai-discussion-custom-${issue.id}` : `ai-discussion-${issue.id}`,
+                type: 'ai_discussion',
+                title: issue.topic,
+                topic: issue.topic,
+                category: issue.category,
+                lastMessageAt: Date.now(),
+                customIssueData: isCustom ? customIssue : undefined,
+                articleId: isCustom ? undefined : issue.id,
+                messages: finalMessages
             });
         } catch (error) {
             console.error("Chat Error:", error);
@@ -329,7 +349,7 @@ export const DiscussionAIDetail: React.FC = () => {
                                 <div key={i} className="h-20 bg-bg rounded-xl border border-border animate-pulse mb-3"></div>
                             ))
                         ) : (
-                            (analysis?.keyPoints?.length ? analysis.keyPoints : [...(analysis?.proArguments || []), ...(analysis?.conArguments || [])].slice(0, 3)).map((kp, idx) => {
+                            (analysis?.keyPoints?.length ? analysis.keyPoints : [...(analysis?.proArguments || []), ...(analysis?.conArguments || [])].slice(0, 3)).map((kp: string, idx: number) => {
                                 const palettes = [
                                     { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' },
                                     { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400' },
