@@ -57,13 +57,13 @@ export const ScrapTab: React.FC<ScrapTabProps> = ({
 
     return (
         <div className="flex flex-col gap-lg">
-            <h2 className="text-xl font-bold text-text-primary m-0 flex items-center gap-sm">
+            <h2 className="text-2xl font-bold text-text-primary m-0 flex items-center gap-sm">
                 <span className="material-icons-round text-amber-500">bookmark</span>
                 스크랩한 게시물
             </h2>
 
             {/* Category Filter */}
-            <div className="flex gap-sm flex-wrap">
+            <div className="flex gap-xs flex-wrap">
                 {CATEGORIES.map((cat) => (
                     <button
                         key={cat}
@@ -91,7 +91,7 @@ export const ScrapTab: React.FC<ScrapTabProps> = ({
                     {showProposals && scrapedProposals.length > 0 && (
                         <div>
                             {activeCategory === '전체' && (
-                                <h3 className="text-sm font-bold text-text-secondary mb-md flex items-center gap-xs">
+                                <h3 className="text-md font-bold text-text-secondary mb-md flex items-center gap-xs">
                                     <span className="material-icons-round text-[16px]">description</span>
                                     국민제안
                                 </h3>
@@ -112,7 +112,7 @@ export const ScrapTab: React.FC<ScrapTabProps> = ({
                     {showCommunity && communityNewsCards.length > 0 && (
                         <div>
                             {activeCategory === '전체' && (
-                                <h3 className="text-sm font-bold text-text-secondary mb-md flex items-center gap-xs">
+                                <h3 className="text-md font-bold text-text-secondary mb-md flex items-center gap-xs">
                                     <span className="material-icons-round text-[16px]">forum</span>
                                     국민토론
                                 </h3>

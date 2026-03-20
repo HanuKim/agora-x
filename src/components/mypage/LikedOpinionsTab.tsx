@@ -27,7 +27,7 @@ export const LikedOpinionsTab: React.FC<LikedOpinionsTabProps> = ({ items }) => 
 
     return (
         <div className="flex flex-col gap-lg">
-            <h2 className="text-xl font-bold text-text-primary m-0 flex items-center gap-sm">
+            <h2 className="text-2xl font-bold text-text-primary m-0 flex items-center gap-sm">
                 <span className="material-icons-round text-primary">thumb_up</span>
                 공감한 의견
             </h2>
@@ -60,7 +60,7 @@ export const LikedOpinionsTab: React.FC<LikedOpinionsTabProps> = ({ items }) => 
                                         <span className="material-icons-round text-[14px] text-primary">
                                             description
                                         </span>
-                                        <span className="text-xs font-bold text-primary line-clamp-1">
+                                        <span className="text-sm font-bold text-primary line-clamp-1">
                                             {isDiscussion ? (discussion.articleTitle ?? `기사 #${discussion.issueId}`) : proposal!.title}
                                         </span>
                                     </div>
@@ -75,7 +75,7 @@ export const LikedOpinionsTab: React.FC<LikedOpinionsTabProps> = ({ items }) => 
                                     <span className="text-xs text-text-secondary">
                                         {isDiscussion ? discussion.authorName : (opinion?.authorNickname ?? '')}
                                     </span>
-                                    <div className="flex items-center gap-xs text-xs text-text-secondary">
+                                    <div className="flex items-center gap-sm text-sm text-text-secondary">
                                         <span className="material-icons-round text-[14px] text-primary">
                                             thumb_up
                                         </span>

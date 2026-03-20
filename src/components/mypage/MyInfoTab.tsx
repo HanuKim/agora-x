@@ -56,7 +56,7 @@ export const MyInfoTab: React.FC<MyInfoTabProps> = ({
                                 <p className="text-3xl font-bold text-primary mb-xs">
                                     Lv.{userLevel.level}
                                 </p>
-                                <p className="text-xs text-text-secondary">
+                                <p className="text-sm text-text-secondary">
                                     {LEVEL_THRESHOLDS.find((t) => t.level === userLevel.level)?.label}
                                 </p>
                             </div>
@@ -64,44 +64,44 @@ export const MyInfoTab: React.FC<MyInfoTabProps> = ({
                                 <p className="text-3xl font-bold text-amber-500 mb-xs">
                                     {userLevel.xp}
                                 </p>
-                                <p className="text-xs text-text-secondary">총 경험치 (XP)</p>
+                                <p className="text-sm text-text-secondary">총 경험치 (XP)</p>
                             </div>
                         </div>
 
                         <div className="bg-surface/50 rounded-lg p-md border border-border">
-                            <p className="text-sm font-bold text-text-primary mb-sm">경험치 획득 방법</p>
-                            <div className="flex flex-col gap-xs">
+                            <p className="text-md font-bold text-text-primary mb-md ml-xs">경험치 획득 방법</p>
+                            <div className="flex flex-col gap-sm mb-sm ml-2">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-text-secondary flex items-center gap-xs">
                                         <span className="material-icons-round text-[16px]">chat_bubble</span>
                                         의견 작성
                                     </span>
-                                    <span className="font-bold text-primary">+{XP_REWARDS.COMMENT} XP</span>
+                                    <span className="font-bold text-primary mr-2">+{XP_REWARDS.COMMENT} XP</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-text-secondary flex items-center gap-xs">
                                         <span className="material-icons-round text-[16px]">edit_note</span>
                                         제안 작성
                                     </span>
-                                    <span className="font-bold text-primary">+{XP_REWARDS.PROPOSAL} XP</span>
+                                    <span className="font-bold text-primary mr-2">+{XP_REWARDS.PROPOSAL} XP</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-text-secondary flex items-center gap-xs">
                                         <span className="material-icons-round text-[16px]">thumb_up</span>
                                         공감 받기
                                     </span>
-                                    <span className="font-bold text-primary">+{XP_REWARDS.RECEIVED_LIKE} XP</span>
+                                    <span className="font-bold text-primary mr-2">+{XP_REWARDS.RECEIVED_LIKE} XP</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="bg-surface/50 rounded-lg p-md border border-border">
-                            <p className="text-sm font-bold text-text-primary mb-sm">레벨 기준</p>
-                            <div className="flex flex-col gap-xs">
+                            <p className="text-md font-bold text-text-primary mb-md ml-xs">레벨 기준</p>
+                            <div className="flex flex-col gap-sm ml-2">
                                 {LEVEL_THRESHOLDS.map((t) => (
                                     <div
                                         key={t.level}
-                                        className={`flex justify-between text-sm ${userLevel.level === t.level ? 'text-primary font-bold' : 'text-text-secondary'
+                                        className={`flex justify-between text-sm mr-2 ${userLevel.level === t.level ? 'text-primary font-bold' : 'text-text-secondary'
                                             }`}
                                     >
                                         <span>Lv.{t.level} {t.label}</span>
@@ -135,7 +135,7 @@ export const MyInfoTab: React.FC<MyInfoTabProps> = ({
                             >
                                 {userLevel.mannerScore}점
                             </p>
-                            <p className="text-sm text-text-secondary flex items-center justify-center gap-xs">
+                            <p className="text-md text-text-secondary flex items-center justify-center gap-xs">
                                 {userLevel.mannerScore >= 90 ? (
                                     <>
                                         <span className="material-icons-round text-green-500 text-[16px]">star</span>
@@ -159,7 +159,7 @@ export const MyInfoTab: React.FC<MyInfoTabProps> = ({
                                 )}
                             </p>
                         </div>
-                        <p className="text-xs text-text-secondary">
+                        <p className="text-sm text-text-secondary">
                             매너 점수는 다른 사용자의 신고에 따라 감소할 수 있습니다. 초기 점수는 100점입니다.
                         </p>
                     </div>
@@ -174,7 +174,7 @@ export const MyInfoTab: React.FC<MyInfoTabProps> = ({
                     <span className="material-icons-round text-blue-500">school</span>
                     분야별 지식 수준
                 </h2>
-                <p className="text-sm text-text-secondary mb-lg">
+                <p className="text-md text-text-secondary mb-lg">
                     변경하면 해당 분야의 AI 요약이 새로 생성됩니다.
                 </p>
 
@@ -185,7 +185,7 @@ export const MyInfoTab: React.FC<MyInfoTabProps> = ({
                                 <span className="material-icons-round text-lg text-text-secondary" aria-hidden="true">
                                     {CATEGORY_ICONS[category]}
                                 </span>
-                                <span className="font-semibold text-text-primary text-sm">
+                                <span className="font-semibold text-text-primary text-md ml-1">
                                     {category}
                                 </span>
                             </div>

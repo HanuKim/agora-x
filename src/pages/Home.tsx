@@ -293,20 +293,20 @@ export const Home: React.FC = () => {
                     </h1>
 
                     {/* Body text — delay 3 */}
-                    <p className="hero-item hero-delay-3 text-lg text-white/80 mb-xl leading-relaxed">
+                    <p className="hero-item hero-delay-3 text-xl text-white/80 mb-xl leading-relaxed">
                         Agora-X는 고도화된 AI를 활용해 우리사회가 당면한 문제를 포착하고 핵심 쟁점을 분석하여,<br /> 사회적 합의를 도모하고 우리 사회의 신뢰 회복을 위한 토론의 장을 제공합니다.
                         <br /> 모든 이의 의견이 존중받는 이곳에서 당신의 생각을 나누어 주세요.
                     </p>
 
                     {/* Buttons — delay 4 */}
                     <div className="hero-item hero-delay-4 flex justify-center gap-md">
-                        <Button size="lg" className="text-white!" onClick={() => navigate('/community')}>
+                        <Button size="lg" className="text-xl text-white!" onClick={() => navigate('/community')}>
                             국민 토론 참여
                         </Button>
                         <Button
                             size="lg"
                             onClick={() => navigate('/ai-discussion')}
-                            className="bg-transparent! text-white! border-2 border-white/50 hover:bg-white/15! hover:border-white!"
+                            className="bg-transparent! text-xl text-white! border-2 border-white/50 hover:bg-white/15! hover:border-white!"
                         >
                             토론 연습 시작 →
                         </Button>
@@ -330,7 +330,7 @@ export const Home: React.FC = () => {
                             </span>
                         </div>
                         <div className="flex items-center gap-lg">
-                            <p className="text-text-secondary">현재 가장 뜨거운 논쟁이 오가고 있는 국민 토론입니다.</p>
+                            <p className="text-xl text-text-secondary">현재 가장 뜨거운 논쟁이 오가고 있는 국민 토론입니다.</p>
                             <LiveCounter />
                         </div>
                     </div>
@@ -391,7 +391,7 @@ export const Home: React.FC = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
                                 {/* Pro Arguments — shuffling */}
                                 <div className="flex flex-col gap-md">
-                                    <h4 className="text-md font-bold flex items-center gap-xs text-emerald-500">
+                                    <h4 className="text-xl font-bold flex items-center gap-xs text-emerald-500">
                                         <span className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center">
                                             <span className="material-icons-round">thumb_up</span>
                                         </span>
@@ -407,7 +407,7 @@ export const Home: React.FC = () => {
                                 {/* Center: Vote with Donut Chart */}
                                 <div className="flex flex-col gap-md items-center justify-center">
                                     <div className="w-full max-w-[270px] text-center h-[260px] flex flex-col items-center justify-center">
-                                        <h4 className="text-xl font-bold text-text-primary mb-md">당신의 생각은?</h4>
+                                        <h4 className="text-2xl font-bold text-text-primary mb-md">당신의 생각은?</h4>
                                         {!poll.voted ? (
                                             <div className="flex gap-sm mt-md w-full">
                                                 <button
@@ -467,7 +467,7 @@ export const Home: React.FC = () => {
 
                                 {/* Con Arguments — shuffling */}
                                 <div className="flex flex-col gap-md">
-                                    <h4 className="text-md font-bold flex items-center gap-xs text-red-500 justify-end">
+                                    <h4 className="text-xl font-bold flex items-center gap-xs text-red-500 justify-end">
                                         반대 의견
                                         <span className="w-6 h-6 rounded-full bg-red-500/10 flex items-center justify-center">
                                             <span className="material-icons-round">thumb_down</span>
@@ -485,7 +485,7 @@ export const Home: React.FC = () => {
                             <div className="mt-lg pt-md border-t border-border flex items-center justify-center">
                                 <button
                                     onClick={() => navigate(`/detail/${currentDebate.id}`)}
-                                    className="inline-flex  items-center gap-xs font-bold text-primary hover:text-primary-hover transition-colors duration-200 group text-md cursor-pointer bg-transparent border-none"
+                                    className="inline-flex items-center gap-xs font-bold text-lg text-primary hover:text-primary-hover transition-colors duration-200 group text-md cursor-pointer bg-transparent border-none"
                                 >
                                     토론 상세보기
                                     <span className="material-icons-round text-primary transition-transform group-hover:translate-x-1 duration-200 text-base">arrow_forward</span>
@@ -529,8 +529,8 @@ export const Home: React.FC = () => {
                         </div>
                         <DebateCardRow ref={cardRowRef} debates={remainingDebates} onNavigate={(id) => navigate(`/detail/${id}`)} />
 
-                        <div className="text-center mt-lg">
-                            <Button variant="secondary" onClick={() => navigate('/community')}>
+                        <div className="text-xl text-center mt-lg">
+                            <Button variant="secondary" size="lg" onClick={() => navigate('/community')}>
                                 국민 토론 더보기
                             </Button>
                         </div>
@@ -553,7 +553,7 @@ export const Home: React.FC = () => {
                         <h2 className="text-[2.5rem] font-bold mb-xs">
                             논의가 활발한 국민 제안
                         </h2>
-                        <p className="text-text-secondary">
+                        <p className="text-xl text-text-secondary">
                             시민들이 직접 제안하고 활발하게 논의 중인 안건들을 확인해 보세요.
                         </p>
                     </div>
@@ -643,7 +643,7 @@ export const Home: React.FC = () => {
                                                         />
                                                     </div>
                                                     <div className="flex flex-col text-left overflow-hidden flex-1 h-full pt-xs">
-                                                        <span className={`text-xs font-bold mb-xs ${isActive ? 'text-primary' : 'text-text-secondary'}`}>
+                                                        <span className={`text-sm font-bold mb-xs ${isActive ? 'text-primary' : 'text-text-secondary'}`}>
                                                             {proposal.category || '국민 제안'}
                                                         </span>
                                                         <span className={`text-base font-bold line-clamp-4 w-full leading-snug break-keep ${isActive ? 'text-text-primary' : 'text-text-primary/70 group-hover:text-text-primary'}`}>
@@ -677,7 +677,7 @@ export const Home: React.FC = () => {
                         <h2 className="text-[2.5rem] font-bold mb-xs">
                             토론 연습하기
                         </h2>
-                        <p className="text-text-secondary">
+                        <p className="text-xl text-text-secondary">
                             Agora-X의 AI, 아곰이와 대화하며 한국 사회의 주요 쟁점을 깊이 파헤쳐 봅니다.
                         </p>
                     </div>
@@ -727,7 +727,7 @@ export const Home: React.FC = () => {
                 </div>
 
                 <div className="text-center mt-md">
-                    <Button variant="secondary" onClick={() => navigate('/ai-discussion')}>
+                    <Button variant="secondary" size="lg" onClick={() => navigate('/ai-discussion')}>
                         토론 주제 더보기
                     </Button>
                 </div>

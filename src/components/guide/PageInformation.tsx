@@ -72,7 +72,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
     <>
       <style dangerouslySetInnerHTML={{ __html: ACCORDION_STYLES }} />
       <section
-        className={`${containerClass} w-full h-[800px] bg-surface/50 gap-4 pt-lg`}
+        className={`${containerClass} w-full h-[800px] gap-4 pt-lg`}
         data-purpose="service-guide-accordion"
       >
         {/* Proposal */}
@@ -106,7 +106,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
               </div>
             )}
             <div className="mt-4 guide-content-fade--visible">
-              <p className="text-text-secondary mb-6 leading-relaxed">
+              <p className="text-text-secondary mb-8 leading-relaxed">
                 사회의 다양한 문제를 정의하고, 해결을 위한 혁신적인 제안을 남겨보세요.
                 시민들의 공감을 얻으면 정책으로 발전합니다.
               </p>
@@ -121,7 +121,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
                   </p>
                 </div>
               )}
-              <div className="space-y-4">
+              <div className="space-y-3 mb-6">
                 {[
                   '문제 정의 및 배경 작성',
                   '이미지 및 관련 뉴스 첨부',
@@ -131,7 +131,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
                     <div className="w-6 h-6 rounded-full bg-surface flex items-center justify-center text-xs font-bold text-text-secondary shrink-0">
                       {i + 1}
                     </div>
-                    <p className="text-sm text-text-secondary">{text}</p>
+                    <p className="text-md text-text-secondary">{text}</p>
                   </div>
                 ))}
               </div>
@@ -177,7 +177,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
               </div>
             )}
             <div className="mt-4 guide-content-fade--visible">
-              <p className="text-text-secondary mb-6 leading-relaxed">
+              <p className="text-text-secondary mb-8 leading-relaxed">
                 주요 쟁점에 대해 찬성과 반대 의견을 나누고, AI가 요약한 핵심 정보를 통해
                 더 깊이 있는 토론에 참여하세요.
               </p>
@@ -191,7 +191,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
                   </p>
                 </div>
               )}
-              <div className="space-y-4">
+              <div className="space-y-3 mb-6">
                 {[
                   'AI 핵심 요약 리포트 확인',
                   '찬반 의견 작성 및 투표',
@@ -201,7 +201,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
                     <div className="w-6 h-6 rounded-full bg-surface flex items-center justify-center text-xs font-bold text-text-secondary shrink-0">
                       {i + 1}
                     </div>
-                    <p className="text-sm text-text-secondary">{text}</p>
+                    <p className="text-md text-text-secondary">{text}</p>
                   </div>
                 ))}
               </div>
@@ -247,7 +247,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
               </div>
             )}
             <div className="mt-4 guide-content-fade--visible">
-              <p className="text-text-secondary mb-6 leading-relaxed">
+              <p className="text-text-secondary mb-8 leading-relaxed">
                 AI와 1:1로 대화하며 논리적 일관성을 점검하고, 반대편의 시각에서 쟁점을
                 다각도로 분석해볼 수 있습니다.
               </p>
@@ -261,7 +261,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
                   </p>
                 </div>
               )}
-              <div className="space-y-4">
+              <div className="space-y-3 mb-6">
                 {[
                   '토론 주제 및 AI 페르소나 설정',
                   '실시간 논리 일관성 수치 확인',
@@ -271,7 +271,7 @@ export const PageInformation: React.FC<PageInformationProps> = ({
                     <div className="w-6 h-6 rounded-full bg-surface flex items-center justify-center text-xs font-bold text-text-secondary shrink-0">
                       {i + 1}
                     </div>
-                    <p className="text-sm text-text-secondary">{text}</p>
+                    <p className="text-md text-text-secondary">{text}</p>
                   </div>
                 ))}
               </div>
