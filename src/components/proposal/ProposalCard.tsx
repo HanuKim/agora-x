@@ -48,11 +48,11 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
                 <div>
                     <div className="mb-md">
                         {proposal.category ? (
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border ${getActiveCategoryColorClass(proposal.category)}`}>
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold border ${getActiveCategoryColorClass(proposal.category)}`}>
                                 {proposal.category}
                             </span>
                         ) : (
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-primary/10 text-primary border border-primary/20">
                                 국민 제안
                             </span>
                         )}

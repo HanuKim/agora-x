@@ -54,14 +54,14 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) 
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute top-3 left-3">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border ${getActiveCategoryColorClass(article.category)}`}>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold border ${getActiveCategoryColorClass(article.category)}`}>
                             {article.category}
                         </span>
                     </div>
                 </div>
             ) : (
                 <div className="relative h-[200px] bg-surface flex items-center justify-center">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border ${getActiveCategoryColorClass(article.category)} absolute top-3 left-3`}>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold border ${getActiveCategoryColorClass(article.category)} absolute top-3 left-3`}>
                         {article.category}
                     </span>
                     <span className="text-4xl opacity-20">📰</span>
