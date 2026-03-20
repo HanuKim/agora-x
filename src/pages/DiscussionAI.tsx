@@ -22,7 +22,7 @@ export const DiscussionAI: React.FC = () => {
     // Custom prompt state
     const [customPrompt, setCustomPrompt] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
-    
+
     // Custom history state
     const [customHistories, setCustomHistories] = useState(getChatHistories().filter(h => h.type === 'ai_discussion'));
 
@@ -49,7 +49,7 @@ export const DiscussionAI: React.FC = () => {
                 background: result.background,
                 keyPoints: result.keyPoints,
             };
-            
+
             // Save to history so it appears in the list
             saveChatHistory({
                 id: `ai-discussion-custom-${newId}`,
@@ -61,7 +61,7 @@ export const DiscussionAI: React.FC = () => {
                 customIssueData: newCustomIssue,
                 messages: []
             });
-            
+
             // Navigate to detail page with custom issue data via state
             navigate(`/ai-discussion/custom/${newId}`, {
                 state: { customIssue: newCustomIssue }
@@ -83,16 +83,16 @@ export const DiscussionAI: React.FC = () => {
 
                 {/* ── Custom Topic Prompt ────────────── */}
                 <div className="mb-xl bg-gradient-to-r from-primary/5 to-amber-500/5 border border-primary/20 rounded-2xl p-lg">
-                    <div className="flex items-center gap-sm mb-md">
+                    <div className="flex items-center gap-md mb-md">
                         <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                             <span className="material-icons-round text-primary text-base">add_circle</span>
                         </span>
                         <div>
-                            <h3 className="text-base font-bold text-text-primary">나만의 토론 주제 만들기</h3>
-                            <p className="text-xs text-text-secondary">원하는 주제를 입력하면 AI가 토론 쟁점을 구조화합니다.</p>
+                            <h3 className="text-lg font-bold text-text-primary">나만의 토론 주제 만들기</h3>
+                            <p className="text-md text-text-secondary">원하는 주제를 입력하면 아곰이가 토론 쟁점을 구조화 하여 토론을 시작합니다.</p>
                         </div>
                     </div>
-                    <div className="flex gap-sm">
+                    <div className="flex gap-md">
                         <input
                             type="text"
                             value={customPrompt}
@@ -105,17 +105,17 @@ export const DiscussionAI: React.FC = () => {
                         <button
                             onClick={handleCustomGenerate}
                             disabled={!customPrompt.trim() || isGenerating}
-                            className="px-lg py-sm bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-xs border-none"
+                            className="px-md py-sm bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-sm border-none"
                         >
                             {isGenerating ? (
                                 <>
-                                    <span className="text-base animate-spin">🐻</span>
+                                    <span className="animate-spin">🐻</span>
                                     생성 중...
                                 </>
                             ) : (
                                 <>
-                                    <span className="material-icons-round text-base">auto_awesome</span>
-                                    AI 주제 생성
+                                    <span className="material-icons-round">auto_awesome</span>
+                                    아곰이와 토론 시작
                                 </>
                             )}
                         </button>

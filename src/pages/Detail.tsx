@@ -100,7 +100,7 @@ export const Detail: React.FC = () => {
                     <div className="flex items-center justify-end gap-md mt-sm border-border pt-md">
                         <button
                             type="button"
-                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold ${articleScraped ? 'text-amber-500' : 'text-text-secondary hover:text-amber-500'}`}
+                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-md font-bold ${articleScraped ? 'text-amber-500' : 'text-text-secondary hover:text-amber-500'}`}
                             onClick={() => {
                                 if (!isAuthenticated || !user) {
                                     openLoginModal();
@@ -109,7 +109,7 @@ export const Detail: React.FC = () => {
                                 toggleArticleScrap();
                             }}
                         >
-                            <span className="material-icons-round text-[15px]! transition-all">
+                            <span className="material-icons-round transition-all">
                                 {articleScraped ? 'bookmark' : 'bookmark_border'}
                             </span>
                             스크랩
@@ -118,7 +118,7 @@ export const Detail: React.FC = () => {
 
                     <div className="mt-md">
                         <Card variant="glass" padding="xl" className="relative pb-lg">
-                            <div className="flex items-center justify-center gap-xs mb-sm text-primary text-[11px] font-bold tracking-[0.16em] uppercase">
+                            <div className="flex items-center justify-center gap-xs mb-sm text-primary text-md font-bold tracking-[0.16em] uppercase">
                                 <span className="material-icons-round text-base">auto_awesome</span>
                                 <span>AI 핵심 요약 (AI Summary)</span>
                             </div>
@@ -139,9 +139,9 @@ export const Detail: React.FC = () => {
                                     rel="noopener noreferrer"
                                     className="mt-md inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover transition-colors group"
                                 >
-                                    <span className="inline-flex items-center gap-xs border-b border-transparent group-hover:border-primary-hover pb-px transition-all">
+                                    <span className="inline-flex items-center gap-xs text-md border-b border-transparent group-hover:border-primary-hover pb-px transition-all">
                                         <span className="material-icons-round text-base leading-none">open_in_new</span>
-                                        <span className="leading-none text-xs">매일경제 뉴스 기사 바로가기</span>
+                                        <span className="leading-none">매일경제 뉴스 기사 바로가기</span>
                                     </span>
                                 </a>
                             ) : null}
@@ -154,9 +154,9 @@ export const Detail: React.FC = () => {
                     {/* 반대 의견 (AI PICK) */}
                     <section className="lg:col-span-5 flex flex-col gap-sm">
                         <div className="flex items-center justify-between mb-xs">
-                            <h2 className="text-[1.1rem] font-bold flex items-center gap-sm text-text-primary">
+                            <h2 className="text-xl font-bold flex items-center gap-sm text-text-primary">
                                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-success/10 text-success">
-                                    <span className="material-icons-round text-sm">auto_awesome</span>
+                                    <span className="material-icons-round">auto_awesome</span>
                                 </span>
                                 AI PICK · 입장 변화를 이끈 찬성 의견 TOP 3
                             </h2>
@@ -185,15 +185,15 @@ export const Detail: React.FC = () => {
                                                 <div className="flex items-start gap-sm h-full">
                                                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-success/10 text-success flex items-center justify-center text-xs font-bold mt-0.5">{i + 1}</span>
                                                     <div className="flex-1 min-w-0 flex flex-col h-full justify-between">
-                                                        <p className="text-md text-text-primary break-keep leading-relaxed line-clamp-3">{op.body}</p>
-                                                        <div className="flex items-center gap-md text-[11px] text-text-muted mt-auto pt-2 border-t border-border/50">
+                                                        <p className="text-lg text-text-primary break-keep leading-relaxed line-clamp-3">{op.body}</p>
+                                                        <div className="flex items-center gap-md text-sm text-text-muted mt-auto pt-2 border-t border-border/50">
                                                             <span className="font-bold text-text-secondary tracking-wide">{op.authorName}</span>
                                                             <span className="flex items-center gap-0.5 text-primary font-medium">
-                                                                <span className="material-icons-round text-[11px]">swap_horiz</span>
+                                                                <span className="material-icons-round">swap_horiz</span>
                                                                 {op.influenceCount}명 영향
                                                             </span>
                                                             <span className="flex items-center gap-0.5">
-                                                                <span className="material-icons-round text-[11px]">thumb_up</span>
+                                                                <span className="material-icons-round">thumb_up</span>
                                                                 {op.likes}
                                                             </span>
                                                         </div>
@@ -232,10 +232,10 @@ export const Detail: React.FC = () => {
                     {/* 반대 의견 (AI PICK) */}
                     <section className="lg:col-span-5 flex flex-col gap-sm">
                         <div className="flex items-center justify-between mb-xs lg:flex-row-reverse">
-                            <h2 className="text-[1.1rem] font-bold flex items-center gap-sm text-text-primary">
+                            <h2 className="text-xl font-bold flex items-center gap-sm text-text-primary">
                                 AI PICK · 입장 변화를 이끌었던 반대 의견 TOP 3
                                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-danger/10 text-danger">
-                                    <span className="material-icons-round text-sm">auto_awesome</span>
+                                    <span className="material-icons-round">auto_awesome</span>
                                 </span>
                             </h2>
                         </div>
@@ -263,15 +263,15 @@ export const Detail: React.FC = () => {
                                                 <div className="flex items-start gap-sm h-full flex-row-reverse text-right">
                                                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-danger/10 text-danger flex items-center justify-center text-xs font-bold mt-0.5">{i + 1}</span>
                                                     <div className="flex-1 min-w-0 flex flex-col h-full justify-between">
-                                                        <p className="text-md text-text-primary break-keep leading-relaxed line-clamp-2">{op.body}</p>
-                                                        <div className="flex items-center justify-end gap-md text-[11px] text-text-muted mt-auto pt-2 border-t border-border/50">
+                                                        <p className="text-lg text-text-primary break-keep leading-relaxed line-clamp-2">{op.body}</p>
+                                                        <div className="flex items-center justify-end gap-md text-sm text-text-muted mt-auto pt-2 border-t border-border/50">
                                                             <span className="flex items-center gap-0.5">
                                                                 {op.likes}
-                                                                <span className="material-icons-round text-[11px]">thumb_up</span>
+                                                                <span className="material-icons-round">thumb_up</span>
                                                             </span>
                                                             <span className="flex items-center gap-0.5 text-primary font-medium">
                                                                 {op.influenceCount}명 영향
-                                                                <span className="material-icons-round text-[11px]">swap_horiz</span>
+                                                                <span className="material-icons-round">swap_horiz</span>
                                                             </span>
                                                             <span className="font-bold text-text-secondary tracking-wide">{op.authorName}</span>
                                                         </div>
@@ -333,7 +333,7 @@ export const Detail: React.FC = () => {
                 {/* Post-vote modal */}
                 {showPostVoteModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                        <Card variant="glass" padding="xl" className="mx-md text-center relative animate-in">
+                        <Card variant="glass" padding="xl" className="mx-md text-center relative animate-in bg-white">
                             <button
                                 type="button"
                                 className="absolute top-md right-md text-text-muted hover:text-text-primary bg-transparent border-none"
@@ -341,7 +341,7 @@ export const Detail: React.FC = () => {
                             >
                                 <span className="material-icons-round">close</span>
                             </button>
-                            <span className="material-icons-round text-5xl text-primary mb-md">how_to_vote</span>
+                            <span className="material-icons-round text-4xl! text-primary mb-md">how_to_vote</span>
                             <h3 className="text-xl font-bold text-text-primary mb-sm">투표해주셔서 감사합니다!</h3>
                             <p className="text-sm text-text-secondary mb-lg break-keep leading-relaxed">
                                 소중한 의견을 AI 토론장에서 공유해주시겠어요?<br />

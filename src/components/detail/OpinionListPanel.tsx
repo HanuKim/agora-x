@@ -51,7 +51,7 @@ export const OpinionListPanel: React.FC<OpinionListPanelProps> = ({ articleId, i
                     </h2>
                     <button
                         type="button"
-                        className="text-text-muted hover:text-text-primary bg-transparent border-none"
+                        className="text-text-muted hover:text-text-primary text-xl! bg-transparent border-none"
                         onClick={onClose}
                     >
                         <span className="material-icons-round">close</span>
@@ -90,13 +90,13 @@ export const OpinionListPanel: React.FC<OpinionListPanelProps> = ({ articleId, i
                             <button
                                 key={option.value}
                                 type="button"
-                                className={`flex items-center gap-1 px-sm py-1 rounded-md text-xs border transition-all ${sort === option.value
-                                        ? 'bg-primary/10 border-primary/30 text-primary font-bold'
-                                        : 'bg-transparent border-border text-text-muted hover:text-text-secondary'
+                                className={`flex items-center gap-1 px-sm py-1 rounded-md text-sm border transition-all ${sort === option.value
+                                    ? 'bg-primary/10 border-primary/30 text-primary font-bold'
+                                    : 'bg-transparent border-border text-text-muted hover:text-text-secondary'
                                     }`}
                                 onClick={() => setSort(option.value)}
                             >
-                                <span className="material-icons-round text-xs">{option.icon}</span>
+                                <span className="material-icons-round text-sm">{option.icon}</span>
                                 {option.label}
                             </button>
                         ))}
@@ -104,14 +104,14 @@ export const OpinionListPanel: React.FC<OpinionListPanelProps> = ({ articleId, i
                 </div>
 
                 {/* Opinions list */}
-                <div className="flex-1 overflow-y-auto p-md space-y-sm">
+                <div className="flex-1 overflow-y-auto p-md space-y-md">
                     {opinions.map((op) => (
                         <OpinionCard key={op.id} opinion={op} />
                     ))}
                     {opinions.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-xxl">
                             <span className="material-icons-round text-4xl text-text-muted mb-sm">search_off</span>
-                            <p className="text-sm text-text-muted">해당 조건의 의견이 없습니다.</p>
+                            <p className="text-md text-text-muted">해당 조건의 의견이 없습니다.</p>
                         </div>
                     )}
                 </div>
@@ -137,9 +137,9 @@ const FilterChip: React.FC<{
 }> = ({ active, onClick, className = '', children }) => (
     <button
         type="button"
-        className={`px-md py-1 rounded-full text-xs font-bold border transition-all ${active
-                ? 'bg-primary/10 border-primary/30 text-primary'
-                : `bg-transparent border-border text-text-muted hover:border-primary/20 ${className}`
+        className={`px-md py-1 rounded-full text-sm font-bold border transition-all ${active
+            ? 'bg-primary/10 border-primary/30 text-primary'
+            : `bg-transparent border-border text-text-muted hover:border-primary/20 ${className}`
             }`}
         onClick={onClick}
     >
@@ -156,23 +156,23 @@ const OpinionCard: React.FC<{ opinion: ArenaOpinion }> = ({ opinion }) => {
 
     return (
         <Card padding="md" className={`${borderClass} hover:shadow-md transition-shadow`}>
-            <div className="flex items-center justify-between mb-xs">
+            <div className="flex items-center justify-between mb-sm">
                 <div className="flex items-center gap-xs">
                     <span className={`text-[10px] font-bold px-sm py-0.5 rounded-full ${isPro ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
                         {isPro ? '찬성' : '반대'}
                     </span>
-                    <span className="text-xs font-medium text-text-secondary">{opinion.authorName}</span>
+                    <span className="text-sm text-text-secondary">{opinion.authorName}</span>
                 </div>
-                <span className="text-[10px] text-text-muted">{timeText}</span>
+                <span className="text-sm text-text-muted">{timeText}</span>
             </div>
-            <p className="text-sm text-text-primary break-keep leading-relaxed">{opinion.body}</p>
-            <div className="flex items-center gap-md mt-sm text-[11px] text-text-muted">
+            <p className="text-md text-text-primary break-keep leading-relaxed">{opinion.body}</p>
+            <div className="flex items-center gap-md mt-sm text-sm text-text-muted">
                 <span className="flex items-center gap-1">
-                    <span className="material-icons-round text-[11px]">thumb_up</span>
+                    <span className="material-icons-round">thumb_up</span>
                     {opinion.likes}
                 </span>
                 <span className="flex items-center gap-1">
-                    <span className="material-icons-round text-[11px]">swap_horiz</span>
+                    <span className="material-icons-round">swap_horiz</span>
                     {opinion.influenceCount}명 영향
                 </span>
             </div>

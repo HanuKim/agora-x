@@ -9,11 +9,11 @@ interface ProposalCardProps {
     onDelete?: (e: React.MouseEvent) => void;
 }
 
-export const ProposalCard: React.FC<ProposalCardProps> = ({ 
-    proposal, 
+export const ProposalCard: React.FC<ProposalCardProps> = ({
+    proposal,
     onClick,
     onEdit,
-    onDelete 
+    onDelete
 }) => {
     return (
         <div
@@ -57,12 +57,12 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
                             </span>
                         )}
                     </div>
-                    <h3 className="text-lg font-bold mb-sm line-clamp-2 text-text-primary leading-tight">
+                    <h3 className="text-lg h-[47px] font-bold mb-sm line-clamp-2 text-text-primary leading-tight">
                         {proposal.title}
                     </h3>
 
                     <div className="mb-md">
-                        <p className="text-sm text-text-secondary line-clamp-3 leading-relaxed">
+                        <p className="text-md text-text-secondary line-clamp-2 leading-relaxed">
                             {proposal.problem || proposal.description}
                         </p>
                     </div>
@@ -70,14 +70,14 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
 
                 <div className="flex flex-col gap-sm border-t border-border pt-sm mt-auto">
                     <div className="flex align-center items-center gap-xs text-text-secondary">
-                        <span className="text-xs font-bold">제안 날짜: {new Date(proposal.createdAt).toLocaleDateString('ko-KR', {
+                        <span className="text-sm font-bold">제안 날짜: {new Date(proposal.createdAt).toLocaleDateString('ko-KR', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
                         })}</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs font-medium text-text-secondary">
+                    <div className="flex items-center justify-between text-sm font-medium text-text-secondary">
                         <div className="flex gap-md">
                             <span className="flex items-center gap-1">
                                 <span className="material-icons-round text-text-emphasis text-[16px]">chat_bubble_outline</span>

@@ -1,92 +1,103 @@
 <!DOCTYPE html>
 <html lang="ko" class="dark">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>K-Agora: Future Democracy Platform</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
-    
+
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
+
     <!-- React Router -->
     <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
     <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
     <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
-    
+
     <!-- Babel -->
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    
+
     <!-- Fonts & Icons -->
-    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round" rel="stylesheet" />
 
     <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              primary: "#FF7A00", 
-              "primary-dark": "#e66e00",
-              secondary: "#2563EB",
-              "background-light": "#F8F9FA", 
-              "background-dark": "#1A1D21", 
-              "card-light": "#FFFFFF",
-              "card-dark": "#2B2E34", 
-              "text-light": "#2B2E34",
-              "text-dark": "#E5E7EB",
-              "surface-light": "#FFFFFF",
-              "surface-dark": "#292524",
-              "neutral-border-light": "#E7E5E4",
-              "neutral-border-dark": "#44403C",
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FF7A00",
+                        "primary-dark": "#e66e00",
+                        secondary: "#2563EB",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#1A1D21",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#2B2E34",
+                        "text-light": "#2B2E34",
+                        "text-dark": "#E5E7EB",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#292524",
+                        "neutral-border-light": "#E7E5E4",
+                        "neutral-border-dark": "#44403C",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "Pretendard", "sans-serif"],
+                        sans: ["Pretendard", "Noto Sans KR", "Inter", "sans-serif"],
+                        body: ["Noto Sans KR", "Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                        'xl': "1rem",
+                        '2xl': "1.5rem",
+                        '3xl': "2rem",
+                    },
+                    boxShadow: {
+                        'neo': '4px 4px 0px 0px rgba(0,0,0,1)',
+                        'neo-dark': '4px 4px 0px 0px rgba(255,255,255,0.2)',
+                        'neo-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(217, 119, 6, 0.3)',
+                    }
+                },
             },
-            fontFamily: {
-              display: ["Space Grotesk", "Pretendard", "sans-serif"],
-              sans: ["Pretendard", "Noto Sans KR", "Inter", "sans-serif"],
-              body: ["Noto Sans KR", "Inter", "sans-serif"],
-            },
-            borderRadius: {
-              DEFAULT: "0.75rem",
-              'xl': "1rem",
-              '2xl': "1.5rem",
-              '3xl': "2rem",
-            },
-            boxShadow: {
-                'neo': '4px 4px 0px 0px rgba(0,0,0,1)',
-                'neo-dark': '4px 4px 0px 0px rgba(255,255,255,0.2)',
-                'neo-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
-                'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                'glow': '0 0 15px rgba(217, 119, 6, 0.3)',
-            }
-          },
-        },
-      };
+        };
     </script>
     <style>
-        .hide-scroll::-webkit-scrollbar, .scrollbar-hide::-webkit-scrollbar {
+        .hide-scroll::-webkit-scrollbar,
+        .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
-        .hide-scroll, .scrollbar-hide {
+
+        .hide-scroll,
+        .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
         body {
             word-break: keep-all;
         }
+
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: transparent;
         }
+
         ::-webkit-scrollbar-thumb {
             background-color: rgba(156, 163, 175, 0.5);
             border-radius: 20px;
@@ -95,6 +106,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
 
@@ -108,32 +120,32 @@
         const NavigationOverlay = () => {
             const navigate = useNavigate();
             const location = useLocation();
-            
+
             return (
                 <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] bg-black/80 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl flex gap-6 border border-white/10">
-                    <button 
-                        onClick={() => navigate('/')} 
+                    <button
+                        onClick={() => navigate('/')}
                         className={`flex flex-col items-center gap-1 hover:text-primary transition-colors ${location.pathname === '/' ? 'text-primary' : 'text-gray-400'}`}
                     >
                         <span className="material-icons text-xl">home</span>
                         <span className="text-[10px] uppercase font-bold">Home</span>
                     </button>
-                    <button 
-                        onClick={() => navigate('/detail')} 
+                    <button
+                        onClick={() => navigate('/detail')}
                         className={`flex flex-col items-center gap-1 hover:text-primary transition-colors ${location.pathname === '/detail' ? 'text-primary' : 'text-gray-400'}`}
                     >
                         <span className="material-icons text-xl">article</span>
                         <span className="text-[10px] uppercase font-bold">Detail</span>
                     </button>
-                    <button 
-                        onClick={() => navigate('/community')} 
+                    <button
+                        onClick={() => navigate('/community')}
                         className={`flex flex-col items-center gap-1 hover:text-primary transition-colors ${location.pathname === '/community' ? 'text-primary' : 'text-gray-400'}`}
                     >
                         <span className="material-icons text-xl">forum</span>
                         <span className="text-[10px] uppercase font-bold">Forum</span>
                     </button>
-                    <button 
-                        onClick={() => navigate('/ai-practice')} 
+                    <button
+                        onClick={() => navigate('/ai-practice')}
                         className={`flex flex-col items-center gap-1 hover:text-primary transition-colors ${location.pathname === '/ai-practice' ? 'text-primary' : 'text-gray-400'}`}
                     >
                         <span className="material-icons text-xl">smart_toy</span>
@@ -168,7 +180,7 @@
                                         <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-[#2B2E34] bg-primary"></span>
                                     </button>
                                     <div className="relative cursor-pointer">
-                                        <img alt="User Profile" className="h-10 w-10 rounded-full border-2 border-gray-600 hover:border-primary transition-colors object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGqYskUc3LcoCYU4OakIkOc_7jfz_2HgBMdo1uzxJpbyLLzCLumV7uf3wrXVdvVUE4N5qHVbeFxCyZqT95cmbi3YTDfwjDryUPRWogGXnbXNOaCMrl9JPJF4a7tVZslJGf1pNdoPqoM9O7e_D5-9UBuRBYDzgYzY4OTlIPEemTY4s3bjl_bvZ-YXFAnwb1Vi6lMZvH9VbH7wa0kquchk85xZPI4PGFVpwD-e0HfkSXTBqtOh2TiTtSRgTj_XA9I-a1qGbk5gniupQ"/>
+                                        <img alt="User Profile" className="h-10 w-10 rounded-full border-2 border-gray-600 hover:border-primary transition-colors object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGqYskUc3LcoCYU4OakIkOc_7jfz_2HgBMdo1uzxJpbyLLzCLumV7uf3wrXVdvVUE4N5qHVbeFxCyZqT95cmbi3YTDfwjDryUPRWogGXnbXNOaCMrl9JPJF4a7tVZslJGf1pNdoPqoM9O7e_D5-9UBuRBYDzgYzY4OTlIPEemTY4s3bjl_bvZ-YXFAnwb1Vi6lMZvH9VbH7wa0kquchk85xZPI4PGFVpwD-e0HfkSXTBqtOh2TiTtSRgTj_XA9I-a1qGbk5gniupQ" />
                                     </div>
                                 </div>
                                 <div className="md:hidden flex items-center">
@@ -189,7 +201,7 @@
                                 <span className="text-sm font-medium tracking-wide uppercase">AI 기반 합의 시스템</span>
                             </div>
                             <h1 className="font-display text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-8">
-                                미래의 시민 담론을 <br/>
+                                미래의 시민 담론을 <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-300 relative">
                                     만들어 갑니다
                                     <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary opacity-80" fill="none" viewBox="0 0 200 9" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.7509 9.37523 78.9113 9.81705 112.604 7.40837C129.352 6.21115 136.138 6.55181 151.782 5.23438C161.731 4.39656 176.475 3.32839 198.004 2.03058" stroke="currentColor" strokeWidth="3"></path></svg>
@@ -229,7 +241,7 @@
                             </div>
                         </div>
                         <div className="flex gap-6 overflow-x-auto hide-scroll pb-4 snap-x">
-                             <Link to="/detail" className="snap-start flex-shrink-0 w-72 bg-card-light dark:bg-card-dark p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer group">
+                            <Link to="/detail" className="snap-start flex-shrink-0 w-72 bg-card-light dark:bg-card-dark p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer group">
                                 <div className="flex justify-between items-start mb-3">
                                     <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded uppercase tracking-wider">#주4일제</span>
                                     <span className="text-gray-400 text-xs">2시간 전</span>
@@ -238,14 +250,14 @@
                                 <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">2026년까지 대기업 및 공공기관 주 4일제 의무화 법안 발의에 대한 논의.</p>
                                 <div className="mt-4 flex items-center gap-2 text-xs font-medium">
                                     <div className="flex -space-x-2">
-                                        <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGqYskUc3LcoCYU4OakIkOc_7jfz_2HgBMdo1uzxJpbyLLzCLumV7uf3wrXVdvVUE4N5qHVbeFxCyZqT95cmbi3YTDfwjDryUPRWogGXnbXNOaCMrl9JPJF4a7tVZslJGf1pNdoPqoM9O7e_D5-9UBuRBYDzgYzY4OTlIPEemTY4s3bjl_bvZ-YXFAnwb1Vi6lMZvH9VbH7wa0kquchk85xZPI4PGFVpwD-e0HfkSXTBqtOh2TiTtSRgTj_XA9I-a1qGbk5gniupQ"/>
-                                        <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAN8f260wtD9MI15S8NwAQuYszxSB7mYAnIctUVpOQpeMp3nnaH1KkR4qkWlRIAQVhMDv2BA45plf_Ln7wKwLRWJnw7xyfWWzSO36jQ6vX_469FahTOEr4uxNv-wINH8DUUD5Bya-MCaoHsdKoC0hjv0lVgDsY4jvIwwzNOmPQCi_BObvZkqnumN9PZ6FEX3g_PthETEt_P4-QATC3jXo_kzbSmUY0AaRVCaEzRkplgTcYqG3FlPYdWND9sooolCwIAMqev1HQXrc"/>
+                                        <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGqYskUc3LcoCYU4OakIkOc_7jfz_2HgBMdo1uzxJpbyLLzCLumV7uf3wrXVdvVUE4N5qHVbeFxCyZqT95cmbi3YTDfwjDryUPRWogGXnbXNOaCMrl9JPJF4a7tVZslJGf1pNdoPqoM9O7e_D5-9UBuRBYDzgYzY4OTlIPEemTY4s3bjl_bvZ-YXFAnwb1Vi6lMZvH9VbH7wa0kquchk85xZPI4PGFVpwD-e0HfkSXTBqtOh2TiTtSRgTj_XA9I-a1qGbk5gniupQ" />
+                                        <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAN8f260wtD9MI15S8NwAQuYszxSB7mYAnIctUVpOQpeMp3nnaH1KkR4qkWlRIAQVhMDv2BA45plf_Ln7wKwLRWJnw7xyfWWzSO36jQ6vX_469FahTOEr4uxNv-wINH8DUUD5Bya-MCaoHsdKoC0hjv0lVgDsY4jvIwwzNOmPQCi_BObvZkqnumN9PZ6FEX3g_PthETEt_P4-QATC3jXo_kzbSmUY0AaRVCaEzRkplgTcYqG3FlPYdWND9sooolCwIAMqev1HQXrc" />
                                     </div>
                                     <span className="text-gray-500">+420명 참여 중</span>
                                 </div>
                             </Link>
 
-                             {/* Static cards as provided */}
+                            {/* Static cards as provided */}
                             <div className="snap-start flex-shrink-0 w-72 bg-card-light dark:bg-card-dark p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer group">
                                 <div className="flex justify-between items-start mb-3">
                                     <span className="text-xs font-bold text-blue-500 bg-blue-500/10 px-2 py-1 rounded uppercase tracking-wider">#AI저작권</span>
@@ -255,8 +267,8 @@
                                 <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">AI 학습 데이터 사용에 대한 보상 체계 마련과 창작자 보호 법안.</p>
                                 <div className="mt-4 flex items-center gap-2 text-xs font-medium">
                                     <div className="flex -space-x-2">
-                                         <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsc58hsqbTRerBy1rlpgp-rbb2Fa7zLc1m4Kkd4Ct7ZkeNPfO6Bsr65esuvJ0nNWOIQC8qqqHd70qXWmW2jOrHRpBH9dVWWkbEFXODrK-5guwRDoDG4ZwsLbT961-YnJ1Fl4L48JUhF18TLaDb6No_qNz3o7TjBQlzxUGQ1OM2mt4mdxsg4WonMOnN353_VpY7M-IqjPdJdt05PPKuR6oLKawWLfGeQJi9unyIr-uWiF41eQo7GPR7Z2bS2MKjheioYrGBFMyk2sI"/>
-                                         <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCT-qior8SvZ9T_oaaNII70QFainJMwkESbIAMD-CxUdu8kil04Tfnut54Lk1uWtVvweMMHrDOpf4PdSBRy5kQjb7dFsXxc50q6UyPnl3FjxarghjVpUY_FIBPLkw-Xn1frHGgRQRGZAsfY8LnRhOZBjrdikDvGLRTmQr4v0ZAmEewDv9_YUaYROCaCtCyCmQc54u7n27Rt4WdIyJ6RJRQ5y9gENM0nGKvU1SpAYDFypqN-S1bbte5rlgKQ2lK505EZO96lZeRTvIk"/>
+                                        <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsc58hsqbTRerBy1rlpgp-rbb2Fa7zLc1m4Kkd4Ct7ZkeNPfO6Bsr65esuvJ0nNWOIQC8qqqHd70qXWmW2jOrHRpBH9dVWWkbEFXODrK-5guwRDoDG4ZwsLbT961-YnJ1Fl4L48JUhF18TLaDb6No_qNz3o7TjBQlzxUGQ1OM2mt4mdxsg4WonMOnN353_VpY7M-IqjPdJdt05PPKuR6oLKawWLfGeQJi9unyIr-uWiF41eQo7GPR7Z2bS2MKjheioYrGBFMyk2sI" />
+                                        <img alt="User" className="w-6 h-6 rounded-full border-2 border-white dark:border-card-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCT-qior8SvZ9T_oaaNII70QFainJMwkESbIAMD-CxUdu8kil04Tfnut54Lk1uWtVvweMMHrDOpf4PdSBRy5kQjb7dFsXxc50q6UyPnl3FjxarghjVpUY_FIBPLkw-Xn1frHGgRQRGZAsfY8LnRhOZBjrdikDvGLRTmQr4v0ZAmEewDv9_YUaYROCaCtCyCmQc54u7n27Rt4WdIyJ6RJRQ5y9gENM0nGKvU1SpAYDFypqN-S1bbte5rlgKQ2lK505EZO96lZeRTvIk" />
                                     </div>
                                     <span className="text-gray-500">+1.2k명 참여 중</span>
                                 </div>
@@ -277,10 +289,10 @@
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            
+
                             <article className="flex flex-col h-full bg-card-light dark:bg-card-dark rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-neo dark:hover:shadow-neo-dark hover:-translate-y-1 transition-all duration-300">
                                 <div className="relative h-48 bg-gray-200 dark:bg-gray-800">
-                                    <img alt="High rise buildings abstract" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaO4sbtDTS0L11A_II9douaIjaqXB6B4MsAXacYGjI9mHvq7OXflID5_-I9MY5sy6FEbnBHQcNH5u41wwcUVv7HI24g8Rj-0IsbL67s8q1GSXBWhdIdAjNzFvLWONNw5GwfFDPxxMfmxET20W-Xq04h1sEZnAJ7yb7i-4qepbhNAmR4CgX56t9mC-bkqoKoqU05ygvdv5RyVGbj9sfJaf-I_KWiBSxGjqFPo7OtIPyKvlFwS4nbnlui23yrC1RhLU9nghrmwHhGbw"/>
+                                    <img alt="High rise buildings abstract" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaO4sbtDTS0L11A_II9douaIjaqXB6B4MsAXacYGjI9mHvq7OXflID5_-I9MY5sy6FEbnBHQcNH5u41wwcUVv7HI24g8Rj-0IsbL67s8q1GSXBWhdIdAjNzFvLWONNw5GwfFDPxxMfmxET20W-Xq04h1sEZnAJ7yb7i-4qepbhNAmR4CgX56t9mC-bkqoKoqU05ygvdv5RyVGbj9sfJaf-I_KWiBSxGjqFPo7OtIPyKvlFwS4nbnlui23yrC1RhLU9nghrmwHhGbw" />
                                     <div className="absolute top-4 left-4">
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-black shadow-sm">
                                             <span className="w-2 h-2 rounded-full bg-primary mr-2"></span>
@@ -313,7 +325,7 @@
 
                             <article className="flex flex-col h-full bg-card-light dark:bg-card-dark rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-neo dark:hover:shadow-neo-dark hover:-translate-y-1 transition-all duration-300">
                                 <div className="relative h-48 bg-gray-200 dark:bg-gray-800">
-                                    <img alt="Cryptocurrency graph" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu4J7aAAYxL1PXQzO5za9sk4iAjqH8-lY-VyWZF0QCo7yMKI4eMzorMULFgjOAxwYDkzOg9idEB_oXPoj1l1-5aYSuvJQ2ZxYfQRQMk9dZmg_Jy-ct-9iNImsugE03WbepKva7_lNU6z8xQ_a8g5x-OExpMfk1KwF8H7gzob0JN6eUSMoFu_yM2zUHlR3rIvgf6PjkGa7-CJR7IldUWa2I-siKgtvks_P9zu1pnVtsINsd0YW4C5IdMGFggOAgJ9bc3nB4eDXv9fQ"/>
+                                    <img alt="Cryptocurrency graph" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu4J7aAAYxL1PXQzO5za9sk4iAjqH8-lY-VyWZF0QCo7yMKI4eMzorMULFgjOAxwYDkzOg9idEB_oXPoj1l1-5aYSuvJQ2ZxYfQRQMk9dZmg_Jy-ct-9iNImsugE03WbepKva7_lNU6z8xQ_a8g5x-OExpMfk1KwF8H7gzob0JN6eUSMoFu_yM2zUHlR3rIvgf6PjkGa7-CJR7IldUWa2I-siKgtvks_P9zu1pnVtsINsd0YW4C5IdMGFggOAgJ9bc3nB4eDXv9fQ" />
                                     <div className="absolute top-4 left-4">
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-black shadow-sm">
                                             <span className="w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
@@ -343,10 +355,10 @@
                                     </div>
                                 </div>
                             </article>
-                            
-                             <article className="flex flex-col h-full bg-card-light dark:bg-card-dark rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-neo dark:hover:shadow-neo-dark hover:-translate-y-1 transition-all duration-300">
+
+                            <article className="flex flex-col h-full bg-card-light dark:bg-card-dark rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-neo dark:hover:shadow-neo-dark hover:-translate-y-1 transition-all duration-300">
                                 <div className="relative h-48 bg-gray-200 dark:bg-gray-800">
-                                    <img alt="Healthcare tech" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_XcqQfUtp0fl40tk6ubQBA6VPhxQLqFHv3XaCYs7IjDiP17e1O5rLg89rOe97Jwa6cic9Kiv97nc6HlcCmhE_0K0xzPbd_ctghlyH4qeCydhrNugiUKGlIk2o2UxZcr55yrUBcf1oUyM6rn5F3vHTzp9bg36WDXol91rAAoJqhGSQ1bsmfbHpCX4ZATpgA2lQsT0bHpF6m17XEYlzd_bLjQCJbkI5XZPwTJJoPVf7DoVDC32Qeav-M4-7mOPSAh8RkaGLCUS0mrA"/>
+                                    <img alt="Healthcare tech" className="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_XcqQfUtp0fl40tk6ubQBA6VPhxQLqFHv3XaCYs7IjDiP17e1O5rLg89rOe97Jwa6cic9Kiv97nc6HlcCmhE_0K0xzPbd_ctghlyH4qeCydhrNugiUKGlIk2o2UxZcr55yrUBcf1oUyM6rn5F3vHTzp9bg36WDXol91rAAoJqhGSQ1bsmfbHpCX4ZATpgA2lQsT0bHpF6m17XEYlzd_bLjQCJbkI5XZPwTJJoPVf7DoVDC32Qeav-M4-7mOPSAh8RkaGLCUS0mrA" />
                                     <div className="absolute top-4 left-4">
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-black shadow-sm">
                                             <span className="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
@@ -440,7 +452,7 @@
                                 </div>
                             </div>
                             <h1 className="text-4xl md:text-6xl font-display font-black leading-tight mb-8 relative inline-block break-keep text-center mx-auto">
-                                주 4일 근무제 도입,<br/>
+                                주 4일 근무제 도입,<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-primary">시기상조인가, 필수 변화인가?</span>
                             </h1>
                             <div className="relative group mt-8 text-center mx-auto max-w-4xl">
@@ -526,7 +538,7 @@
                                         투표하기
                                         <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">how_to_vote</span>
                                     </button>
-                                    <p className="mt-4 text-xs text-gray-400">투표 마감까지 3일 남음</p>
+                                    <p className="mt-4 text-xs text-gray-400">투표 마감까지 3일</p>
                                 </div>
                             </div>
                             <section className="lg:col-span-5 flex flex-col gap-6">
@@ -627,7 +639,7 @@
                                         <span className="material-icons-round">notifications_none</span>
                                     </button>
                                     <button className="h-8 w-8 rounded-full overflow-hidden border border-neutral-border-light dark:border-neutral-border-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-stone-900">
-                                        <img alt="User Avatar" className="h-full w-full object-cover bg-stone-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6PfGGhh6CySFPpJL0uSxB033RUUDhOcYqvs-ZIboBMmCc7mj3rhw19yXaZgXdKbKQypIl9Ga7yV0jU2j-tb3ak7ATnRGqCiU2iCC--DRxzGUCkR-Lc0XcYEggEjKwWbN7IQ7Lhm8kiOb_Yz6jNqW8Zyi0FSI9ha0IErDv-H00RJXQ6fv2SIGDsEz5exdjZxC25rc_0Ix0RmrF3OlcSFjxhd5xcZ1Kjc37mqCE8Gd0wNknWiD4raw9c0BctjJOA6ykHSDbbwAa1Kg"/>
+                                        <img alt="User Avatar" className="h-full w-full object-cover bg-stone-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6PfGGhh6CySFPpJL0uSxB033RUUDhOcYqvs-ZIboBMmCc7mj3rhw19yXaZgXdKbKQypIl9Ga7yV0jU2j-tb3ak7ATnRGqCiU2iCC--DRxzGUCkR-Lc0XcYEggEjKwWbN7IQ7Lhm8kiOb_Yz6jNqW8Zyi0FSI9ha0IErDv-H00RJXQ6fv2SIGDsEz5exdjZxC25rc_0Ix0RmrF3OlcSFjxhd5xcZ1Kjc37mqCE8Gd0wNknWiD4raw9c0BctjJOA6ykHSDbbwAa1Kg" />
                                     </button>
                                 </div>
                             </div>
@@ -831,7 +843,7 @@
                                             <span className="font-mono text-primary">98/100</span>
                                         </div>
                                         <div className="w-full bg-stone-200 dark:bg-stone-700 h-1 rounded-full mt-2 overflow-hidden">
-                                            <div className="bg-primary h-full rounded-full" style={{width: '98%'}}></div>
+                                            <div className="bg-primary h-full rounded-full" style={{ width: '98%' }}></div>
                                         </div>
                                     </div>
                                 </div>
@@ -851,7 +863,7 @@
                                 </div>
                                 <div className="mt-6 text-center">
                                     <p className="text-xs text-stone-400 dark:text-stone-500">
-                                        K-Agora © 2023 <br/>
+                                        K-Agora © 2023 <br />
                                         <a className="hover:underline" href="#">개인정보 처리방침</a> • <a className="hover:underline" href="#">이용약관</a>
                                     </p>
                                 </div>
@@ -957,7 +969,7 @@
                                                     <span className="text-green-400">92%</span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-green-400 rounded-full" style={{width: '92%'}}></div>
+                                                    <div className="h-full bg-green-400 rounded-full" style={{ width: '92%' }}></div>
                                                 </div>
                                             </div>
                                             <div>
@@ -966,7 +978,7 @@
                                                     <span className="text-primary">78%</span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-primary rounded-full" style={{width: '78%'}}></div>
+                                                    <div className="h-full bg-primary rounded-full" style={{ width: '78%' }}></div>
                                                 </div>
                                             </div>
                                             <div>
@@ -975,7 +987,7 @@
                                                     <span className="text-blue-400">통과</span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-blue-400 rounded-full" style={{width: '100%'}}></div>
+                                                    <div className="h-full bg-blue-400 rounded-full" style={{ width: '100%' }}></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1095,4 +1107,5 @@
         root.render(<App />);
     </script>
 </body>
+
 </html>

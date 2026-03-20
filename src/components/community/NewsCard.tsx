@@ -70,7 +70,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, showAI }) 
 
             {/* ── Body ──────────────────────────────── */}
             <div className="p-lg flex flex-col flex-1">
-                <h3 className="text-lg font-bold mb-md leading-snug line-clamp-2">
+                <h3 className="h-[45px] text-lg font-bold mb-md leading-snug line-clamp-2">
                     {article.title}
                 </h3>
 

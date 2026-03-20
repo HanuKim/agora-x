@@ -19,7 +19,7 @@ export const PollCardAfter: React.FC<PollCardAfterProps> = ({
     proCount,
     neutralCount,
     conCount,
-    deadlineText = '투표 마감까지 3일 남음',
+    deadlineText = '투표 마감까지 3일',
     onEdit,
 }) => {
     const total = proCount + neutralCount + conCount;
@@ -91,7 +91,7 @@ export const PollCardAfter: React.FC<PollCardAfterProps> = ({
                     수정하기
                     <span className="material-icons-round text-base ml-1">how_to_vote</span>
                 </Button>
-                <p className="mt-sm text-[11px] text-text-secondary">{deadlineText}</p>
+                <p className="mt-sm text-sm text-text-secondary">{deadlineText}</p>
             </Card>
         </aside>
     );

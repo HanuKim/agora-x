@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth';
 import { useTheme } from '../../hooks/useTheme';
 import { useNotifications } from '../../features/notification';
@@ -9,6 +9,19 @@ export const Header: React.FC = () => {
     const { user, isAuthenticated, openLoginModal } = useAuth();
     const { isDark, toggleTheme } = useTheme();
     const { unreadCount, isModalOpen, openModal, closeModal } = useNotifications();
+    const location = useLocation();
+
+    // Helper to determine if a nav item should be active based on current path
+    const isNavActive = (to: string) => {
+        if (to === '/') return location.pathname === '/';
+        if (to === '/community') {
+            return location.pathname.startsWith('/community') || location.pathname.startsWith('/detail');
+        }
+        if (to === '/proposals') {
+            return location.pathname.startsWith('/proposals') || location.pathname.startsWith('/proposal-detail');
+        }
+        return location.pathname.startsWith(to);
+    };
 
     return (
         <>
@@ -32,8 +45,8 @@ export const Header: React.FC = () => {
                             key={to}
                             to={to}
                             end={to === '/'}
-                            className={({ isActive }) =>
-                                isActive
+                            className={() =>
+                                isNavActive(to)
                                     ? 'text-md font-bold text-primary no-underline'
                                     : 'text-md font-bold text-text-white no-underline hover:text-primary transition-colors duration-200'
                             }

@@ -19,7 +19,7 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
     selectedVote,
     onSelect,
     onSubmit,
-    deadlineText = '투표 마감까지 3일 남음',
+    deadlineText = '투표 마감까지 3일',
 }) => {
     return (
         <aside className="flex justify-center lg:pt-xl mb-lg lg:mb-0">
@@ -37,8 +37,8 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
                         type="button"
                         onClick={() => onSelect('pro')}
                         className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${selectedVote === 'pro'
-                                ? 'border-success bg-success/20 text-success ring-2 ring-success/40'
-                                : 'border-success/30 bg-success/5 text-success hover:bg-success/10'
+                            ? 'border-success bg-success/20 text-success ring-2 ring-success/40'
+                            : 'border-success/30 bg-success/5 text-success hover:bg-success/10'
                             }`}
                     >
                         찬성
@@ -47,8 +47,8 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
                         type="button"
                         onClick={() => onSelect('con')}
                         className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${selectedVote === 'con'
-                                ? 'border-danger bg-danger/20 text-danger ring-2 ring-danger/40'
-                                : 'border-danger/30 bg-danger/5 text-danger hover:bg-danger/10'
+                            ? 'border-danger bg-danger/20 text-danger ring-2 ring-danger/40'
+                            : 'border-danger/30 bg-danger/5 text-danger hover:bg-danger/10'
                             }`}
                     >
                         반대
@@ -57,8 +57,8 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
                         type="button"
                         onClick={() => onSelect('neutral')}
                         className={`w-full h-[43px] rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer ${selectedVote === 'neutral'
-                                ? 'border-border bg-surface text-text-primary ring-2 ring-border'
-                                : 'border-border bg-stone-100/5 text-text-secondary hover:bg-stone-100/10'
+                            ? 'border-border bg-surface text-text-primary ring-2 ring-border'
+                            : 'border-border bg-stone-100/5 text-text-secondary hover:bg-stone-100/10'
                             }`}
                     >
                         보류
@@ -78,7 +78,7 @@ export const PollCardBefore: React.FC<PollCardBeforeProps> = ({
                         투표하기
                         <span className="material-icons-round text-base ml-1">how_to_vote</span>
                     </Button>
-                    <p className="mt-sm text-[11px] text-text-secondary font-medium">{deadlineText}</p>
+                    <p className="mt-sm text-sm text-text-secondary font-medium">{deadlineText}</p>
                 </div>
             </Card>
         </aside>

@@ -63,15 +63,15 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick, compact })
             <span className={`self-start text-xs font-bold px-sm py-[2px] rounded-full ${badgeClass}`}>
                 {issue.category}
             </span>
-            <h3 className="text-lg font-semibold text-text-primary m-0">{issue.topic}</h3>
-            <p className="text-sm text-text-secondary flex-1 line-clamp-3 leading-relaxed">
+            <h3 className="text-xl font-bold text-text-primary m-0">{issue.topic}</h3>
+            <p className="text-md text-text-secondary flex-1 line-clamp-2 leading-relaxed">
                 {loading ? (
                     <span className="animate-pulse">AI 요약 생성 중...</span>
                 ) : (
                     summary
                 )}
             </p>
-            <Button variant="secondary" size="sm" className="bg-transparent! self-end text-primary!">
+            <Button variant="secondary" size="md" className="bg-transparent! self-end text-primary!">
                 토론 시작하기 →
             </Button>
         </Card>

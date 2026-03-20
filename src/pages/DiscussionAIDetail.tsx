@@ -32,7 +32,7 @@ export const DiscussionAIDetail: React.FC = () => {
     // Custom issue from navigation state or DB fallback
     const customIssueFromState = (location.state as any)?.customIssue;
     const historyEntry = isCustom ? getChatHistory(`ai-discussion-custom-${issueId}`) : undefined;
-    
+
     const customIssue = customIssueFromState || historyEntry?.customIssueData as {
         id: number;
         topic: string;
@@ -142,7 +142,7 @@ export const DiscussionAIDetail: React.FC = () => {
                 messages: finalMessages,
                 opinionAnalysis: analysisResponse
             });
-            
+
             // Save to MyPage history
             saveChatHistory({
                 id: isCustom ? `ai-discussion-custom-${issue.id}` : `ai-discussion-${issue.id}`,
@@ -292,22 +292,22 @@ export const DiscussionAIDetail: React.FC = () => {
                 <div className="p-6 md:p-8 space-y-8">
                     {/* Header Back Button & Topic Header */}
                     <div>
-                        <button onClick={() => navigate('/ai-discussion')} className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors text-sm font-bold mb-6">
+                        <button onClick={() => navigate('/ai-discussion')} className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors text-md font-bold mb-6">
                             <span className="material-icons-round text-lg">arrow_back</span>
-                            이슈 목록으로
+                            이슈 목록으로 이동
                         </button>
                         <div className="flex items-center gap-2 mb-3">
-                            <span className="material-icons-round text-primary text-sm">public</span>
-                            <span className="text-xs font-bold uppercase tracking-widest text-text-secondary">토론 주제</span>
+                            <span className="material-icons-round text-primary text-md">public</span>
+                            <span className="text-md font-bold uppercase tracking-widest text-text-secondary">토론 주제</span>
                             {isCustom && (
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">사용자 생성</span>
+                                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">사용자 생성</span>
                             )}
                         </div>
                         <h1 className="font-display text-2xl md:text-3xl font-bold leading-tight text-text-primary mb-4 break-keep">
                             {issue.topic}
                         </h1>
                         <div className="flex flex-wrap gap-2">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium border bg-primary/10 text-primary border-primary/20`}>
+                            <span className={`px-3 py-1 rounded-full text-md font-medium border bg-primary/10 text-primary border-primary/20`}>
                                 {issue.category}
                             </span>
                         </div>
@@ -315,20 +315,20 @@ export const DiscussionAIDetail: React.FC = () => {
 
                     {/* AI Background / Subpoints */}
                     <div className="space-y-4">
-                        <h3 className="text-sm font-semibold uppercase tracking-wide text-text-secondary flex items-center justify-between">
+                        <h3 className="text-md font-semibold uppercase tracking-wide text-text-secondary flex items-center justify-between">
                             AI 배경 분석
                             <button
                                 onClick={() => setIsResetDialogOpen(true)}
-                                className="flex items-center gap-1 text-[10px] bg-surface-variant hover:bg-danger/10 hover:text-danger px-2 py-1 rounded transition-colors border border-border cursor-pointer"
+                                className="flex items-center gap-1 text-sm bg-surface-variant hover:bg-danger/10 hover:text-danger px-2 py-1 rounded transition-colors border border-border cursor-pointer"
                                 title="대화 내용 초기화"
                             >
-                                <span className="material-icons-round text-xs">restart_alt</span>
+                                <span className="material-icons-round">restart_alt</span>
                                 대화 초기화
                             </button>
                         </h3>
 
                         <div className="p-4 rounded-xl bg-bg border border-border hover:border-primary/30 transition-colors cursor-default">
-                            <p className="text-sm text-text-primary leading-relaxed break-keep">
+                            <p className="text-md text-text-primary leading-relaxed break-keep">
                                 {isLoading ? (
                                     <span className="animate-pulse">배경 분석 중...</span>
                                 ) : (
@@ -340,7 +340,7 @@ export const DiscussionAIDetail: React.FC = () => {
 
                     {/* Key Points */}
                     <div className="space-y-4">
-                        <h3 className="text-sm font-semibold uppercase tracking-wide text-text-secondary flex items-center justify-between">
+                        <h3 className="text-md font-semibold uppercase tracking-wide text-text-secondary flex items-center justify-between">
                             핵심 논점
                         </h3>
 
@@ -359,11 +359,11 @@ export const DiscussionAIDetail: React.FC = () => {
                                 return (
                                     <div key={idx} className="p-4 rounded-xl bg-bg border border-border hover:border-primary/30 transition-colors cursor-default group">
                                         <div className="flex items-start gap-3">
-                                            <span className={`flex-shrink-0 w-6 h-6 rounded-full ${bColor.bg} ${bColor.text} flex items-center justify-center text-xs font-bold mt-0.5`}>
+                                            <span className={`flex-shrink-0 w-6 h-6 rounded-full ${bColor.bg} ${bColor.text} flex items-center justify-center text-md font-bold mt-0.5`}>
                                                 {idx + 1}
                                             </span>
                                             <div>
-                                                <p className="text-sm text-text-primary leading-relaxed break-keep">{kp}</p>
+                                                <p className="text-md text-text-primary leading-relaxed break-keep">{kp}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -378,16 +378,16 @@ export const DiscussionAIDetail: React.FC = () => {
                             <div className="absolute top-0 right-0 w-24 h-24 bg-primary blur-[50px] opacity-10 rounded-full pointer-events-none"></div>
                             <div className="flex justify-between items-start mb-4 relative z-10">
                                 <div>
-                                    <h3 className="font-display font-bold text-sm text-white">논리적 일관성 분석</h3>
-                                    <p className="text-[10px] text-gray-400 mt-1">최근 발언 기준으로 주장을 분석합니다.</p>
+                                    <h3 className="font-bold text-lg text-white">논리적 일관성 분석</h3>
+                                    <p className="text-sm text-gray-400 mt-1">최근 발언 기준으로 주장을 분석합니다.</p>
                                 </div>
                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
-                                    <span className="material-icons-round text-primary text-sm">analytics</span>
+                                    <span className="material-icons-round text-primary text-md">analytics</span>
                                 </div>
                             </div>
                             <div className="space-y-3 relative z-10 mb-4">
                                 <div>
-                                    <div className="flex justify-between text-[10px] font-medium text-gray-400 mb-1">
+                                    <div className="flex justify-between text-sm font-medium text-gray-400 mb-1">
                                         <span>명확성</span>
                                         <span className="text-green-400">{opinionAnalysis.clarity}%</span>
                                     </div>
@@ -396,7 +396,7 @@ export const DiscussionAIDetail: React.FC = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-[10px] font-medium text-gray-400 mb-1">
+                                    <div className="flex justify-between text-sm font-medium text-gray-400 mb-1">
                                         <span>관련성</span>
                                         <span className="text-primary">{opinionAnalysis.relevance}%</span>
                                     </div>
@@ -405,7 +405,7 @@ export const DiscussionAIDetail: React.FC = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-[10px] font-medium text-gray-400 mb-1">
+                                    <div className="flex justify-between text-sm font-medium text-gray-400 mb-1">
                                         <span>오류 검증</span>
                                         <span className="text-blue-400">{opinionAnalysis.logicValid}%</span>
                                     </div>
@@ -416,7 +416,7 @@ export const DiscussionAIDetail: React.FC = () => {
                             </div>
                             {opinionAnalysis.feedback !== "대기 중" && (
                                 <div className="mt-3 pt-3 border-t border-gray-700 relative z-10">
-                                    <p className="text-xs text-gray-300 leading-relaxed break-keep">
+                                    <p className="text-md text-gray-300 leading-relaxed break-keep">
                                         💡 {opinionAnalysis.feedback}
                                     </p>
                                 </div>
@@ -432,7 +432,7 @@ export const DiscussionAIDetail: React.FC = () => {
                 {/* Chat History */}
                 <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 flex flex-col scroll-smooth">
                     <div className="flex justify-center my-4">
-                        <span className="text-xs font-medium text-text-secondary bg-surface px-3 py-1 rounded-full border border-border">
+                        <span className="text-md font-medium text-text-secondary bg-surface px-3 py-1 rounded-full border border-border">
                             오늘의 세션 시작
                         </span>
                     </div>
@@ -446,16 +446,16 @@ export const DiscussionAIDetail: React.FC = () => {
                                     : 'bg-surface dark:bg-surface-dark text-text-primary'
                                     }`}>
                                     {isUser ? (
-                                        <span className="text-xs font-bold font-sans">ME</span>
+                                        <span className="text-md font-bold font-sans">ME</span>
                                     ) : (
                                         <span className="text-2xl">🐻</span>
                                     )}
                                 </div>
                                 <div className={`flex flex-col gap-1 w-full ${isUser ? 'items-end' : ''}`}>
-                                    <span className={`text-xs font-bold text-text-secondary ${isUser ? 'mr-1' : 'ml-1'}`}>
+                                    <span className={`text-md font-bold text-text-secondary ${isUser ? 'mr-1' : 'ml-1'}`}>
                                         {isUser ? '나' : '아곰이'}
                                     </span>
-                                    <div className={`p-5 shadow-sm text-sm md:text-base leading-relaxed break-keep ${isUser
+                                    <div className={`p-5 shadow-sm text-md md:text-base leading-relaxed break-keep ${isUser
                                         ? 'bg-primary/10 text-text-primary border border-primary/20 rounded-2xl rounded-tr-none'
                                         : 'bg-surface dark:bg-surface-dark border border-border rounded-2xl rounded-tl-none text-text-primary'
                                         }`}>
@@ -472,7 +472,7 @@ export const DiscussionAIDetail: React.FC = () => {
                                 <span className="text-lg animate-spin">🐻</span>
                             </div>
                             <div className="flex flex-col gap-1 w-full">
-                                <span className="text-xs font-bold text-text-secondary ml-1">아곰이</span>
+                                <span className="text-md font-bold text-text-secondary ml-1">아곰이</span>
                                 <div className="p-4 bg-surface border border-border rounded-2xl rounded-tl-none shadow-sm flex gap-1 w-20 items-center justify-center">
                                     <span className="w-2 h-2 rounded-full bg-text-secondary animate-bounce" style={{ animationDelay: '0ms' }}></span>
                                     <span className="w-2 h-2 rounded-full bg-text-secondary animate-bounce" style={{ animationDelay: '150ms' }}></span>
@@ -491,8 +491,8 @@ export const DiscussionAIDetail: React.FC = () => {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-sm">
                                 <span className="text-lg">🐻</span>
-                                <h4 className="text-sm font-bold text-text-primary">AI에게 도움받기</h4>
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${helpRemaining > 3 ? 'bg-emerald-500/10 text-emerald-500' : helpRemaining > 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'}`}>
+                                <h4 className="text-md font-bold text-text-primary">AI에게 도움받기</h4>
+                                <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${helpRemaining > 3 ? 'bg-emerald-500/10 text-emerald-500' : helpRemaining > 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'}`}>
                                     {helpRemaining}/10회 남음
                                 </span>
                             </div>
@@ -511,9 +511,9 @@ export const DiscussionAIDetail: React.FC = () => {
                                     key={btn.type}
                                     onClick={() => handleAIHelp(btn.type)}
                                     disabled={helpLoading || helpRemaining <= 0}
-                                    className="flex items-center gap-1 px-3 py-2 rounded-xl bg-bg border border-border text-sm font-bold text-text-primary hover:border-primary hover:text-primary transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-1 px-3 py-2 rounded-xl bg-bg border border-border text-md font-bold text-text-primary hover:border-primary hover:text-primary transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
-                                    <span className="material-icons-round text-sm">{btn.icon}</span>
+                                    <span className="material-icons-round text-md">{btn.icon}</span>
                                     {btn.label}
                                 </button>
                             ))}
@@ -528,12 +528,12 @@ export const DiscussionAIDetail: React.FC = () => {
                                 onKeyDown={(e) => e.key === 'Enter' && freeHelpInput.trim() && handleAIHelp('free')}
                                 placeholder="자유 질문: 예) 이 주장의 약점은?"
                                 disabled={helpLoading || helpRemaining <= 0}
-                                className="flex-1 bg-bg border border-border rounded-xl px-3 py-2 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:border-primary disabled:opacity-40"
+                                className="flex-1 bg-bg border border-border rounded-xl px-3 py-2 text-md text-text-primary placeholder-text-secondary focus:outline-none focus:border-primary disabled:opacity-40"
                             />
                             <button
                                 onClick={() => freeHelpInput.trim() && handleAIHelp('free')}
                                 disabled={!freeHelpInput.trim() || helpLoading || helpRemaining <= 0}
-                                className="px-3 py-2 bg-primary text-white rounded-xl text-sm font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border-none hover:bg-primary-hover transition-colors"
+                                className="px-3 py-2 bg-primary text-white rounded-xl text-md font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border-none hover:bg-primary-hover transition-colors"
                             >
                                 질문
                             </button>
@@ -541,26 +541,26 @@ export const DiscussionAIDetail: React.FC = () => {
 
                         {/* Help response */}
                         {helpLoading && (
-                            <div className="flex items-center gap-sm text-sm text-text-secondary">
+                            <div className="flex items-center gap-sm text-md text-text-secondary">
                                 <span className="animate-spin text-base">🐻</span>
                                 도움을 생성하고 있습니다...
                             </div>
                         )}
                         {helpResponse && (
                             <div className="bg-bg border border-primary/20 rounded-xl p-4 space-y-2">
-                                <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap break-keep">{helpResponse}</p>
+                                <p className="text-md text-text-primary leading-relaxed whitespace-pre-wrap break-keep">{helpResponse}</p>
                                 <button
                                     onClick={insertHelpToInput}
-                                    className="flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-hover transition-colors bg-transparent border-none cursor-pointer"
+                                    className="flex items-center gap-1 text-md font-bold text-primary hover:text-primary-hover transition-colors bg-transparent border-none cursor-pointer"
                                 >
-                                    <span className="material-icons-round text-sm">content_paste</span>
+                                    <span className="material-icons-round">content_paste</span>
                                     채팅에 붙여넣기
                                 </button>
                             </div>
                         )}
 
                         {helpRemaining <= 0 && (
-                            <p className="text-xs text-red-500 font-medium">이번 대화에서 도움 횟수를 모두 사용했습니다.</p>
+                            <p className="text-md text-red-500 font-medium">이번 대화에서 도움 횟수를 모두 사용했습니다.</p>
                         )}
                     </div>
                 )}
@@ -572,26 +572,26 @@ export const DiscussionAIDetail: React.FC = () => {
                             {/* AI Help toggle button */}
                             <button
                                 onClick={() => setIsHelpOpen(!isHelpOpen)}
-                                className={`flex items-center gap-1 text-xs font-bold transition-colors ${isHelpOpen ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}
+                                className={`flex items-center gap-1 text-md font-bold transition-colors ${isHelpOpen ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}
                             >
-                                <span className="material-icons-round text-sm">psychology</span>
+                                <span className="material-icons-round text-md">psychology</span>
                                 AI 도움받기
                                 {helpRemaining < 10 && (
-                                    <span className="text-[10px] text-text-secondary">({helpRemaining})</span>
+                                    <span className="text-sm text-text-secondary">({helpRemaining})</span>
                                 )}
                             </button>
                             <span className="text-border">|</span>
                             <button
                                 onClick={() => insertFormatting('[', '](url)')}
-                                className="text-text-secondary hover:text-text-primary transition-colors text-xs font-medium flex items-center gap-1"
+                                className="text-text-secondary hover:text-text-primary transition-colors text-md font-medium flex items-center gap-1"
                             >
-                                <span className="material-icons-round text-sm">link</span> 링크
+                                <span className="material-icons-round text-md">link</span> 링크
                             </button>
                             <button
                                 onClick={() => insertFormatting('- ')}
-                                className="text-text-secondary hover:text-text-primary transition-colors text-xs font-medium flex items-center gap-1"
+                                className="text-text-secondary hover:text-text-primary transition-colors text-md font-medium flex items-center gap-1"
                             >
-                                <span className="material-icons-round text-sm">list</span> 목록
+                                <span className="material-icons-round text-md">list</span> 목록
                             </button>
                         </div>
                         <div className={`relative bg-bg rounded-2xl border transition-all shadow-sm ${isChatLoading ? 'border-border opacity-70' : 'border-border focus-within:border-primary'
