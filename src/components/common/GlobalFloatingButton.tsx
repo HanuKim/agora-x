@@ -188,23 +188,23 @@ ${dataContext}
                 <div className="flex border-b border-border bg-surface shrink-0">
                     <button
                         onClick={() => setActiveTab('trending')}
-                        className={`flex-1 py-3 text-sm font-bold transition-colors border-none cursor-pointer ${activeTab === 'trending' ? 'text-primary border-b-2 border-primary bg-bg' : 'text-text-secondary bg-transparent hover:text-text-primary'}`}
+                        className={`flex justify-center items-center flex-1 py-3 text-md font-bold transition-colors border-none cursor-pointer ${activeTab === 'trending' ? 'text-primary border-b-2 border-primary bg-bg' : 'text-text-secondary bg-transparent hover:text-text-primary'}`}
                     >
-                        <span className="material-icons-round text-base! align-middle mr-2">trending_up</span>
+                        <span className="material-icons-round mr-2">trending_up</span>
                         실시간 인기
                     </button>
                     <button
                         onClick={() => setActiveTab('chat')}
-                        className={`flex-1 py-3 text-sm font-bold transition-colors border-none cursor-pointer ${activeTab === 'chat' ? 'text-primary border-b-2 border-primary bg-bg' : 'text-text-secondary bg-transparent hover:text-text-primary'}`}
+                        className={`flex justify-center items-center flex-1 py-3 text-md font-bold transition-colors border-none cursor-pointer ${activeTab === 'chat' ? 'text-primary border-b-2 border-primary bg-bg' : 'text-text-secondary bg-transparent hover:text-text-primary'}`}
                     >
-                        <span className="material-icons-round text-base! align-middle mr-2">smart_toy</span>
+                        <span className="material-icons-round mr-2">smart_toy</span>
                         AI 도우미
                     </button>
                     <button
                         onClick={() => setIsOpen(false)}
-                        className="px-3 text-text-secondary hover:text-text-primary bg-transparent border-none cursor-pointer"
+                        className="px-4 text-text-secondary text-lg hover:text-text-primary bg-transparent border-none cursor-pointer"
                     >
-                        <span className="material-icons-round text-base">close</span>
+                        <span className="material-icons-round">close</span>
                     </button>
                 </div>
 
@@ -213,11 +213,11 @@ ${dataContext}
                     /* ── Trending Tab ────────────── */
                     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
                         <div className="flex items-center justify-between mb-3 ml-3">
-                            <h3 className="text-md font-bold text-text-primary flex items-center gap-3">
+                            <h3 className="text-lg font-bold text-text-primary flex items-center gap-3">
                                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                                 실시간 인기 토론 주제
                             </h3>
-                            <span className="text-[12px] text-text-secondary">
+                            <span className="text-sm text-text-secondary">
                                 {new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 기준
                             </span>
                         </div>
@@ -232,8 +232,8 @@ ${dataContext}
                                     {item.rank}
                                 </span>
                                 <div className="flex-1 min-w-0">
-                                    <span className={`text-[${idx === trendingIndex ? '14px' : '12px'}] transition-all duration-300 ease-in-out text-text-primary font-medium block truncate`}>{item.topic}</span>
-                                    <span className={`text-[${idx === trendingIndex ? '11px' : '10px'}] transition-all duration-300 ease-in-out text-text-secondary`}>
+                                    <span className={`text-[${idx === trendingIndex ? '20px' : '14px'}] transition-all duration-300 ease-in-out text-text-primary font-medium block truncate`}>{item.topic}</span>
+                                    <span className={`text-[${idx === trendingIndex ? '14px' : '12px'}] transition-all duration-300 ease-in-out text-text-secondary`}>
                                         {item.type === 'discussion' ? '국민 토론' : '토론 연습'}
                                     </span>
                                 </div>
@@ -254,7 +254,7 @@ ${dataContext}
                                             <span className="text-sm">🐻</span>
                                         </div>
                                     )}
-                                    <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed break-keep ${m.role === 'user'
+                                    <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-md leading-relaxed break-keep ${m.role === 'user'
                                         ? 'bg-primary/10 text-text-primary rounded-tr-none'
                                         : 'bg-surface border border-border text-text-primary rounded-tl-none'
                                         }`}>
@@ -287,12 +287,12 @@ ${dataContext}
                                     onChange={(e) => setChatInput(e.target.value)}
                                     disabled={isSending}
                                     placeholder="무엇이든 물어보세요!"
-                                    className="flex-1 bg-bg border border-border rounded-xl px-3 py-2 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:border-primary transition-colors disabled:opacity-60"
+                                    className="flex-1 bg-bg border border-border rounded-xl px-3 py-2 text-md text-text-primary placeholder-text-secondary focus:outline-none focus:border-primary transition-colors disabled:opacity-60"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!chatInput.trim() || isSending}
-                                    className="w-9 h-9 bg-primary text-white rounded-xl flex items-center justify-center disabled:opacity-50 cursor-pointer border-none hover:bg-primary-hover transition-colors shrink-0"
+                                    className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center disabled:opacity-50 cursor-pointer border-none hover:bg-primary-hover transition-colors shrink-0"
                                 >
                                     <span className="material-icons-round text-[16px] transform -rotate-45 translate-x-px -translate-y-px">send</span>
                                 </button>

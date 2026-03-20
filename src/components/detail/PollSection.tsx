@@ -99,7 +99,7 @@ export const PollSection: React.FC<PollSectionProps> = ({ articleId, onVoteCompl
                 proCount={poll.proCount}
                 neutralCount={poll.neutralCount}
                 conCount={poll.conCount}
-                deadlineText="투표 마감까지 3일 남음"
+                deadlineText="투표 마감까지 3일"
                 onEdit={handleEditPoll}
             />
         );
@@ -110,7 +110,7 @@ export const PollSection: React.FC<PollSectionProps> = ({ articleId, onVoteCompl
             selectedVote={selectedVote}
             onSelect={setSelectedVote}
             onSubmit={handleVoteSubmit}
-            deadlineText="투표 마감까지 3일 남음"
+            deadlineText="투표 마감까지 3일"
         />
     );
 };

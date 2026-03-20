@@ -18,10 +18,10 @@ interface OpinionItemProps {
     onDelete?: (opinionId: string) => void;
 }
 
-export const OpinionItem: React.FC<OpinionItemProps> = ({ 
-    opinion, 
-    isAuthor, 
-    currentUserId, 
+export const OpinionItem: React.FC<OpinionItemProps> = ({
+    opinion,
+    isAuthor,
+    currentUserId,
     onLike,
     onEdit,
     onDelete
@@ -47,7 +47,7 @@ export const OpinionItem: React.FC<OpinionItemProps> = ({
         <>
             <div className="flex flex-col gap-sm p-lg rounded-xl bg-surface/50 border border-border">
                 <div className="flex items-center gap-sm">
-                    <span className="flex items-center font-bold text-sm text-text-primary">
+                    <span className="flex items-center font-bold text-md text-text-primary">
                         {opinion.authorNickname}
                         {isAuthor && (
                             <span className="ml-2 text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
@@ -55,7 +55,7 @@ export const OpinionItem: React.FC<OpinionItemProps> = ({
                             </span>
                         )}
                     </span>
-                    <span className="text-xs text-text-secondary">
+                    <span className="text-sm text-text-secondary">
                         {new Date(opinion.createdAt).toLocaleDateString('ko-KR', {
                             year: 'numeric',
                             month: 'long',
@@ -64,12 +64,12 @@ export const OpinionItem: React.FC<OpinionItemProps> = ({
                     </span>
                 </div>
 
-                <p className="text-sm leading-relaxed text-text-primary whitespace-pre-wrap break-keep my-xs">
+                <p className="text-md leading-relaxed text-text-primary whitespace-pre-wrap break-keep my-xs">
                     {opinion.content}
                 </p>
 
                 {/* Interaction Buttons */}
-                <div className="flex gap-md text-xs font-semibold text-text-secondary mt-xs">
+                <div className="flex gap-md text-sm font-semibold text-text-secondary mt-xs">
                     <button
                         className={`flex items-center gap-1 transition-colors bg-transparent border-none cursor-pointer p-0 ${hasLiked ? 'text-primary' : 'hover:text-primary'}`}
                         onClick={() => onLike && onLike(opinion.id)}

@@ -103,7 +103,7 @@ export const GlobalDialog: React.FC<GlobalDialogProps> = ({
             )}
             <Button
               onClick={() => onConfirm(type === 'prompt' ? inputValue : undefined)}
-              variant={isDestructive ? 'outline' : 'primary'}
+              variant="primary"
             >
               {confirmText}
             </Button>

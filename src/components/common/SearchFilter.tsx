@@ -28,7 +28,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
                     placeholder={placeholder}
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="bg-transparent border-none outline-none w-full text-sm text-text-primary placeholder:text-text-secondary"
+                    className="bg-transparent border-none outline-none w-full text-md text-text-primary placeholder:text-text-secondary"
                 />
             </div>
 

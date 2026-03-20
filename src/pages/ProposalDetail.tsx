@@ -249,27 +249,27 @@ export const ProposalDetail: React.FC = () => {
                 />
             )}
             {/* 1. Header & Breadcrumb */}
-            <button onClick={() => navigate('/proposals')} className="bg-transparent border-0 flex items-center gap-xs text-text-secondary hover:text-primary transition-colors cursor-pointer text-sm font-bold mb-lg">
-                <span className="material-icons-round text-sm">arrow_back</span>
-                국민 제안 목록
+            <button onClick={() => navigate('/proposals')} className="bg-transparent border-0 flex items-center gap-xs text-text-secondary hover:text-primary transition-colors cursor-pointer text-md font-bold mb-lg">
+                <span className="material-icons-round text-md">arrow_back</span>
+                제안 목록으로 이동
             </button>
 
             {/* 2. Proposal Body & Hero */}
             <div className="mb-xxl">
                 <div className="flex flex-col gap-sm mb-xl py-lg">
                     {proposal.category ? (
-                        <span className={`inline-flex max-w-max items-center px-4 py-1.5 rounded-full text-xs font-bold border ${getActiveCategoryColorClass(proposal.category)} mb-xs`}>
+                        <span className={`inline-flex max-w-max items-center px-4 py-1.5 rounded-full text-sm font-bold border ${getActiveCategoryColorClass(proposal.category)} mb-xs`}>
                             {proposal.category}
                         </span>
                     ) : (
-                        <span className="inline-flex max-w-max items-center px-sm py-[4px] rounded-full text-xs font-bold bg-primary/10 text-primary mb-xs">
+                        <span className="inline-flex max-w-max items-center px-sm py-[4px] rounded-full text-sm font-bold bg-primary/10 text-primary mb-xs">
                             시민의 목소리
                         </span>
                     )}
                     <h1 className="text-[2rem] font-bold text-text-primary leading-tight break-keep">
                         {proposal.title}
                     </h1>
-                    <div className="flex justify-between items-center text-sm font-medium text-text-secondary mt-sm">
+                    <div className="flex justify-between items-center text-md font-medium text-text-secondary mt-sm">
                         <div className="flex items-center gap-xs">
                             <span className="material-icons-round text-[20px]!">person</span>
                             <span className="text-text-primary font-bold">{proposal.authorNickname} {isViewerAuthor && "(나)"}</span>
@@ -282,7 +282,7 @@ export const ProposalDetail: React.FC = () => {
                                         className="w-8 h-8 rounded-full bg-surface border border-border text-text-secondary flex items-center justify-center hover:text-primary transition-colors cursor-pointer"
                                         title="수정"
                                     >
-                                        <span className="material-icons-round text-sm">edit</span>
+                                        <span className="material-icons-round text-md">edit</span>
                                     </button>
                                     <button
                                         onClick={() => {
@@ -302,7 +302,7 @@ export const ProposalDetail: React.FC = () => {
                                         className="w-8 h-8 rounded-full bg-surface border border-border text-text-secondary flex items-center justify-center hover:text-danger transition-colors cursor-pointer"
                                         title="삭제"
                                     >
-                                        <span className="material-icons-round text-sm">delete</span>
+                                        <span className="material-icons-round text-md">delete</span>
                                     </button>
                                 </div>
                             )}
@@ -319,7 +319,7 @@ export const ProposalDetail: React.FC = () => {
                     {/* Interactions */}
                     <div className="flex items-center gap-md mt-sm border-t border-border pt-md">
                         <button
-                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold ${isAuthenticated && user && proposal.likedBy?.includes(user.id) ? 'text-primary' : 'text-text-secondary hover:text-primary'
+                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-md font-bold ${isAuthenticated && user && proposal.likedBy?.includes(user.id) ? 'text-primary' : 'text-text-secondary hover:text-primary'
                                 }`}
                             onClick={() => {
                                 if (!isAuthenticated || !user) {
@@ -335,7 +335,7 @@ export const ProposalDetail: React.FC = () => {
                             공감 {proposal.likes || 0}
                         </button>
                         <button
-                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold ${isAuthenticated && user && proposal.scrapedBy?.includes(user.id) ? 'text-amber-500' : 'text-text-secondary hover:text-amber-500'
+                            className={`flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-md font-bold ${isAuthenticated && user && proposal.scrapedBy?.includes(user.id) ? 'text-amber-500' : 'text-text-secondary hover:text-amber-500'
                                 }`}
                             onClick={() => {
                                 if (!isAuthenticated || !user) {
@@ -353,7 +353,7 @@ export const ProposalDetail: React.FC = () => {
                         {/* Report Button */}
                         {isAuthenticated && user && proposal.authorId !== user.id && (
                             <button
-                                className="flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-sm font-bold text-text-secondary hover:text-danger"
+                                className="flex items-center gap-1 bg-transparent border-none cursor-pointer transition-colors text-md font-bold text-text-secondary hover:text-danger"
                                 onClick={() => setIsReportOpen(true)}
                             >
                                 <span className="material-icons-round text-[15px]!">flag</span>
@@ -369,7 +369,7 @@ export const ProposalDetail: React.FC = () => {
                         {/* Problem */}
                         {(proposal.problem || (!proposal.problem && proposal.description)) && (
                             <div className="bg-surface border border-border rounded-2xl p-lg md:p-xl hover:border-primary/30 transition-colors">
-                                <h3 className="text-sm font-bold text-primary mb-md inline-flex items-center gap-xs bg-primary/10 px-3 py-1 rounded-full">
+                                <h3 className="text-md font-bold text-primary mb-md inline-flex items-center gap-xs bg-primary/10 px-3 py-1 rounded-full">
                                     <span className="material-icons-round text-lg!">error</span>
                                     문제 정의
                                 </h3>
@@ -382,7 +382,7 @@ export const ProposalDetail: React.FC = () => {
                         {/* Reason */}
                         {proposal.reason && (
                             <div className="bg-surface border border-border rounded-2xl p-lg md:p-xl hover:border-primary/30 transition-colors">
-                                <h3 className="text-sm font-bold text-blue-500 mb-md inline-flex items-center gap-xs bg-blue-500/10 px-3 py-1 rounded-full">
+                                <h3 className="text-md font-bold text-blue-500 mb-md inline-flex items-center gap-xs bg-blue-500/10 px-3 py-1 rounded-full">
                                     <span className="material-icons-round text-lg!">help_outline</span>
                                     제안 이유
                                 </h3>
@@ -395,7 +395,7 @@ export const ProposalDetail: React.FC = () => {
                         {/* Current Situation */}
                         {proposal.currentSituation && (
                             <div className="bg-surface border border-border rounded-2xl p-lg md:p-xl hover:border-primary/30 transition-colors">
-                                <h3 className="text-sm font-bold text-amber-500 mb-md inline-flex items-center gap-xs bg-amber-500/10 px-3 py-1 rounded-full">
+                                <h3 className="text-md font-bold text-amber-500 mb-md inline-flex items-center gap-xs bg-amber-500/10 px-3 py-1 rounded-full">
                                     <span className="material-icons-round text-lg!">info</span>
                                     현재 상황
                                 </h3>
@@ -408,7 +408,7 @@ export const ProposalDetail: React.FC = () => {
                         {/* Solution */}
                         {proposal.solution && (
                             <div className="bg-surface border border-border rounded-2xl p-lg md:p-xl hover:border-primary/30 transition-colors">
-                                <h3 className="text-sm font-bold text-green-500 mb-md inline-flex items-center gap-xs bg-green-500/10 px-3 py-1 rounded-full">
+                                <h3 className="text-md font-bold text-green-500 mb-md inline-flex items-center gap-xs bg-green-500/10 px-3 py-1 rounded-full">
                                     <span className="material-icons-round text-lg!">lightbulb</span>
                                     해결책 제시
                                 </h3>
@@ -417,14 +417,103 @@ export const ProposalDetail: React.FC = () => {
                                 </p>
                             </div>
                         )}
+
+                        {/* 4. Discussion (Opinions) below the content grid */}
+                        <div className="mt-xl border-t border-border pt-xl">
+                            <div className="flex items-center justify-between pb-sm mb-lg">
+                                <h2 className="text-xl font-bold flex items-center gap-sm m-0">
+                                    의견 {opinions.length}개
+                                </h2>
+                            </div>
+
+                            <div className="bg-surface border border-border rounded-xl p-md mb-lg">
+                                {!isAuthenticated ? (
+                                    <div className="text-center py-xl">
+                                        <p className="mb-md text-text-secondary font-medium">로그인 후 의견을 남길 수 있습니다.</p>
+                                        <Button onClick={openLoginModal} size="sm">로그인</Button>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-sm">
+                                        <div className="flex items-center gap-sm">
+                                            <span className="text-md font-bold text-primary">임시 닉네임: {currentViewerNickname}</span>
+                                            <span className="flex items-center gap-1 text-xs bg-bg py-[2px] px-sm rounded text-text-secondary"><span className='material-icons'>warning</span> AI가 부적절한 발언을 검사 중입니다.</span>
+                                        </div>
+                                        <textarea
+                                            value={newOpinion}
+                                            onChange={(e) => setNewOpinion(e.target.value)}
+                                            className="w-full bg-bg border border-border rounded-lg p-md text-text-primary focus:outline-none focus:border-primary min-h-[100px] resize-none"
+                                            placeholder="상호 존중을 바탕으로 한 유익하고 생산적인 논의를 만들어주세요."
+                                        />
+                                        {opinionError && (
+                                            <div className="text-danger text-md font-bold bg-danger/10 px-md py-sm rounded-md border border-danger/20">
+                                                {opinionError}
+                                            </div>
+                                        )}
+                                        <div className="flex justify-end">
+                                            <Button onClick={handleOpinionSubmit} disabled={isSubmitting || !newOpinion.trim()} className='text-md'>
+                                                {isSubmitting ? '안전성 검토 중...' : '등록하기'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* List opinions */}
+                            <div className="flex flex-col gap-md">
+                                {opinions.length === 0 ? (
+                                    <EmptyState
+                                        message="첫 번째 의견을 남겨주세요."
+                                        icon="chat_bubble_outline"
+                                        description="당신의 소중한 의견이 문제 해결의 단초가 됩니다."
+                                    />
+                                ) : (
+                                    opinions.map((op) => (
+                                        <OpinionItem
+                                            key={op.id}
+                                            opinion={op}
+                                            isAuthor={op.authorNickname === proposal.authorNickname}
+                                            currentUserId={user?.id}
+                                            onLike={(opinionId) => toggleOpinionLike(opinionId, user?.id || '')}
+                                            onEdit={(opinion) => {
+                                                setDialogConfig({
+                                                    isOpen: true,
+                                                    type: 'prompt',
+                                                    title: '의견 수정',
+                                                    message: '의견 내용을 수정해주세요.',
+                                                    confirmText: '수정',
+                                                    defaultValue: opinion.content,
+                                                    onConfirm: (val) => {
+                                                        if (val) editOpinion({ ...opinion, content: val });
+                                                        closeDialog();
+                                                    }
+                                                });
+                                            }}
+                                            onDelete={(opinionId) => {
+                                                setDialogConfig({
+                                                    isOpen: true,
+                                                    type: 'confirm',
+                                                    title: '의견 삭제',
+                                                    message: '정말로 이 의견을 삭제하시겠습니까?',
+                                                    confirmText: '삭제',
+                                                    isDestructive: true,
+                                                    onConfirm: () => {
+                                                        removeOpinion(opinionId);
+                                                        closeDialog();
+                                                    }
+                                                });
+                                            }}
+                                        />
+                                    ))
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-xl">
+                    <div className="flex flex-col gap-xl lg:sticky lg:top-24 h-fit pb-lg">
                         {/* 3. Related News (Sidebar / Right column) */}
                         {relatedNews.length > 0 && (
                             <div className="bg-surface/50 p-lg rounded-[1.25rem] border border-border h-fit">
                                 <h2 className="text-lg font-bold mb-md flex items-center gap-xs">
-                                    <span className="text-primary text-xl">📰</span>
                                     관련 매경 기사
                                 </h2>
                                 <div className="flex flex-col gap-md">
@@ -435,96 +524,6 @@ export const ProposalDetail: React.FC = () => {
                                     ))}
                                 </div>
                             </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* 4. Discussion (Opinions) below the content grid */}
-                <div className="mt-xxl border-t border-border pt-xl">
-                    <div className="flex items-center justify-between pb-sm mb-lg">
-                        <h2 className="text-xl font-bold flex items-center gap-sm m-0">
-                            의견 {opinions.length}개
-                        </h2>
-                    </div>
-
-                    <div className="bg-surface border border-border rounded-xl p-md mb-lg max-w-[800px]">
-                        {!isAuthenticated ? (
-                            <div className="text-center py-xl">
-                                <p className="mb-md text-text-secondary font-medium">로그인 후 의견을 남길 수 있습니다.</p>
-                                <Button onClick={openLoginModal} size="sm">로그인</Button>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-sm">
-                                <div className="flex items-center gap-sm">
-                                    <span className="text-sm font-bold text-primary">임시 닉네임: {currentViewerNickname}</span>
-                                    <span className="flex items-center gap-1 text-[10px] bg-bg py-[2px] px-sm rounded text-text-secondary"><span className='material-icons'>warning</span> AI가 부적절한 발언을 검사 중입니다.</span>
-                                </div>
-                                <textarea
-                                    value={newOpinion}
-                                    onChange={(e) => setNewOpinion(e.target.value)}
-                                    className="w-full bg-bg border border-border rounded-lg p-md text-text-primary focus:outline-none focus:border-primary min-h-[100px] resize-none"
-                                    placeholder="상호 존중을 바탕으로 한 유익하고 생산적인 논의를 만들어주세요."
-                                />
-                                {opinionError && (
-                                    <div className="text-danger text-sm font-bold bg-danger/10 px-md py-sm rounded-md border border-danger/20">
-                                        {opinionError}
-                                    </div>
-                                )}
-                                <div className="flex justify-end">
-                                    <Button onClick={handleOpinionSubmit} disabled={isSubmitting || !newOpinion.trim()} className='text-sm'>
-                                        {isSubmitting ? '안전성 검토 중...' : '등록하기'}
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* List opinions */}
-                    <div className="flex flex-col gap-md max-w-[800px]">
-                        {opinions.length === 0 ? (
-                            <EmptyState
-                                message="첫 번째 의견을 남겨주세요."
-                                icon="chat_bubble_outline"
-                                description="당신의 소중한 의견이 문제 해결의 단초가 됩니다."
-                            />
-                        ) : (
-                            opinions.map((op) => (
-                                <OpinionItem
-                                    key={op.id}
-                                    opinion={op}
-                                    isAuthor={op.authorNickname === proposal.authorNickname}
-                                    currentUserId={user?.id}
-                                    onLike={(opinionId) => toggleOpinionLike(opinionId, user?.id || '')}
-                                    onEdit={(opinion) => {
-                                        setDialogConfig({
-                                            isOpen: true,
-                                            type: 'prompt',
-                                            title: '의견 수정',
-                                            message: '의견 내용을 수정해주세요.',
-                                            confirmText: '수정',
-                                            defaultValue: opinion.content,
-                                            onConfirm: (val) => {
-                                                if (val) editOpinion({ ...opinion, content: val });
-                                                closeDialog();
-                                            }
-                                        });
-                                    }}
-                                    onDelete={(opinionId) => {
-                                        setDialogConfig({
-                                            isOpen: true,
-                                            type: 'confirm',
-                                            title: '의견 삭제',
-                                            message: '정말로 이 의견을 삭제하시겠습니까?',
-                                            confirmText: '삭제',
-                                            isDestructive: true,
-                                            onConfirm: () => {
-                                                removeOpinion(opinionId);
-                                                closeDialog();
-                                            }
-                                        });
-                                    }}
-                                />
-                            ))
                         )}
                     </div>
                 </div>

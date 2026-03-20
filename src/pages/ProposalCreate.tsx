@@ -6,6 +6,18 @@ import { CONTENT_CATEGORIES, type ContentCategory } from '../features/user';
 import { generateNickname } from '../utils/nicknameGenerator';
 import { Button } from '../components/ui/Button';
 import { getProposalById } from '../services/db/proposalDB';
+import { GlobalDialog, type DialogType } from '../components/common/GlobalDialog';
+
+export interface DialogConfig {
+    isOpen: boolean;
+    type: DialogType;
+    title: string;
+    message: string;
+    confirmText?: string;
+    defaultValue?: string;
+    isDestructive?: boolean;
+    onConfirm: (val?: string) => void;
+}
 
 export const ProposalCreate: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,8 +32,17 @@ export const ProposalCreate: React.FC = () => {
     const [reason, setReason] = useState('');
     const [currentSituation, setCurrentSituation] = useState('');
     const [solution, setSolution] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
     const [fetchLoading, setFetchLoading] = useState(isEditMode);
+
+    const [dialogConfig, setDialogConfig] = useState<DialogConfig>({
+        isOpen: false,
+        type: 'alert',
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
+
+    const closeDialog = () => setDialogConfig((prev: DialogConfig) => ({ ...prev, isOpen: false }));
 
     // Minimum length requirement for structured fields
     const MIN_LENGTH = 20;
@@ -40,10 +61,22 @@ export const ProposalCreate: React.FC = () => {
                         setCurrentSituation(proposal.currentSituation || '');
                         setSolution(proposal.solution || '');
                     } else {
-                        setErrorMsg('게시물을 찾을 수 없습니다.');
+                        setDialogConfig({
+                            isOpen: true,
+                            type: 'alert',
+                            title: '오류',
+                            message: '게시물을 찾을 수 없습니다.',
+                            onConfirm: closeDialog,
+                        });
                     }
                 } catch (err) {
-                    setErrorMsg('게시물을 불러오는 중 오류가 발생했습니다.');
+                    setDialogConfig({
+                        isOpen: true,
+                        type: 'alert',
+                        title: '오류',
+                        message: '게시물을 불러오는 중 오류가 발생했습니다.',
+                        onConfirm: closeDialog,
+                    });
                 } finally {
                     setFetchLoading(false);
                 }
@@ -61,17 +94,35 @@ export const ProposalCreate: React.FC = () => {
         }
 
         if (!title.trim() || !category || !problem.trim() || !reason.trim() || !currentSituation.trim() || !solution.trim()) {
-            setErrorMsg('모든 필드(카테고리 포함)를 입력해주세요.');
+            setDialogConfig({
+                isOpen: true,
+                type: 'alert',
+                title: '입력 확인',
+                message: '모든 필드(카테고리 포함)를 입력해주세요.',
+                onConfirm: closeDialog,
+            });
             return;
         }
 
         if (title.length < 5) {
-            setErrorMsg('제목은 5자 이상 작성해주세요.');
+            setDialogConfig({
+                isOpen: true,
+                type: 'alert',
+                title: '입력 확인',
+                message: '제목은 5자 이상 작성해주세요.',
+                onConfirm: closeDialog,
+            });
             return;
         }
 
         if (problem.length < MIN_LENGTH || reason.length < MIN_LENGTH || currentSituation.length < MIN_LENGTH || solution.length < MIN_LENGTH) {
-            setErrorMsg(`모든 내용 항목은 최소 ${MIN_LENGTH}자 이상 작성해주세요.`);
+            setDialogConfig({
+                isOpen: true,
+                type: 'alert',
+                title: '입력 확인',
+                message: `모든 내용 항목은 최소 ${MIN_LENGTH}자 이상 작성해주세요.`,
+                onConfirm: closeDialog,
+            });
             return;
         }
 
@@ -113,7 +164,13 @@ export const ProposalCreate: React.FC = () => {
                 navigate(`/proposals/${proposalId}`);
             }
         } catch (err) {
-            setErrorMsg('저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+            setDialogConfig({
+                isOpen: true,
+                type: 'alert',
+                title: '오류',
+                message: '저장에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+                onConfirm: closeDialog,
+            });
         }
     };
 
@@ -132,21 +189,16 @@ export const ProposalCreate: React.FC = () => {
             </h1>
 
             {!isAuthenticated && (
-                <div className="bg-warning/10 border border-warning/20 p-md rounded-lg mb-lg flex justify-between items-center text-sm text-warning font-medium">
+                <div className="bg-warning/10 border border-warning/20 p-md rounded-lg mb-lg flex justify-between items-center text-md text-warning font-medium">
                     <span>제안을 작성하려면 로그인이 필요합니다. (아고라-X에서는 랜덤 닉네임으로 자유로운 의견 개진이 보장됩니다)</span>
                     <Button size="sm" onClick={openLoginModal}>로그인</Button>
                 </div>
             )}
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-lg bg-surface p-xl rounded-[1.25rem] border border-border">
-                {errorMsg && (
-                    <div className="p-sm bg-danger/10 text-danger text-sm font-medium rounded-md border border-danger/20">
-                        {errorMsg}
-                    </div>
-                )}
 
                 <div className="flex flex-col gap-xs">
-                    <label className="text-md mb-1 font-bold text-text-primary">
+                    <label className="text-lg mb-1 font-bold text-text-primary">
                         카테고리 <span className="text-danger">*</span>
                     </label>
                     <div className="flex flex-wrap gap-sm">
@@ -155,7 +207,7 @@ export const ProposalCreate: React.FC = () => {
                                 key={cat}
                                 type="button"
                                 onClick={() => setCategory(cat)}
-                                className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${category === cat
+                                className={`px-4 py-2 rounded-full text-md font-bold transition-colors border ${category === cat
                                     ? 'bg-primary text-white border-primary'
                                     : 'bg-bg text-text-secondary border-border hover:border-primary hover:text-primary'
                                     }`}
@@ -168,7 +220,7 @@ export const ProposalCreate: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-xs mt-md">
-                    <label className="text-md mb-1 font-bold text-text-primary">
+                    <label className="text-lg mb-1 font-bold text-text-primary">
                         제안 제목 <span className="text-danger">*</span>
                     </label>
                     <input
@@ -182,7 +234,7 @@ export const ProposalCreate: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-xs relative mt-md">
-                    <label className="text-md mb-1 font-bold text-text-primary flex justify-between">
+                    <label className="text-lg mb-1 font-bold text-text-primary flex justify-between">
                         <span>제안 주제 (문제 정의) <span className="text-danger">*</span></span>
                     </label>
                     <textarea
@@ -193,14 +245,14 @@ export const ProposalCreate: React.FC = () => {
                         disabled={loading || !isAuthenticated}
                     />
                     <div className="flex justify-end">
-                        <span className={`text-[10px] font-medium ${problem.length < MIN_LENGTH ? 'text-danger' : 'text-primary'}`}>
+                        <span className={`text-sm font-medium ${problem.length < MIN_LENGTH ? 'text-danger' : 'text-primary'}`}>
                             {problem.length} / {MIN_LENGTH}자 이상
                         </span>
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-xs relative">
-                    <label className="text-md mb-1 font-bold text-text-primary flex justify-between">
+                    <label className="text-lg mb-1 font-bold text-text-primary flex justify-between">
                         <span>제안 이유 <span className="text-danger">*</span></span>
                     </label>
                     <textarea
@@ -211,14 +263,14 @@ export const ProposalCreate: React.FC = () => {
                         disabled={loading || !isAuthenticated}
                     />
                     <div className="flex justify-end">
-                        <span className={`text-[10px] font-medium ${reason.length < MIN_LENGTH ? 'text-danger' : 'text-primary'}`}>
+                        <span className={`text-sm font-medium ${reason.length < MIN_LENGTH ? 'text-danger' : 'text-primary'}`}>
                             {reason.length} / {MIN_LENGTH}자 이상
                         </span>
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-xs relative">
-                    <label className="text-md mb-1 font-bold text-text-primary flex justify-between">
+                    <label className="text-lg mb-1 font-bold text-text-primary flex justify-between">
                         <span>현재 상황 <span className="text-danger">*</span></span>
                     </label>
                     <textarea
@@ -229,14 +281,14 @@ export const ProposalCreate: React.FC = () => {
                         disabled={loading || !isAuthenticated}
                     />
                     <div className="flex justify-end">
-                        <span className={`text-[10px] font-medium ${currentSituation.length < MIN_LENGTH ? 'text-danger' : 'text-primary'}`}>
+                        <span className={`text-sm font-medium ${currentSituation.length < MIN_LENGTH ? 'text-danger' : 'text-primary'}`}>
                             {currentSituation.length} / {MIN_LENGTH}자 이상
                         </span>
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-xs relative">
-                    <label className="text-md mb-1 font-bold text-text-primary flex justify-between">
+                    <label className="text-lg mb-1 font-bold text-text-primary flex justify-between">
                         <span>해결책 제시 <span className="text-danger">*</span></span>
                     </label>
                     <textarea
@@ -247,7 +299,7 @@ export const ProposalCreate: React.FC = () => {
                         disabled={loading || !isAuthenticated}
                     />
                     <div className="flex justify-end">
-                        <span className={`text-[10px] font-medium ${solution.length < MIN_LENGTH ? 'text-danger' : 'text-primary'}`}>
+                        <span className={`text-sm font-medium ${solution.length < MIN_LENGTH ? 'text-danger' : 'text-primary'}`}>
                             {solution.length} / {MIN_LENGTH}자 이상
                         </span>
                     </div>
@@ -262,6 +314,19 @@ export const ProposalCreate: React.FC = () => {
                     </Button>
                 </div>
             </form>
+
+            {/* Global Dialog */}
+            <GlobalDialog
+                isOpen={dialogConfig.isOpen}
+                type={dialogConfig.type}
+                title={dialogConfig.title}
+                message={dialogConfig.message}
+                confirmText={dialogConfig.confirmText}
+                defaultValue={dialogConfig.defaultValue}
+                isDestructive={dialogConfig.isDestructive}
+                onConfirm={dialogConfig.onConfirm}
+                onCancel={closeDialog}
+            />
         </div>
     );
 };

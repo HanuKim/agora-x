@@ -6,6 +6,7 @@ import { claudeService, type UserArgumentAnalysis } from '../services/ai/claudeS
 import type { ArenaOpinion } from '../features/common/types';
 import { GlobalDialog } from '../components/common/GlobalDialog';
 import { saveChatHistory } from '../services/db/historyDB';
+import { Button } from '../components/ui/Button';
 
 /* ── AI Help Types (same as DiscussionAIDetail) ────────── */
 type HelpType = 'organize' | 'argument' | 'counter' | 'free';
@@ -135,49 +136,49 @@ export const DiscussionArena: React.FC = () => {
                     {/* Back button & Topic */}
                     <div>
                         <button onClick={() => navigate(`/detail/${arena.numericId}`)}
-                            className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors text-sm font-bold mb-6">
-                            <span className="material-icons-round text-lg">arrow_back</span>
-                            토론 상세로
+                            className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors text-md font-bold mb-6">
+                            <span className="material-icons-round">arrow_back</span>
+                            상세페이지로 이동
                         </button>
                         <div className="flex items-center gap-2 mb-3">
-                            <span className="material-icons-round text-primary text-sm">psychology</span>
-                            <span className="text-xs font-bold uppercase tracking-widest text-text-secondary">AI 중재 토론장</span>
+                            <span className="material-icons-round text-primary text-lg!">psychology</span>
+                            <span className="text-md font-bold uppercase tracking-widest text-text-secondary">AI 중재 토론장</span>
                         </div>
                         <h1 className="font-display text-2xl md:text-3xl font-bold leading-tight text-text-primary mb-4 break-keep">
                             {arena.debateTopic ?? '토론 주제를 불러오는 중...'}
                         </h1>
                         {arena.stance && (
-                            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${arena.stance === 'pro'
+                            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-md font-bold border ${arena.stance === 'pro'
                                 ? 'bg-success/10 text-success border-success/20'
                                 : 'bg-danger/10 text-danger border-danger/20'
                                 }`}>
-                                {arena.stance === 'pro' ? '👍 찬성' : '👎 반대'} 입장
+                                {arena.stance === 'pro' ? '찬성' : '반대'} 입장
                             </span>
                         )}
                     </div>
 
                     {/* Issue Summary */}
                     <div className="space-y-4">
-                        <h3 className="text-sm font-semibold uppercase tracking-wide text-text-secondary flex items-center justify-between">
+                        <h3 className="text-md font-semibold uppercase tracking-wide text-text-secondary flex items-center justify-between">
                             쟁점 요약
                             <button
                                 onClick={() => setIsResetDialogOpen(true)}
-                                className="flex items-center gap-1 text-[10px] bg-surface-variant hover:bg-danger/10 hover:text-danger px-2 py-1 rounded transition-colors border border-border cursor-pointer"
+                                className="flex items-center gap-1 text-md! bg-surface-variant hover:bg-danger/10 hover:text-danger px-2 py-1 rounded transition-colors border border-border cursor-pointer"
                                 title="대화 내용 초기화"
                             >
-                                <span className="material-icons-round text-xs">restart_alt</span>
+                                <span className="material-icons-round text-md!">restart_alt</span>
                                 초기화
                             </button>
                         </h3>
                         <div className="p-4 rounded-xl bg-bg border border-border hover:border-primary/30 transition-colors">
-                            <p className="text-sm text-text-primary leading-relaxed break-keep">
+                            <p className="text-md text-text-primary leading-relaxed break-keep">
                                 {arena.overview ?? 'AI가 기사 분석 중...'}
                             </p>
                         </div>
                         {arena.articleUrl && (
                             <a href={arena.articleUrl} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-hover transition-colors font-medium">
-                                <span className="material-icons-round text-xs">open_in_new</span>
+                                className="inline-flex items-center gap-2 text-md! text-primary hover:text-primary-hover transition-colors font-medium">
+                                <span className="material-icons-round">open_in_new</span>
                                 원문 기사 보기
                             </a>
                         )}
@@ -185,16 +186,16 @@ export const DiscussionArena: React.FC = () => {
 
                     {/* Discussion Guide */}
                     <div className="space-y-4">
-                        <h3 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">토론 안내</h3>
+                        <h3 className="text-md font-semibold uppercase tracking-wide text-text-secondary">토론 안내</h3>
                         {[
                             { icon: 'check_circle', color: 'text-success', text: 'AI가 다른 시민들의 반대 의견을 제시합니다' },
                             { icon: 'check_circle', color: 'text-success', text: '의견을 주고받으며 논점을 발전시키세요' },
                             { icon: 'check_circle', color: 'text-success', text: '토론 종료 후 최종 입장을 투표합니다' },
                             { icon: 'swap_horiz', color: 'text-primary', text: '입장 변화 시 가장 영향을 준 의견을 선택합니다' },
                         ].map((item, i) => (
-                            <div key={i} className="p-3 rounded-xl bg-bg border border-border flex items-start gap-3">
-                                <span className={`material-icons-round text-xs mt-0.5 ${item.color}`}>{item.icon}</span>
-                                <p className="text-xs text-text-primary leading-relaxed break-keep">{item.text}</p>
+                            <div key={i} className="p-3 rounded-xl bg-bg border border-border text-md flex items-center gap-3">
+                                <span className={`material-icons-round mt-0.5 ${item.color}`}>{item.icon}</span>
+                                <p className="text-text-primary leading-relaxed break-keep">{item.text}</p>
                             </div>
                         ))}
                     </div>
@@ -206,8 +207,8 @@ export const DiscussionArena: React.FC = () => {
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary blur-[50px] opacity-10 rounded-full pointer-events-none" />
                                 <div className="flex justify-between items-start mb-4 relative z-10">
                                     <div>
-                                        <h3 className="font-display font-bold text-sm text-white">논리적 일관성 분석</h3>
-                                        <p className="text-[10px] text-gray-400 mt-1">최근 발언 기준으로 주장을 분석합니다.</p>
+                                        <h3 className="font-bold text-lg text-white">논리적 일관성 분석</h3>
+                                        <p className="text-sm text-gray-400 mt-1">최근 발언 기준으로 주장을 분석합니다.</p>
                                     </div>
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
                                         <span className="material-icons-round text-primary text-sm">analytics</span>
@@ -220,7 +221,7 @@ export const DiscussionArena: React.FC = () => {
                                         { label: '오류 검증', value: opinionAnalysis.logicValid, color: 'bg-blue-400', textColor: 'text-blue-400' },
                                     ].map((metric) => (
                                         <div key={metric.label}>
-                                            <div className="flex justify-between text-[10px] font-medium text-gray-400 mb-1">
+                                            <div className="flex justify-between text-sm font-medium text-gray-400 mb-1">
                                                 <span>{metric.label}</span>
                                                 <span className={metric.textColor}>{metric.value}%</span>
                                             </div>
@@ -232,7 +233,7 @@ export const DiscussionArena: React.FC = () => {
                                 </div>
                                 {opinionAnalysis.feedback !== "대기 중" && (
                                     <div className="mt-3 pt-3 border-t border-gray-700 relative z-10">
-                                        <p className="text-xs text-gray-300 leading-relaxed break-keep">
+                                        <p className="text-sm text-gray-300 leading-relaxed break-keep">
                                             💡 {opinionAnalysis.feedback}
                                         </p>
                                     </div>
@@ -257,9 +258,9 @@ export const DiscussionArena: React.FC = () => {
                     <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center justify-center">
                         <div className="w-full text-center space-y-8">
                             <div>
-                                <span className="material-icons-round text-5xl text-primary mb-4 block">how_to_vote</span>
+                                <span className="material-icons-round text-4xl! text-primary mb-4 block">how_to_vote</span>
                                 <h2 className="text-2xl font-bold text-text-primary mb-2">입장을 선택하고 의견을 작성해주세요</h2>
-                                <p className="text-sm text-text-secondary break-keep leading-relaxed">
+                                <p className="text-md text-text-secondary break-keep leading-relaxed">
                                     선택한 입장에서 의견을 작성하면, AI가 반대 입장의 시민 의견을 제시하며 토론을 진행합니다.
                                 </p>
                             </div>
@@ -290,22 +291,24 @@ export const DiscussionArena: React.FC = () => {
                             {selectedStance && (
                                 <div className="space-y-4">
                                     <textarea
-                                        className="w-full min-h-[120px] p-4 rounded-xl border border-border bg-bg text-text-primary text-sm resize-none focus:outline-none focus:border-primary transition-all placeholder-text-secondary"
+                                        className="w-full min-h-[220px] p-4 rounded-xl border border-border bg-bg text-text-primary text-md resize-none focus:outline-none focus:border-primary transition-all placeholder-text-secondary"
                                         placeholder="이 주제에 대한 당신의 의견을 자유롭게 작성해주세요..."
                                         value={initialOpinion}
                                         onChange={(e) => setInitialOpinion(e.target.value)}
                                     />
-                                    <button
-                                        type="button"
-                                        className="w-full py-3 bg-primary text-white rounded-xl font-bold text-base cursor-pointer border-none hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                        disabled={!initialOpinion.trim()}
-                                        onClick={() => {
-                                            if (!isAuthenticated || !user) { openLoginModal(); return; }
-                                            arena.startDiscussion(selectedStance, initialOpinion);
-                                        }}>
-                                        <span className="material-icons-round text-lg">send</span>
-                                        토론 시작하기
-                                    </button>
+                                    <div className='flex justify-end'>
+                                        <Button
+                                            variant="primary"
+
+                                            disabled={!initialOpinion.trim()}
+                                            onClick={() => {
+                                                if (!isAuthenticated || !user) { openLoginModal(); return; }
+                                                arena.startDiscussion(selectedStance, initialOpinion);
+                                            }}>
+                                            <span className="material-icons-round mr-2 text-lg">send</span>
+                                            토론 시작하기
+                                        </Button>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -352,8 +355,8 @@ export const DiscussionArena: React.FC = () => {
                                                         <div key={op.id} className="flex items-start gap-2 p-3 rounded-xl bg-bg border border-border text-left">
                                                             <span className="material-icons-round text-xs text-danger mt-0.5">record_voice_over</span>
                                                             <div>
-                                                                <p className="text-xs text-text-primary break-keep leading-relaxed">{op.body}</p>
-                                                                <span className="text-[10px] text-text-muted mt-1 block">— {op.authorName}</span>
+                                                                <p className="text-md text-text-primary break-keep leading-relaxed">{op.body}</p>
+                                                                <span className="text-sm text-text-muted mt-1 block">— {op.authorName}</span>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -431,8 +434,8 @@ export const DiscussionArena: React.FC = () => {
                                     <div className="bg-bg border border-primary/20 rounded-xl p-4 space-y-2">
                                         <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap break-keep">{helpResponse}</p>
                                         <button onClick={insertHelpToInput}
-                                            className="flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-hover transition-colors bg-transparent border-none cursor-pointer">
-                                            <span className="material-icons-round text-sm">content_paste</span>
+                                            className="flex items-center gap-1 text-sm font-bold text-primary hover:text-primary-hover transition-colors bg-transparent border-none cursor-pointer">
+                                            <span className="material-icons-round">content_paste</span>
                                             채팅에 붙여넣기
                                         </button>
                                     </div>
@@ -445,18 +448,18 @@ export const DiscussionArena: React.FC = () => {
                             <div className="max-w-4xl mx-auto relative">
                                 <div className="flex items-center gap-4 px-2 mb-2">
                                     <button onClick={() => setIsHelpOpen(!isHelpOpen)}
-                                        className={`flex items-center gap-1 text-xs font-bold transition-colors bg-transparent border-none cursor-pointer ${isHelpOpen ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}>
-                                        <span className="material-icons-round text-sm">psychology</span>
+                                        className={`flex items-center gap-1 text-md font-bold transition-colors bg-transparent border-none cursor-pointer ${isHelpOpen ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}>
+                                        <span className="material-icons-round">psychology</span>
                                         AI 도움받기
                                         {helpRemaining < 10 && <span className="text-[10px] text-text-secondary">({helpRemaining})</span>}
                                     </button>
                                     <span className="text-border">|</span>
                                     <button onClick={arena.startFinalVote}
-                                        className="flex items-center gap-1 text-xs font-bold text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer">
-                                        <span className="material-icons-round text-sm">how_to_vote</span>
+                                        className="flex items-center gap-1 text-md font-bold text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer">
+                                        <span className="material-icons-round">how_to_vote</span>
                                         토론 종료 &amp; 최종 투표
                                     </button>
-                                    <span className="text-[11px] text-text-muted ml-auto">{arena.roundCount}라운드 진행 중</span>
+                                    <span className="text-sm text-text-muted ml-auto">{arena.roundCount}라운드 진행 중</span>
                                 </div>
                                 <div className={`relative bg-bg rounded-2xl border transition-all shadow-sm ${arena.isLoading ? 'border-border opacity-70' : 'border-border focus-within:border-primary'}`}>
                                     <textarea
@@ -495,22 +498,22 @@ export const DiscussionArena: React.FC = () => {
                 {/* ── Phase: Completed ── */}
                 {arena.phase === 'completed' && (
                     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                        <span className="material-icons-round text-6xl text-success mb-4">celebration</span>
+                        <span className="material-icons-round text-4xl! text-success mb-4">celebration</span>
                         <h2 className="text-2xl font-bold text-text-primary mb-2">토론이 완료되었습니다!</h2>
-                        <p className="text-sm text-text-secondary mb-6 break-keep">
+                        <p className="text-md text-text-secondary mb-6 break-keep">
                             {arena.finalStance !== arena.stance
                                 ? '토론을 통해 입장이 변화했습니다. 선택하신 의견이 영향력 순위에 반영됩니다.'
                                 : '기존 입장을 유지하셨습니다. 소중한 의견 감사합니다!'}
                         </p>
                         <div className="flex items-center gap-4 mb-8">
                             <div className={`px-4 py-2 rounded-full text-sm font-bold ${arena.stance === 'pro' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
-                                초기: {arena.stance === 'pro' ? '찬성' : '반대'}
+                                토론 전 : {arena.stance === 'pro' ? '찬성' : '반대'}
                             </div>
                             {arena.finalStance !== arena.stance && (
                                 <>
                                     <span className="material-icons-round text-primary">arrow_forward</span>
                                     <div className={`px-4 py-2 rounded-full text-sm font-bold ${arena.finalStance === 'pro' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
-                                        최종: {arena.finalStance === 'pro' ? '찬성' : '반대'}
+                                        토론 후 : {arena.finalStance === 'pro' ? '찬성' : '반대'}
                                     </div>
                                 </>
                             )}
@@ -518,7 +521,7 @@ export const DiscussionArena: React.FC = () => {
                         <button onClick={() => navigate(`/detail/${arena.numericId}`)}
                             className="px-8 py-3 bg-primary text-white rounded-xl font-bold cursor-pointer border-none hover:bg-primary-hover transition-colors flex items-center gap-2">
                             <span className="material-icons-round">arrow_back</span>
-                            토론 상세로 돌아가기
+                            상세페이지로 돌아가기
                         </button>
                     </div>
                 )}
@@ -554,9 +557,9 @@ const FinalVoteView: React.FC<{
         <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center">
             <div className="w-full">
                 <div className="text-center mb-8">
-                    <span className="material-icons-round text-4xl text-primary mb-4 block">how_to_vote</span>
-                    <h2 className="text-xl font-bold text-text-primary mb-2">최종 투표</h2>
-                    <p className="text-sm text-text-secondary">토론을 통해 최종 입장을 선택해주세요.</p>
+                    <span className="material-icons-round text-4xl! text-primary mb-4 block">how_to_vote</span>
+                    <h2 className="text-2xl font-bold text-text-primary mb-2">최종 투표</h2>
+                    <p className="text-md text-text-secondary">토론을 통해 최종 입장을 선택해주세요.</p>
                 </div>
 
                 <div className="flex gap-4 mb-8 justify-center">
@@ -576,8 +579,8 @@ const FinalVoteView: React.FC<{
 
                 {stanceChanged && oppositeOpinions.length > 0 && (
                     <div className="mb-8">
-                        <h3 className="text-sm font-bold text-text-primary mb-3 flex items-center gap-2">
-                            <span className="material-icons-round text-sm text-primary">star</span>
+                        <h3 className="text-md font-bold text-text-primary mb-3 flex items-center gap-2">
+                            <span className="material-icons-round text-lg! text-primary">star</span>
                             입장 변화에 가장 큰 영향을 준 의견을 선택해주세요
                         </h3>
                         <div className="space-y-3 max-h-[300px] overflow-y-auto">
@@ -588,24 +591,26 @@ const FinalVoteView: React.FC<{
                                         : 'border-border bg-surface hover:border-primary/30'
                                         }`}
                                     onClick={() => setSelectedInfluentialOpinionId(op.id)}>
-                                    <p className="text-sm text-text-primary break-keep">{op.body}</p>
-                                    <span className="text-[10px] text-text-muted mt-2 block">— {op.authorName}</span>
+                                    <p className="text-md text-text-primary break-keep">{op.body}</p>
+                                    <span className="text-sm text-text-muted mt-2 block">— {op.authorName}</span>
                                 </button>
                             ))}
                         </div>
                     </div>
                 )}
 
-                <button type="button"
-                    className="w-full py-3 bg-primary text-white rounded-xl font-bold text-base cursor-pointer border-none hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    disabled={stanceChanged && !selectedInfluentialOpinionId}
-                    onClick={() => onSubmit(chosenStance, selectedInfluentialOpinionId ?? undefined)}>
-                    <span className="material-icons-round">check_circle</span>
-                    {stanceChanged ? '입장 변화 확정하기' : '입장 유지 확정하기'}
-                </button>
+                <div className="flex justify-center">
+                    <button type="button"
+                        className="w-[200px] py-3 bg-primary text-white rounded-xl font-bold text-base cursor-pointer border-none hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        disabled={stanceChanged && !selectedInfluentialOpinionId}
+                        onClick={() => onSubmit(chosenStance, selectedInfluentialOpinionId ?? undefined)}>
+                        <span className="material-icons-round">check_circle</span>
+                        {stanceChanged ? '입장 변화 확정하기' : '입장 유지 확정하기'}
+                    </button>
+                </div>
 
                 {stanceChanged && !selectedInfluentialOpinionId && (
-                    <p className="text-xs text-text-muted text-center mt-3">
+                    <p className="text-md text-text-muted text-center mt-3">
                         입장이 변화한 경우, 영향을 준 의견을 반드시 선택해주세요.
                     </p>
                 )}
