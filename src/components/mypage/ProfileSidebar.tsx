@@ -116,12 +116,12 @@ export const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
 
                 {/* Level & XP */}
                 {userLevel && (
-                    <div className="border-t border-border pt-md mb-lg">
+                    <div className="border-t border-border pt-md mb-xl">
                         <div className="flex items-center justify-between mb-sm">
-                            <span className="text-xs font-bold text-text-secondary">레벨</span>
+                            <span className="text-sm font-bold text-text-secondary">레벨</span>
                             <span className="text-sm font-bold text-primary">
                                 Lv.{userLevel.level}{' '}
-                                <span className="text-text-secondary font-medium">
+                                <span className="text-text-secondary font-medium ml-1">
                                     {levelInfo?.label}
                                 </span>
                             </span>
@@ -132,13 +132,13 @@ export const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
                                 style={{ width: `${xpProgress}%` }}
                             />
                         </div>
-                        <p className="text-[11px] text-text-secondary text-right">
+                        <p className="text-[12px] text-text-secondary text-right">
                             {userLevel.xp} XP
                         </p>
 
                         {/* Manner Score */}
                         <div className="flex items-center justify-between mt-md">
-                            <span className="text-xs font-bold text-text-secondary">매너 점수</span>
+                            <span className="text-sm font-bold text-text-secondary">매너 점수</span>
                             <span
                                 className={`text-sm font-bold ${userLevel.mannerScore >= 80
                                     ? 'text-green-500'
@@ -181,7 +181,7 @@ export const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
                     ))}
                 </nav>
                 {/* Logout */}
-                <div className="flex justify-end mt-md">
+                <div className="flex justify-end mt-md mb-xs">
                     <Button variant="outline" size="sm" onClick={onLogout}>
                         로그아웃
                     </Button>

@@ -47,7 +47,7 @@ export const Header: React.FC = () => {
                 <div className="flex items-center gap-md">
                     {/* Auth */}
                     {isAuthenticated && user ? (
-                        <NavLink to="/mypage" className="flex items-center gap-sm no-underline">
+                        <NavLink to="/mypage" className="flex items-center gap-md no-underline">
                             <span className="text-md font-medium text-text-primary">{user.name}</span>
                             {user.picture ? (
                                 <div className="w-10 h-10 rounded-full border border-border overflow-hidden">

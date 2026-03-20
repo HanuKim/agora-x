@@ -159,15 +159,15 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
 
     return (
         <div className="flex flex-col gap-lg">
-            <h2 className="text-xl font-bold text-text-primary m-0 flex items-center gap-sm">
+            <h2 className="text-2xl font-bold text-text-primary m-0 flex items-center gap-sm">
                 <span className="material-icons-round text-blue-500">edit_note</span>
                 내가 작성한 게시물/의견
             </h2>
 
             {/* Category Ratio Chart */}
             {categoryStats.length > 0 && (
-                <Card className="p-lg">
-                    <p className="text-sm font-bold text-text-primary mb-md flex items-center gap-xs">
+                <Card className="p-lg mb-4">
+                    <p className="text-md font-bold text-text-primary mb-md flex items-center gap-xs">
                         <span className="material-icons-round text-[16px] text-primary">pie_chart</span>
                         카테고리별 활동 비율
                     </p>
@@ -183,7 +183,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                         ))}
                     </div>
                     {/* Legend */}
-                    <div className="flex flex-wrap gap-md">
+                    <div className="flex flex-wrap gap-md ml-1">
                         {categoryStats.map(({ category, count, ratio }) => (
                             <div key={category} className="flex items-center gap-xs">
                                 <span
@@ -200,7 +200,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
 
             {/* Filters */}
             <div className="flex items-center justify-between flex-wrap gap-sm">
-                <div className="flex gap-sm flex-wrap">
+                <div className="flex gap-xs flex-wrap">
                     {CATEGORIES.map((cat) => (
                         <button
                             key={cat}
@@ -220,7 +220,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                         <button
                             key={key}
                             onClick={() => setSortOption(key)}
-                            className={`px-sm py-xs text-xs font-medium rounded-md transition-all duration-200 border cursor-pointer ${
+                            className={`px-sm py-xs text-sm font-medium rounded-md transition-all duration-200 border cursor-pointer ${
                                 sortOption === key
                                     ? 'bg-text-primary text-bg border-text-primary'
                                     : 'bg-transparent text-text-secondary border-border hover:text-text-primary'
@@ -308,7 +308,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                     {showProposalOpinions && sortedProposalOpinions.length > 0 && (
                         <div>
                             {activeCategory === '전체' && (
-                                <h3 className="text-sm font-bold text-text-secondary mb-md flex items-center gap-xs">
+                                <h3 className="text-md font-bold text-text-secondary mb-md flex items-center gap-xs">
                                     <span className="material-icons-round text-[16px]">chat_bubble_outline</span>
                                     국민제안 의견 ({sortedProposalOpinions.length})
                                 </h3>
@@ -327,7 +327,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                                                     <span className="material-icons-round text-[14px] text-primary">
                                                         description
                                                     </span>
-                                                    <span className="text-xs font-bold text-primary line-clamp-1">
+                                                    <span className="text-sm font-bold text-primary line-clamp-1">
                                                         {proposal.title}
                                                     </span>
                                                 </div>
@@ -343,7 +343,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                                                         day: 'numeric',
                                                     })}
                                                 </span>
-                                                <span className="flex items-center gap-xs text-xs text-text-secondary">
+                                                <span className="flex items-center gap-sm text-sm text-text-secondary">
                                                     <span className="material-icons-round text-[14px] text-primary">thumb_up</span>
                                                     {opinion.likes || 0}
                                                 </span>
@@ -401,7 +401,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                     {showDiscussionOpinions && sortedDiscussionOpinions.length > 0 && (
                         <div>
                             {activeCategory === '전체' && (
-                                <h3 className="text-sm font-bold text-text-secondary mb-md flex items-center gap-xs">
+                                <h3 className="text-md font-bold text-text-secondary mb-md flex items-center gap-xs">
                                     <span className="material-icons-round text-[16px]">forum</span>
                                     국민토론 의견 ({sortedDiscussionOpinions.length})
                                 </h3>
@@ -417,7 +417,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
 <span className="material-icons-round text-[14px] text-primary">
                                                         description
                                                     </span>
-                                                <span className="text-xs font-bold text-primary line-clamp-1">
+                                                <span className="text-sm font-bold text-primary line-clamp-1">
                                                     {discussion.articleTitle ?? `기사 #${discussion.issueId}`}
                                                 </span>
                                             </div>
@@ -432,7 +432,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                                                         day: 'numeric',
                                                     })}
                                                 </span>
-                                                <span className="flex items-center gap-xs text-xs text-text-secondary">
+                                                <span className="flex items-center gap-sm text-sm text-text-secondary">
                                                     <span className="material-icons-round text-[14px] text-primary">thumb_up</span>
                                                     {discussion.likes ?? 0}
                                                 </span>
@@ -490,7 +490,7 @@ export const MyPostsTab: React.FC<MyPostsTabProps> = ({
                     {showHistories && sortedHistories.length > 0 && (
                         <div>
                             {activeCategory === '전체' && (
-                                <h3 className="text-sm font-bold text-text-secondary mb-md flex items-center gap-xs">
+                                <h3 className="text-md font-bold text-text-secondary mb-md flex items-center gap-xs">
                                     <span className="material-icons-round text-[16px]">smart_toy</span>
                                     AI 토론 기록 ({sortedHistories.length})
                                 </h3>
