@@ -11,6 +11,7 @@ export default defineConfig({
     allowedHosts: true,
   },
   server: {
+    allowedHosts: true,
     proxy: {
       // Kakao OAuth token exchange (bypasses CORS from browser)
       '/oauth/kakao/token': {
