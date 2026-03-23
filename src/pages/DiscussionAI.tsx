@@ -24,7 +24,7 @@ export const DiscussionAI: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState(false);
 
     // Custom history state
-    const [customHistories, setCustomHistories] = useState(getChatHistories().filter(h => h.type === 'ai_discussion'));
+    const [customHistories] = useState(getChatHistories().filter(h => h.type === 'ai_discussion'));
 
     const tabs = ['전체', ...CONTENT_CATEGORIES];
 

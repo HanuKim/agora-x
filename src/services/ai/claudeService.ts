@@ -85,7 +85,7 @@ export class ClaudeService {
 
         try {
             const controller = new AbortController();
-            const timeoutMs = 12_000;
+            const timeoutMs = 60_000;
             const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
 
             const body = {
