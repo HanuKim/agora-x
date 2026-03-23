@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingDots } from '../components/ui/LoadingDots';
 import { Card } from '../components/ui/Card';
@@ -20,7 +20,6 @@ export const Detail: React.FC = () => {
     const [isOpinionPanelOpen, setIsOpinionPanelOpen] = useState(false);
     const {
         numericId,
-        article,
         articleUrl,
         debateTopic,
         overview,

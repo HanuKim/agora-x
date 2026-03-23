@@ -197,6 +197,7 @@ export function recordStanceChange(articleId: number, opinionId: string): void {
     if (!store[key]) store[key] = { total: 0, byOpinion: {} };
     store[key].total += 1;
     store[key].byOpinion[opinionId] = (store[key].byOpinion[opinionId] ?? 0) + 1;
+    setStanceChangeStore(store);
 
     // Also update the opinion's influenceCount
     const opStore = getOpinionStore();
