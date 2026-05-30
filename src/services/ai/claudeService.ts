@@ -104,12 +104,15 @@ export class ClaudeService {
         }
 
         try {
+            const requestedTokens = request.maxTokens ?? 512;
             const model = this.genAI.getGenerativeModel({
                 model: this.modelName,
                 systemInstruction: request.systemPrompt,
                 safetySettings: SAFETY_SETTINGS,
                 generationConfig: {
-                    maxOutputTokens: request.maxTokens ?? 512,
+                    // gemini-2.5-flash는 thinking 토큰을 별도 소모하므로
+                    // 실제 응답 토큰이 잘리지 않도록 3배 여유를 둠
+                    maxOutputTokens: requestedTokens * 3,
                 },
             });
 
