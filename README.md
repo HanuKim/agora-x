@@ -92,9 +92,9 @@ graph TD
 - Claude 서비스를 위한 활성화된 Anthropic API Key.
 
 ### 2. 환경 변수 설정 (Environment Setup)
-프로젝트 루트 디렉토리에 `.env.local` 파일을 생성하고 Claude API 키를 추가하세요:
+프로젝트 루트 디렉토리에 `.env.local` 파일을 생성하고 API 키를 추가하세요:
 ```
-VITE_CLAUDE_API_KEY=your_api_key_here
+VITE_GEMINI_API_KEY=your_api_key_here
 ```
 
 ### 3. 패키지 설치 (Installation)
