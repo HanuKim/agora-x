@@ -1,12 +1,21 @@
 /**
- * Claude AI Service
+ * Gemini AI Service (formerly Claude AI Service)
  *
- * Handles all communication with the Claude API.
+ * Handles all communication with the Google Gemini API.
  * Centralized here to manage retry, error handling, and prompt engineering.
+ * Drop-in replacement for the previous Claude-based service — all exported
+ * types and the singleton `claudeService` are kept identical so that
+ * consumers do not need to change.
  *
- * v2: 지식 수준(KnowledgeLevel) 파라미터 지원 추가 — 응답 상세도 조절.
+ * v3: Migrated to Google Gemini (gemini-2.5-flash).
  */
 
+import {
+    GoogleGenerativeAI,
+    HarmBlockThreshold,
+    HarmCategory,
+    type Content,
+} from '@google/generative-ai';
 import type { KnowledgeLevel } from '../../features/user/types';
 
 export interface ClaudeMessageRequest {
@@ -66,64 +75,74 @@ const LEVEL_INSTRUCTIONS: Record<KnowledgeLevel, string> = {
     high: '전문가·정책 연구자 수준의 독자를 가정하고, 학술적·제도적 관점과 심층 분석을 포함하세요. 전문 용어를 적극 사용하세요.',
 };
 
-// ─── ClaudeService ─────────────────────────────────────────────────────────────
+// ─── Safety settings (lenient for debate content) ────────────────────────────
+
+const SAFETY_SETTINGS = [
+    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+];
+
+// ─── GeminiService ────────────────────────────────────────────────────────────
 
 export class ClaudeService {
-    private apiKey: string;
-    private readonly apiUrl = 'https://api.anthropic.com/v1/messages';
-    private readonly model = 'claude-haiku-4-5-20251001';
+    private readonly genAI: GoogleGenerativeAI;
+    private readonly modelName = 'gemini-2.5-flash';
 
     constructor(apiKey?: string) {
-        this.apiKey = apiKey ?? (import.meta.env.VITE_CLAUDE_API_KEY as string) ?? '';
+        const key = apiKey ?? (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        this.genAI = new GoogleGenerativeAI(key);
     }
 
+    /** Core method – converts Claude-style request to Gemini SDK call */
     async sendMessage(request: ClaudeMessageRequest): Promise<ClaudeMessageResponse> {
-        if (!this.apiKey) {
-            console.warn('ClaudeService: No API key provided.');
-            return { reply: '[API 키 없음] ClaudeService에 API 키가 설정되지 않았습니다.' };
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) {
+            console.warn('GeminiService: No API key provided.');
+            return { reply: '[API 키 없음] GeminiService에 API 키가 설정되지 않았습니다.' };
         }
 
         try {
-            const controller = new AbortController();
-            const timeoutMs = 60_000;
-            const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
-
-            const body = {
-                model: this.model,
-                max_tokens: request.maxTokens ?? 512,
-                system: request.systemPrompt,
-                messages: request.messages,
-            };
-
-            const response = await fetch(this.apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': this.apiKey,
-                    'anthropic-version': '2023-06-01',
-                    'anthropic-dangerous-direct-browser-access': 'true',
+            const model = this.genAI.getGenerativeModel({
+                model: this.modelName,
+                systemInstruction: request.systemPrompt,
+                safetySettings: SAFETY_SETTINGS,
+                generationConfig: {
+                    maxOutputTokens: request.maxTokens ?? 512,
                 },
-                body: JSON.stringify(body),
-                signal: controller.signal,
-            }).finally(() => window.clearTimeout(timeoutId));
+            });
 
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`Claude API error ${response.status}: ${errText}`);
+            // Convert messages array to Gemini history + last user turn
+            const history: Content[] = [];
+            const allMessages = request.messages;
+
+            // All messages except the last one go into history
+            for (let i = 0; i < allMessages.length - 1; i++) {
+                const msg = allMessages[i];
+                history.push({
+                    role: msg.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: msg.content }],
+                });
             }
 
-            const data = await response.json();
-            const reply: string = data?.content?.[0]?.text ?? '';
+            const lastMessage = allMessages[allMessages.length - 1];
+
+            const chat = model.startChat({ history });
+            const result = await chat.sendMessage(lastMessage.content);
+            const reply = result.response.text();
+
             return { reply };
         } catch (e) {
-            console.error('[ClaudeService] sendMessage failed:', e);
+            console.error('[GeminiService] sendMessage failed:', e);
             throw e;
         }
     }
 
+    // ─── Private helpers ────────────────────────────────────────────────────
+
     /**
      * 응답 텍스트에서 JSON 객체를 추출해 NewsAISummary 형식으로 반환.
-     * 코드 블록·앞뒤 설명이 있어도 첫 번째 { } 쌍을 찾아 파싱.
      */
     private parseNewsSummaryJson(
         reply: string,
@@ -167,13 +186,10 @@ export class ClaudeService {
         }
     }
 
+    // ─── Public domain methods (signatures unchanged) ───────────────────────
+
     /**
      * 뉴스 기사의 한 줄 개요와 토론 주제를 생성합니다.
-     * (지식 수준에 따라 표현 난이도 조절)
-     *
-     * @param topic   selectedNews.json의 `topic` 필드
-     * @param summary selectedNews.json의 `article_summary.summary` 필드
-     * @param knowledgeLevel 사용자 분야별 지식 수준 (기본값: 'medium')
      */
     async generateNewsAISummary(
         topic: string,
@@ -189,7 +205,8 @@ export class ClaudeService {
             conArgumentSummaries: [],
         };
 
-        if (!this.apiKey) return fallback;
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return fallback;
 
         const levelInstruction = LEVEL_INSTRUCTIONS[knowledgeLevel];
 
@@ -246,14 +263,13 @@ export class ClaudeService {
                         : fallback.conArgumentSummaries,
             };
         } catch (e) {
-            console.warn('[ClaudeService] generateNewsAISummary fallback. Error:', e);
+            console.warn('[GeminiService] generateNewsAISummary fallback. Error:', e);
             return fallback;
         }
     }
 
     /**
      * 특정 토론 이슈에 대해 50자 내외의 짧은 설명을 생성합니다.
-     * IssueCard에서 찬성 의견 대신 출력할 때 사용됩니다.
      */
     async generateIssueSummary(
         issueTopic: string,
@@ -261,7 +277,8 @@ export class ClaudeService {
     ): Promise<string> {
         const fallback = "이 이슈에 대한 의견이 팽팽하게 대립하고 있습니다.";
 
-        if (!this.apiKey) return fallback;
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return fallback;
 
         try {
             const userPrompt = `"${issueTopic}" (분야: ${issueCategory})에 대한 찬반 논쟁의 핵심을 50자 내외의 한 문장으로 매우 짧게 요약해 주세요. 추가 설명이나 인사말 없이 요약된 문장만 반환하세요.`;
@@ -274,20 +291,13 @@ export class ClaudeService {
 
             return reply.trim() || fallback;
         } catch (e) {
-            console.warn('[ClaudeService] generateIssueSummary fallback. Error:', e);
+            console.warn('[GeminiService] generateIssueSummary fallback. Error:', e);
             return fallback;
         }
     }
 
     /**
      * 한국 사회 토론 이슈에 대한 심화 AI 분석을 생성합니다.
-     * 배경 설명, 핵심 쟁점, 찬반 심화 논거를 지식 수준에 맞게 제공합니다.
-     *
-     * @param issueTopic  koreanSocialIssues.json의 `topic` 필드
-     * @param issueCategory koreanSocialIssues.json의 `category` 필드
-     * @param pro  기존 찬성 논거 배열 (심화 설명의 기반)
-     * @param con  기존 반대 논거 배열 (심화 설명의 기반)
-     * @param knowledgeLevel 사용자 분야별 지식 수준
      */
     async generateIssueAIAnalysis(
         issueTopic: string,
@@ -303,7 +313,8 @@ export class ClaudeService {
             conArguments: con,
         };
 
-        if (!this.apiKey) return fallback;
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return fallback;
 
         const levelInstruction = LEVEL_INSTRUCTIONS[knowledgeLevel];
 
@@ -352,7 +363,7 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
                         : fallback.conArguments,
             };
         } catch (e) {
-            console.warn('[ClaudeService] generateIssueAIAnalysis fallback. Error:', e);
+            console.warn('[GeminiService] generateIssueAIAnalysis fallback. Error:', e);
             return fallback;
         }
     }
@@ -365,7 +376,8 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
         chatHistory: { role: 'user' | 'assistant', content: string }[],
         knowledgeLevel: KnowledgeLevel = 'medium'
     ): Promise<string> {
-        if (!this.apiKey) return "AI 오류: 응답을 생성할 수 없습니다.";
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return "AI 오류: 응답을 생성할 수 없습니다.";
 
         const levelInstruction = LEVEL_INSTRUCTIONS[knowledgeLevel];
 
@@ -384,7 +396,7 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
 
             return reply.trim();
         } catch (e) {
-            console.error('[ClaudeService] generateChatReply failed:', e);
+            console.error('[GeminiService] generateChatReply failed:', e);
             return "죄송합니다. 서버 통신 중 오류가 발생하여 답변할 수 없습니다.";
         }
     }
@@ -398,7 +410,8 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
     ): Promise<UserArgumentAnalysis> {
         const fallback: UserArgumentAnalysis = { clarity: 0, relevance: 0, logicValid: 0, feedback: "분석 불가" };
 
-        if (!this.apiKey) return fallback;
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return fallback;
 
         try {
             const userPrompt = `토론 주제: "${issueTopic}"
@@ -434,17 +447,18 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
                 feedback: parsed.feedback || "의견에 대한 분석을 완료했습니다.",
             };
         } catch (e) {
-            console.error('[ClaudeService] analyzeUserArgument failed:', e);
+            console.error('[GeminiService] analyzeUserArgument failed:', e);
             return fallback;
         }
     }
 
     /**
-     * 사용자의 발언에 대한 AI 반론 또는 토론 응답을 생성합니다.
+     * 사용자의 발언에 대한 유해성 검증을 수행합니다.
      */
     async validateOpinion(content: string): Promise<OpinionValidation> {
         const fallback: OpinionValidation = { isValid: true };
-        if (!this.apiKey) return fallback;
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return fallback;
 
         try {
             const systemPrompt = `당신은 공공 토론 플랫폼의 중재자 AI입니다. 
@@ -472,7 +486,7 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
                 reason: parsed.reason,
             };
         } catch (e) {
-            console.error('[ClaudeService] validateOpinion failed:', e);
+            console.error('[GeminiService] validateOpinion failed:', e);
             return fallback;
         }
     }
@@ -497,7 +511,8 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
             keyPoints: [prompt],
         };
 
-        if (!this.apiKey) return fallback;
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return fallback;
 
         try {
             const { reply } = await this.sendMessage({
@@ -533,7 +548,7 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
                 keyPoints: Array.isArray(parsed.keyPoints) ? parsed.keyPoints : fallback.keyPoints,
             };
         } catch (e) {
-            console.warn('[ClaudeService] generateCustomIssueSummary fallback:', e);
+            console.warn('[GeminiService] generateCustomIssueSummary fallback:', e);
             return fallback;
         }
     }
@@ -547,7 +562,8 @@ ${con.map((c, i) => `${i + 1}. ${c}`).join('\n')}
         helpType: 'organize' | 'argument' | 'counter' | 'free',
         freeInput?: string
     ): Promise<string> {
-        if (!this.apiKey) return 'AI 도움 기능을 사용할 수 없습니다. API 키를 확인해주세요.';
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return 'AI 도움 기능을 사용할 수 없습니다. API 키를 확인해주세요.';
 
         const helpInstructions: Record<string, string> = {
             organize: '사용자가 지금까지 한 발언들을 정리하여 핵심 주장을 명확하게 요약해주세요. 구조화된 형태로 제시하세요.',
@@ -577,7 +593,7 @@ ${recentContext}
 
             return reply.trim();
         } catch (e) {
-            console.error('[ClaudeService] generateDebateHelp failed:', e);
+            console.error('[GeminiService] generateDebateHelp failed:', e);
             return '도움을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.';
         }
     }
@@ -589,7 +605,8 @@ ${recentContext}
         userMessage: string,
         chatHistory: { role: 'user' | 'assistant'; content: string }[]
     ): Promise<string> {
-        if (!this.apiKey) return 'AI 어시스턴트를 사용할 수 없습니다.';
+        const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+        if (!apiKey) return 'AI 어시스턴트를 사용할 수 없습니다.';
 
         try {
             const { reply } = await this.sendMessage({
@@ -613,7 +630,7 @@ ${recentContext}
 
             return reply.trim();
         } catch (e) {
-            console.error('[ClaudeService] siteAssistantChat failed:', e);
+            console.error('[GeminiService] siteAssistantChat failed:', e);
             return '죄송합니다. 일시적인 오류가 발생했습니다.';
         }
     }
